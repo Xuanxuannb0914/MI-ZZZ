@@ -9,7 +9,7 @@ import { PageTransition } from '../../shared/ui/page-transition';
 import { SearchBar } from '../../shared/ui/search-bar';
 import { Tag } from '../../shared/ui/tag';
 
-const filters = ['全部', '角色', '攻略', '活动', '资讯', '驱动盘', '音擎', '版本'] as const;
+const filters = ['全部', '角色', '攻略', '活动', '资讯', '驱动盘', '音擎', '材料', '版本'] as const;
 type SearchFilter = (typeof filters)[number];
 
 export default function SearchPage() {

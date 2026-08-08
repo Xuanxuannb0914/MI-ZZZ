@@ -1,9 +1,18 @@
 import { agents } from '../mock/agents';
+import { dailySchedules, todaysMaterials } from '../mock/daily';
 import { events } from '../mock/events';
 import { guides } from '../mock/guides';
 import { news } from '../mock/news';
 
-export type SearchResultKind = '角色' | '攻略' | '活动' | '资讯' | '驱动盘' | '音擎' | '版本';
+export type SearchResultKind =
+  | '角色'
+  | '攻略'
+  | '活动'
+  | '资讯'
+  | '驱动盘'
+  | '音擎'
+  | '材料'
+  | '版本';
 
 export interface SearchResult {
   readonly id: string;
@@ -19,7 +28,7 @@ const agentResults: readonly SearchResult[] = agents.map((agent) => ({
   title: agent.name,
   description: `${agent.attribute}属性 · ${agent.specialty} · ${agent.faction}`,
   kind: '角色',
-  to: `/agent/${agent.id}`,
+  to: `/zzz/agents/${agent.id}`,
   keywords: `${agent.name} ${agent.attribute} ${agent.specialty} ${agent.faction}`,
 }));
 
@@ -28,7 +37,7 @@ const guideResults: readonly SearchResult[] = guides.map((guide) => ({
   title: guide.title,
   description: guide.summary,
   kind: '攻略',
-  to: `/guide/${guide.id}`,
+  to: `/zzz/guides/${guide.id}`,
   keywords: `${guide.title} ${guide.summary} ${guide.category} ${guide.tags.join(' ')}`,
 }));
 
@@ -37,7 +46,7 @@ const eventResults: readonly SearchResult[] = events.map((event) => ({
   title: event.title,
   description: `${event.type ?? '活动'} · ${event.duration}`,
   kind: '活动',
-  to: '/events',
+  to: '/zzz/events',
   keywords: `${event.title} ${event.type ?? ''} ${event.reward}`,
 }));
 
@@ -57,7 +66,7 @@ const driveDiscResults: readonly SearchResult[] = Array.from(
   title,
   description: '角色推荐驱动盘配置',
   kind: '驱动盘',
-  to: '/guides?category=资源',
+  to: '/zzz/guides?category=资源',
   keywords: `${title} 驱动盘 套装 词条`,
 }));
 
@@ -68,8 +77,19 @@ const weaponResults: readonly SearchResult[] = Array.from(
   title,
   description: '角色推荐音擎',
   kind: '音擎',
-  to: '/guides?category=角色养成',
+  to: '/zzz/guides?category=角色养成',
   keywords: `${title} 音擎 武器`,
+}));
+
+const materialResults: readonly SearchResult[] = Array.from(
+  new Set([...todaysMaterials, ...dailySchedules.flatMap((schedule) => schedule.materials)]),
+).map((title, index) => ({
+  id: `material-${index}`,
+  title,
+  description: '每日养成材料与体力规划',
+  kind: '材料',
+  to: '/zzz/planner',
+  keywords: `${title} 材料 养成 体力 每日 周常`,
 }));
 
 export const searchIndex: readonly SearchResult[] = [
@@ -79,6 +99,7 @@ export const searchIndex: readonly SearchResult[] = [
   ...newsResults,
   ...driveDiscResults,
   ...weaponResults,
+  ...materialResults,
 ];
 
 export function searchLocal(keyword: string, limit?: number): readonly SearchResult[] {

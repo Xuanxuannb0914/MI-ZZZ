@@ -7,6 +7,7 @@ import {
   Home,
   PanelLeftClose,
   PanelLeftOpen,
+  Search,
   Settings,
   UserRound,
   UsersRound,
@@ -30,6 +31,7 @@ const navigationEntries: readonly NavigationEntry[] = [
   { label: '活动', to: '/zzz/events', icon: Compass },
   { label: '养成', to: '/zzz/planner', icon: CalendarDays },
   { label: '收藏', to: '/zzz/favorites', icon: Heart },
+  { label: '搜索', to: '/zzz/search', icon: Search, end: true },
 ];
 
 export function Sidebar() {
