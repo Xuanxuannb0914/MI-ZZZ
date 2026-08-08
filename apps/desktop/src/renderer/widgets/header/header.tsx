@@ -52,7 +52,7 @@ export function Header() {
   };
 
   const openSearch = () => {
-    navigate(`/search?q=${encodeURIComponent(searchKeyword)}`);
+    navigate(`/zzz/search?q=${encodeURIComponent(searchKeyword)}`);
   };
 
   return (

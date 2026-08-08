@@ -8,6 +8,7 @@ export const motionDurations = {
   normal: themeMotion.durationSeconds.normal,
   slow: themeMotion.durationSeconds.slow,
   route: themeMotion.durationSeconds.route,
+  cinematic: themeMotion.durationSeconds.cinematic,
   ambient: themeMotion.durationSeconds.ambient,
 } as const;
 

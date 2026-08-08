@@ -1,7 +1,9 @@
 import { ArrowUpRight, Info } from '@game-guide-hub/icons';
+import { motion as themeMotion } from '@game-guide-hub/theme';
 import { motion } from 'framer-motion';
 import type { GameDefinition } from '../../../shared/mock/games';
 import { games } from '../../../shared/mock/games';
+import { BackgroundScene } from '../../../shared/scene/background-scene';
 import { GameCard } from './game-card';
 
 interface GameHubProps {
@@ -19,9 +21,10 @@ export function GameHub({ isExiting, onGameSelect }: GameHubProps) {
           ? { opacity: 0, scale: 0.96, filter: 'blur(16px)' }
           : { opacity: 1, scale: 1, filter: 'blur(0px)' }
       }
-      transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: themeMotion.durationSeconds.cinematic, ease: [0.16, 1, 0.3, 1] }}
       aria-label="Asteris 游戏中心"
     >
+      <BackgroundScene className="platform-background-canvas" />
       <div className="platform-landing-shell">
         <header className="platform-landing-header">
           <div className="platform-logo">

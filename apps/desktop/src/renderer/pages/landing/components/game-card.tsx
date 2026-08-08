@@ -1,4 +1,5 @@
 import { ArrowUpRight, ShieldCheck } from '@game-guide-hub/icons';
+import { motion as themeMotion } from '@game-guide-hub/theme';
 import { motion } from 'framer-motion';
 import type { GameDefinition } from '../../../shared/mock/games';
 
@@ -20,7 +21,7 @@ export function GameCard({ game, onSelect }: GameCardProps) {
       }}
       whileHover={{ y: -6, scale: 1.015 }}
       whileTap={isAvailable ? { scale: 0.975 } : {}}
-      transition={{ duration: 0.22, ease: 'easeOut' }}
+      transition={{ duration: themeMotion.durationSeconds.normal, ease: 'easeOut' }}
     >
       <img src={game.cover} alt="" width="960" height="540" loading="lazy" />
       <span className="platform-game-card-scrim" aria-hidden="true" />

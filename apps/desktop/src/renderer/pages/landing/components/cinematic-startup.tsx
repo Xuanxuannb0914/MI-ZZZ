@@ -1,6 +1,14 @@
+import { motion as themeMotion } from '@game-guide-hub/theme';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import {
+  lazy,
+  type PointerEvent as ReactPointerEvent,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useStartupAudio } from '../../../hooks/use-startup-audio';
 
 const StartupScene = lazy(async () => {
@@ -57,6 +65,16 @@ export function CinematicStartup({ isExiting, onEnterHub }: CinematicStartupProp
     onEnterHub();
   };
 
+  const handlePointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    const root = rootRef.current;
+    if (!root) return;
+    const bounds = root.getBoundingClientRect();
+    const pointerX = ((event.clientX - bounds.left) / Math.max(bounds.width, 1)) * 100;
+    const pointerY = ((event.clientY - bounds.top) / Math.max(bounds.height, 1)) * 100;
+    root.style.setProperty('--startup-pointer-x', `${pointerX}%`);
+    root.style.setProperty('--startup-pointer-y', `${pointerY}%`);
+  };
+
   return (
     <motion.main
       ref={rootRef}
@@ -66,8 +84,9 @@ export function CinematicStartup({ isExiting, onEnterHub }: CinematicStartupProp
           ? { opacity: 0, scale: 1.08, filter: 'blur(18px)' }
           : { opacity: 1, scale: 1, filter: 'blur(0px)' }
       }
-      transition={{ duration: 0.68, ease: [0.76, 0, 0.24, 1] }}
+      transition={{ duration: themeMotion.durationSeconds.cinematic, ease: [0.76, 0, 0.24, 1] }}
       onClick={handleEnter}
+      onPointerMove={handlePointerMove}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') handleEnter();
       }}
@@ -75,39 +94,40 @@ export function CinematicStartup({ isExiting, onEnterHub }: CinematicStartupProp
       aria-label="Asteris 启动画面，点击任意位置进入游戏中心"
     >
       <Suspense fallback={null}>
-        <StartupScene />
+        <StartupScene isTransitioning={isExiting} />
       </Suspense>
       <div className="cinematic-vignette" aria-hidden="true" />
-      <div className="cinematic-content">
+      <div className="cinematic-content cinematic-glass-panel">
+        <div className="cinematic-panel-reflection" aria-hidden="true" />
         <motion.div
           className="cinematic-logo-mark"
           animate={isExiting ? { scale: 2.8, opacity: 0 } : { scale: 1, opacity: 1 }}
-          transition={{ duration: 0.68, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: themeMotion.durationSeconds.cinematic, ease: [0.76, 0, 0.24, 1] }}
         >
           A
         </motion.div>
-        <p className="cinematic-kicker">系统启动 / 动漫游戏智能平台</p>
+        <p className="cinematic-kicker">ANIME GAME HUB / 001</p>
         <h1 className="cinematic-title">Asteris</h1>
-        <p className="cinematic-subtitle">连接每一个世界，保持你的冒险清晰。</p>
-        <p className="cinematic-meta">本地工作区 · 数据已同步</p>
+        <p className="cinematic-subtitle">二次元游戏 · 攻略 · 数据 · 工具</p>
+        <p className="cinematic-meta">智能档案正在连接</p>
       </div>
       <motion.button
         type="button"
         className="cinematic-enter"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: isReady && !isExiting ? 1 : 0.12, y: isReady ? 0 : 8 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: themeMotion.durationSeconds.slow }}
         onClick={(event) => {
           event.stopPropagation();
           handleEnter();
         }}
       >
         <span className="cinematic-enter-line" aria-hidden="true" />
-        <span>{isReady ? '点击任意位置进入' : '正在建立连接...'}</span>
+        <span>{isReady ? '点击进入' : '正在建立连接...'}</span>
         <span className="cinematic-enter-line" aria-hidden="true" />
       </motion.button>
-      <span className="cinematic-corner cinematic-corner-top">ASTERIS / 001</span>
-      <span className="cinematic-corner cinematic-corner-bottom">本地桌面 · 2026</span>
+      <span className="cinematic-corner cinematic-corner-top">PLATFORM / ONLINE</span>
+      <span className="cinematic-corner cinematic-corner-bottom">LOCAL DESKTOP · 2026</span>
     </motion.main>
   );
 }

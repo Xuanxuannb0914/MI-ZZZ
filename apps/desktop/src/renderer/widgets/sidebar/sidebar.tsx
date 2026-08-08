@@ -3,16 +3,11 @@ import {
   BookOpen,
   CalendarDays,
   Compass,
-  Disc3,
   Heart,
   Home,
-  Newspaper,
   PanelLeftClose,
   PanelLeftOpen,
-  Radio,
   Settings,
-  Sparkles,
-  Swords,
   UserRound,
   UsersRound,
 } from '@game-guide-hub/icons';
@@ -30,16 +25,11 @@ interface NavigationEntry {
 
 const navigationEntries: readonly NavigationEntry[] = [
   { label: '首页', to: '/zzz', icon: Home, end: true },
-  { label: '角色', to: '/agents', icon: UsersRound },
-  { label: '攻略', to: '/guides', icon: BookOpen },
-  { label: '活动', to: '/events', icon: Compass },
-  { label: '资讯', to: '/news', icon: Newspaper },
-  { label: '每日养成', to: '/daily', icon: CalendarDays },
-  { label: '配队', to: '/agents', icon: Swords },
-  { label: '驱动盘', to: '/guides', icon: Disc3 },
-  { label: '音擎', to: '/guides', icon: Radio },
-  { label: '收藏', to: '/favorites', icon: Heart },
-  { label: 'AI 助手', to: '/zzz', icon: Sparkles, comingSoon: true },
+  { label: '攻略', to: '/zzz/guides', icon: BookOpen },
+  { label: '角色', to: '/zzz/agents', icon: UsersRound },
+  { label: '活动', to: '/zzz/events', icon: Compass },
+  { label: '养成', to: '/zzz/planner', icon: CalendarDays },
+  { label: '收藏', to: '/zzz/favorites', icon: Heart },
 ];
 
 export function Sidebar() {

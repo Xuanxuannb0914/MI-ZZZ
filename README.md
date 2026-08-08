@@ -29,9 +29,10 @@ Hub 是一个内容优先、键盘友好、可扩展的桌面工作台。它借�
 | [FRONTEND.md](./FRONTEND.md)                     | Electron/React 客户端如何组织、通信和保障体验？    |
 | [BACKEND.md](./BACKEND.md)                       | NestJS 服务、任务与实时能力如何设计？              |
 | [UI_SYSTEM.md](./UI_SYSTEM.md)                   | 视觉 Token、组件、动效和无障碍规则是什么？         |
-| [docs/design-system.md](./docs/design-system.md) | Alpha 工作区的设计令牌与玻璃材质如何使用？         |
-| [docs/ui-components.md](./docs/ui-components.md) | 共享组件的状态与可访问性契约是什么？               |
-| [docs/widget-guide.md](./docs/widget-guide.md)   | 首页 Widget 如何扩展为可重排模块？                 |
+| [docs/architecture.md](./docs/architecture.md)   | 客户端路由、布局和场景生命周期如何组织？           |
+| [docs/design-system.md](./docs/design-system.md) | 设计令牌与玻璃材质如何使用？                       |
+| [docs/ui-guidelines.md](./docs/ui-guidelines.md) | 信息层级、视觉与动效规则是什么？                   |
+| [docs/development.md](./docs/development.md)     | 如何运行、验证和扩展当前客户端？                   |
 | [DATABASE.md](./DATABASE.md)                     | 数据所有权、迁移、索引、备份和一致性如何治理？     |
 | [API_GUIDELINE.md](./API_GUIDELINE.md)           | REST、WebSocket、错误、分页和兼容性契约是什么？    |
 | [CODING_RULE.md](./CODING_RULE.md)               | 代码边界、类型安全、工具职责和安全规则是什么？     |
@@ -50,11 +51,10 @@ Hub 是一个内容优先、键盘友好、可扩展的桌面工作台。它借�
 
 根级命令统一为
 `pnpm install`、`pnpm dev`、`pnpm build`、`pnpm test`、`pnpm lint`、`pnpm typecheck`、`pnpm e2e` 和
-`pnpm clean`。安装、调试、贡献和故障处理见
-[docs/development-guide.md](./docs/development-guide.md)。
+`pnpm clean`。安装、调试、贡献和故障处理见 [docs/development.md](./docs/development.md)。
 
-本地 Web 预览默认地址为 `http://127.0.0.1:5173/#/`；完成启动体验后进入
-`#/zzz`。桌面端通过同一 Renderer 架构运行，Three.js 仅用于启动与背景场景。
+本地 Web 预览默认地址为 `http://127.0.0.1:5173/#/startup`；启动流程为
+`#/startup → #/games → #/zzz`。桌面端通过同一 Renderer 架构运行，Three.js 仅用于启动场景。
 
 ## 贡献
 

@@ -85,10 +85,11 @@
   --ggh-glow-secondary: 0 0 2.5rem rgb(139 92 246 / 22%);
   --ggh-glow-accent: 0 0 2.5rem rgb(163 255 18 / 20%);
   --ggh-shadow-widget: var(--ggh-shadow-2);
-  --ggh-motion-fast: 160ms;
-  --ggh-motion-normal: 220ms;
-  --ggh-motion-slow: 320ms;
-  --ggh-motion-route: 360ms;
+  --ggh-motion-fast: 150ms;
+  --ggh-motion-normal: 250ms;
+  --ggh-motion-slow: 400ms;
+  --ggh-motion-route: 400ms;
+  --ggh-motion-cinematic: 900ms;
   --ggh-motion-loading: 1800ms;
   --ggh-motion-distance-pressed: 1px;
   --ggh-motion-distance-hover: 2px;

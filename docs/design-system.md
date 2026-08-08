@@ -6,6 +6,10 @@ Asteris is a desktop-first anime game intelligence client. All workspaces share 
 grammar: deep-blue atmosphere, restrained neon accents, frosted glass surfaces, Lucide icons, and
 motion that communicates hierarchy.
 
+The permanent UI foundation uses three card levels (`Basic`, `Elevated`, `Featured`) and four motion
+tiers (`Fast` 150ms, `Normal` 250ms, `Slow` 400ms, `Cinematic` 900ms). Glass is reserved for
+navigation, focused widgets, dialogs, and showcase cards.
+
 ## Tokens
 
 The source of truth is `packages/theme/src/tokens` and `packages/theme/src/styles.css`. Components

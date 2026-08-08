@@ -1,3 +1,4 @@
+import { motion as themeMotion } from '@game-guide-hub/theme';
 import { motion } from 'framer-motion';
 
 interface TransitionLayerProps {
@@ -14,7 +15,7 @@ export function TransitionLayer({ isActive }: TransitionLayerProps) {
           ? { opacity: 1, scale: 1.04, filter: 'blur(14px)' }
           : { opacity: 0, scale: 1, filter: 'blur(0px)' }
       }
-      transition={{ duration: 0.62, ease: [0.76, 0, 0.24, 1] }}
+      transition={{ duration: themeMotion.durationSeconds.cinematic, ease: [0.76, 0, 0.24, 1] }}
       aria-hidden="true"
     />
   );

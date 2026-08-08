@@ -1,4 +1,4 @@
-import { Float, PerspectiveCamera, Sparkles } from '@react-three/drei';
+import { PerspectiveCamera } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, Noise } from '@react-three/postprocessing';
 import { memo, useEffect, useMemo, useRef } from 'react';
@@ -109,7 +109,11 @@ function SceneLifecycle() {
   return null;
 }
 
-function LandingWorld() {
+interface LandingWorldProps {
+  readonly isTransitioning: boolean;
+}
+
+function LandingWorld({ isTransitioning }: LandingWorldProps) {
   const primaryColor = useMemo(() => new THREE.Color(scenePalette.primary), []);
   const accentColor = useMemo(() => new THREE.Color(scenePalette.accent), []);
   const particleMaterial = useMemo(
@@ -145,47 +149,42 @@ function LandingWorld() {
   const particleMaterialRef = useRef(particleMaterial);
   const energyMaterialRef = useRef(energyMaterial);
 
-  useFrame(({ clock, camera }) => {
+  useFrame(({ clock, camera, pointer }) => {
     const time = clock.getElapsedTime();
     const particleTime = particleMaterialRef.current.uniforms.uTime;
     const energyTime = energyMaterialRef.current.uniforms.uTime;
     if (particleTime) particleTime.value = time;
     if (energyTime) energyTime.value = time;
-    const push = Math.min(time / 7.2, 1);
-    camera.position.z = THREE.MathUtils.lerp(8.2, 6.4, push);
-    camera.lookAt(0, 0, -1.8);
+    const startupPush = Math.min(time / 7.2, 1);
+    const transitionPush = isTransitioning ? 1 : 0;
+    const depth = THREE.MathUtils.lerp(8.2, 6.5, startupPush);
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, pointer.x * 0.18, 0.035);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, pointer.y * 0.12, 0.035);
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, depth - transitionPush * 3.2, 0.06);
+    camera.lookAt(pointer.x * 0.08, pointer.y * 0.05, -1.8);
   });
 
   return (
     <>
       <PerspectiveCamera makeDefault position={[0, 0, 8.2]} fov={42} />
       <ambientLight intensity={0.2} />
-      <points frustumCulled={false}>
+      <points frustumCulled={false} scale={isTransitioning ? 1.5 : 1}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[particlePositions, 3]} />
         </bufferGeometry>
         <primitive object={particleMaterial} attach="material" />
       </points>
-      <mesh position={[0, 0.2, -2.5]}>
+      <mesh position={[0, 0.2, -2.5]} scale={isTransitioning ? 1.24 : 1}>
         <planeGeometry args={[13, 7, 1, 1]} />
         <primitive object={energyMaterial} attach="material" />
       </mesh>
-      <Float speed={0.45} rotationIntensity={0.08} floatIntensity={0.18}>
-        <mesh position={[0, 0, -1.4]}>
-          <icosahedronGeometry args={[1.7, 2]} />
-          <meshBasicMaterial color={scenePalette.primary} transparent opacity={0.025} wireframe />
-        </mesh>
-      </Float>
-      <Sparkles
-        count={90}
-        scale={[11, 6, 8]}
-        size={1.6}
-        speed={0.18}
-        color={scenePalette.accent}
-        opacity={0.28}
-      />
       <EffectComposer multisampling={0}>
-        <Bloom intensity={0.82} luminanceThreshold={0.55} luminanceSmoothing={0.28} mipmapBlur />
+        <Bloom
+          intensity={isTransitioning ? 1.5 : 0.64}
+          luminanceThreshold={0.55}
+          luminanceSmoothing={0.28}
+          mipmapBlur
+        />
         <Noise premultiply opacity={0.08} />
         <ChromaticAberration
           offset={new THREE.Vector2(0.0007, 0.0007)}
@@ -198,7 +197,11 @@ function LandingWorld() {
   );
 }
 
-export const LandingScene = memo(function LandingScene() {
+interface LandingSceneProps {
+  readonly isTransitioning: boolean;
+}
+
+export const LandingScene = memo(function LandingScene({ isTransitioning }: LandingSceneProps) {
   return (
     <Canvas
       className="startup-scene-canvas"
@@ -207,7 +210,7 @@ export const LandingScene = memo(function LandingScene() {
       camera={{ position: [0, 0, 8.2], fov: 42 }}
       onCreated={({ gl }) => gl.setClearColor(scenePalette.canvas, 0)}
     >
-      <LandingWorld />
+      <LandingWorld isTransitioning={isTransitioning} />
     </Canvas>
   );
 });

@@ -2,26 +2,26 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useStartup } from '../hooks/use-startup';
 import { LandingLayout } from './layouts/landing-layout';
 import { MainLayout } from './layouts/main-layout';
-import { AppRoutes } from './router/routes';
+import { StartupRoutes, WorkspaceRoutes } from './router/routes';
 
 export function App() {
   const location = useLocation();
   const { applicationReady } = useStartup();
-  const isLandingRoute = location.pathname === '/';
+  const isStartupRoute = ['/', '/startup', '/games'].includes(location.pathname);
 
   if (!applicationReady) {
-    return isLandingRoute ? (
+    return isStartupRoute ? (
       <LandingLayout>
-        <AppRoutes includeLanding />
+        <StartupRoutes />
       </LandingLayout>
     ) : (
-      <Navigate replace to="/" />
+      <Navigate replace to="/startup" />
     );
   }
 
   return (
     <MainLayout>
-      <AppRoutes />
+      <WorkspaceRoutes />
     </MainLayout>
   );
 }

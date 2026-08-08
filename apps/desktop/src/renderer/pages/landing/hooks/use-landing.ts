@@ -1,3 +1,4 @@
+import { motion as themeMotion } from '@game-guide-hub/theme';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStartupAudio } from '../../../hooks/use-startup-audio';
 
@@ -12,7 +13,10 @@ export function useLanding(onComplete: () => void) {
     hasStartedRef.current = true;
     playClickSound();
     setIsEntering(true);
-    timeoutRef.current = window.setTimeout(onComplete, 620);
+    timeoutRef.current = window.setTimeout(
+      onComplete,
+      themeMotion.durationSeconds.cinematic * 1000,
+    );
   }, [onComplete, playClickSound]);
 
   useEffect(() => {
