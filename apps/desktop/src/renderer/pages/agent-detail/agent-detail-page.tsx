@@ -25,8 +25,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app-store';
-import { agents, findAgentById } from '../../shared/mock/agents';
-import { guides } from '../../shared/mock/guides';
+import { agents, findAgentById, guides } from '../../shared/content';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
 import { Tag } from '../../shared/ui/tag';
@@ -67,7 +66,7 @@ export default function AgentDetailPage() {
   useEffect(() => {
     if (agent) recordAgentVisit(agent.id);
   }, [agent, recordAgentVisit]);
-  if (!agent) return <Navigate replace to="/agents" />;
+  if (!agent) return <Navigate replace to="/zzz/agents" />;
 
   const teamAgents = agent.recommendedTeam
     .map((name) => agents.find((candidate) => candidate.name === name))
@@ -111,7 +110,7 @@ export default function AgentDetailPage() {
             />
             <div className="relative z-base max-w-2xl">
               <Link
-                to="/agents"
+                to="/zzz/agents"
                 className="mb-section inline-flex items-center gap-compact text-label text-text-secondary hover:text-text-primary"
               >
                 <ChevronLeft aria-hidden="true" size={17} />
@@ -229,7 +228,7 @@ export default function AgentDetailPage() {
                 {relatedGuides.map((guide) => (
                   <Link
                     key={guide.id}
-                    to={`/guide/${guide.id}`}
+                    to={`/zzz/guides/${guide.id}`}
                     className="rounded-lg border border-border-subtle bg-surface-1 p-content hover:bg-surface-2"
                   >
                     <strong className="block text-label text-text-primary">{guide.title}</strong>

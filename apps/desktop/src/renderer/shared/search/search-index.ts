@@ -1,8 +1,12 @@
-import { agents } from '../mock/agents';
-import { dailySchedules, todaysMaterials } from '../mock/daily';
-import { events } from '../mock/events';
-import { guides } from '../mock/guides';
-import { news } from '../mock/news';
+import {
+  agents,
+  dailySchedules,
+  events,
+  guides,
+  materials,
+  news,
+  todaysMaterials,
+} from '../content';
 
 export type SearchResultKind =
   | '角色'
@@ -81,12 +85,21 @@ const weaponResults: readonly SearchResult[] = Array.from(
   keywords: `${title} 音擎 武器`,
 }));
 
-const materialResults: readonly SearchResult[] = Array.from(
+const materialResults: readonly SearchResult[] = materials.map((material) => ({
+  id: `material-${material.id}`,
+  title: material.name,
+  description: `${material.category} · ${material.purpose}`,
+  kind: '材料',
+  to: `/zzz/materials/${material.id}`,
+  keywords: `${material.name} ${material.category} ${material.purpose} ${material.source.join(' ')} 材料 养成 体力 每日 周常`,
+}));
+
+const scheduleMaterialResults: readonly SearchResult[] = Array.from(
   new Set([...todaysMaterials, ...dailySchedules.flatMap((schedule) => schedule.materials)]),
 ).map((title, index) => ({
-  id: `material-${index}`,
+  id: `schedule-material-${index}`,
   title,
-  description: '每日养成材料与体力规划',
+  description: '今日养成材料与体力规划',
   kind: '材料',
   to: '/zzz/planner',
   keywords: `${title} 材料 养成 体力 每日 周常`,
@@ -100,6 +113,7 @@ export const searchIndex: readonly SearchResult[] = [
   ...driveDiscResults,
   ...weaponResults,
   ...materialResults,
+  ...scheduleMaterialResults,
 ];
 
 export function searchLocal(keyword: string, limit?: number): readonly SearchResult[] {

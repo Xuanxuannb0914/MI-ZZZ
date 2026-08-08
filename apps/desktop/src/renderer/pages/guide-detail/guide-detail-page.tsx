@@ -14,7 +14,7 @@ import { Banner, Button, Card, ScrollArea } from '@game-guide-hub/ui';
 import { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app-store';
-import { findGuideById, guides } from '../../shared/mock/guides';
+import { findGuideById, guides } from '../../shared/content';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
 import { Tag } from '../../shared/ui/tag';
@@ -27,7 +27,7 @@ export default function GuideDetailPage() {
   const toggleFavoriteGuide = useAppStore((state) => state.toggleFavoriteGuide);
   const recordGuideVisit = useAppStore((state) => state.recordGuideVisit);
 
-  if (!guide) return <Navigate replace to="/guides" />;
+  if (!guide) return <Navigate replace to="/zzz/guides" />;
 
   const isFavorite = favoriteGuideIds.includes(guide.id);
   const relatedGuides = guides
@@ -49,7 +49,7 @@ export default function GuideDetailPage() {
     <PageTransition>
       <Page className="page-surface page-guide-detail max-w-app">
         <Link
-          to="/guides"
+          to="/zzz/guides"
           className="inline-flex min-h-control items-center gap-compact text-label text-text-secondary hover:text-text-primary"
         >
           <ChevronLeft aria-hidden="true" size={17} />
@@ -182,7 +182,7 @@ export default function GuideDetailPage() {
                 {relatedGuides.map((related) => (
                   <Link
                     key={related.id}
-                    to={`/guide/${related.id}`}
+                    to={`/zzz/guides/${related.id}`}
                     className="group flex items-start gap-control rounded-md border border-border-subtle p-content hover:bg-surface-2"
                   >
                     <span className="mt-compact text-content-electric">↗</span>

@@ -1,8 +1,8 @@
 import { ArrowUpRight, UsersRound } from '@game-guide-hub/icons';
+import { Widget as WidgetShell } from '@game-guide-hub/ui';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { agents } from '../../../shared/mock/agents';
-import { WidgetShell } from './widget-shell';
+import { agents } from '../../../shared/content';
 
 const recommendations = ['miyabi', 'tsukishiro-yanagi', 'ellen-joe', 'caesar-king']
   .map((id) => agents.find((agent) => agent.id === id))
@@ -23,14 +23,14 @@ export const CharacterRecommendationsWidget = memo(function CharacterRecommendat
       icon={UsersRound}
       className="workspace-widget-characters"
       action={
-        <Link to="/agents" className="workspace-text-link">
+        <Link to="/zzz/agents" className="workspace-text-link">
           全部角色 <ArrowUpRight aria-hidden="true" size={14} />
         </Link>
       }
     >
       <div className="workspace-character-grid">
         {recommendations.map((agent) => (
-          <Link to={`/agent/${agent.id}`} key={agent.id} className="workspace-character-card">
+          <Link to={`/zzz/agents/${agent.id}`} key={agent.id} className="workspace-character-card">
             <img src={agent.avatar} alt="" width="128" height="128" loading="lazy" />
             <span className="workspace-character-copy">
               <small>

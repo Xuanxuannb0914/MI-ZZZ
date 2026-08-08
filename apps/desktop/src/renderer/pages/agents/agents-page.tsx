@@ -3,7 +3,7 @@ import { useAppStore } from '../../app/stores/app-store';
 import type { AgentAttribute, AgentSpecialty } from '../../entities/agent/model/types';
 import { agentAttributes, agentSpecialties } from '../../entities/agent/model/types';
 import { AgentCard } from '../../entities/agent/ui/agent-card';
-import { agents } from '../../shared/mock/agents';
+import { agents } from '../../shared/content';
 import { EmptyState } from '../../shared/ui/empty-state';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';

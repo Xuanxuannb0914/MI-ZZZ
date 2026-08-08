@@ -2,7 +2,7 @@ import { ArrowUpRight, Megaphone, Newspaper, Wrench } from '@game-guide-hub/icon
 import { Card, Tabs } from '@game-guide-hub/ui';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { news } from '../../shared/mock/news';
+import { news } from '../../shared/content';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
 import { Tag } from '../../shared/ui/tag';

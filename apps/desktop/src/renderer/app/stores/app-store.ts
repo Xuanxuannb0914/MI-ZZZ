@@ -8,6 +8,8 @@ interface AppStore {
   readonly favoriteTeamIds: readonly string[];
   readonly historyAgentIds: readonly string[];
   readonly historyGuideIds: readonly string[];
+  readonly completedDailyTaskIds: readonly string[];
+  readonly completedWeeklyTaskIds: readonly string[];
   readonly searchKeyword: string;
   readonly isSidebarOpen: boolean;
   readonly isSidebarCollapsed: boolean;
@@ -21,6 +23,8 @@ interface AppStore {
   readonly toggleFavoriteTeam: (teamId: string) => void;
   readonly recordAgentVisit: (agentId: string) => void;
   readonly recordGuideVisit: (guideId: string) => void;
+  readonly toggleDailyTask: (taskId: string) => void;
+  readonly toggleWeeklyTask: (taskId: string) => void;
   readonly setSidebarOpen: (isOpen: boolean) => void;
   readonly toggleSidebarCollapsed: () => void;
   readonly setThemeMode: (themeMode: 'dark' | 'light') => void;
@@ -40,6 +44,8 @@ export const useAppStore = create<AppStore>()(
       favoriteTeamIds: ['miyabi-disorder'],
       historyAgentIds: [],
       historyGuideIds: ['miyabi-frostburn', 'battery-plan'],
+      completedDailyTaskIds: ['coffee', 'scratch-card'],
+      completedWeeklyTaskIds: ['ridu-fund'],
       searchKeyword: '',
       isSidebarOpen: false,
       isSidebarCollapsed: false,
@@ -85,6 +91,18 @@ export const useAppStore = create<AppStore>()(
             ...state.historyGuideIds.filter((historyId) => historyId !== guideId),
           ].slice(0, HISTORY_LIMIT),
         })),
+      toggleDailyTask: (taskId) =>
+        set((state) => ({
+          completedDailyTaskIds: state.completedDailyTaskIds.includes(taskId)
+            ? state.completedDailyTaskIds.filter((id) => id !== taskId)
+            : [...state.completedDailyTaskIds, taskId],
+        })),
+      toggleWeeklyTask: (taskId) =>
+        set((state) => ({
+          completedWeeklyTaskIds: state.completedWeeklyTaskIds.includes(taskId)
+            ? state.completedWeeklyTaskIds.filter((id) => id !== taskId)
+            : [...state.completedWeeklyTaskIds, taskId],
+        })),
       setSidebarOpen: (isSidebarOpen) => set({ isSidebarOpen }),
       toggleSidebarCollapsed: () =>
         set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
@@ -99,6 +117,8 @@ export const useAppStore = create<AppStore>()(
           favoriteTeamIds: [],
           historyAgentIds: [],
           historyGuideIds: [],
+          completedDailyTaskIds: [],
+          completedWeeklyTaskIds: [],
         }),
     }),
     {
@@ -110,6 +130,8 @@ export const useAppStore = create<AppStore>()(
         favoriteTeamIds,
         historyAgentIds,
         historyGuideIds,
+        completedDailyTaskIds,
+        completedWeeklyTaskIds,
         isSidebarCollapsed,
         themeMode,
         performanceMode,
@@ -121,12 +143,14 @@ export const useAppStore = create<AppStore>()(
         favoriteTeamIds,
         historyAgentIds,
         historyGuideIds,
+        completedDailyTaskIds,
+        completedWeeklyTaskIds,
         isSidebarCollapsed,
         themeMode,
         performanceMode,
         animationEnabled,
       }),
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         if (!persistedState || typeof persistedState !== 'object') {
           return persistedState as AppStore;
@@ -140,10 +164,23 @@ export const useAppStore = create<AppStore>()(
             themeMode: state.themeMode === 'light' ? 'light' : 'dark',
             performanceMode: state.performanceMode === 'balanced' ? 'balanced' : 'quality',
             animationEnabled: state.animationEnabled !== false,
+            completedDailyTaskIds: Array.isArray(state.completedDailyTaskIds)
+              ? state.completedDailyTaskIds
+              : ['coffee', 'scratch-card'],
+            completedWeeklyTaskIds: Array.isArray(state.completedWeeklyTaskIds)
+              ? state.completedWeeklyTaskIds
+              : ['ridu-fund'],
           } as AppStore;
         }
-
-        return state as AppStore;
+        return {
+          ...state,
+          completedDailyTaskIds: Array.isArray(state.completedDailyTaskIds)
+            ? state.completedDailyTaskIds
+            : ['coffee', 'scratch-card'],
+          completedWeeklyTaskIds: Array.isArray(state.completedWeeklyTaskIds)
+            ? state.completedWeeklyTaskIds
+            : ['ridu-fund'],
+        } as AppStore;
       },
     },
   ),

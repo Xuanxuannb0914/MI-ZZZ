@@ -4,7 +4,7 @@ import { useAppStore } from '../../app/stores/app-store';
 import type { GuideCategory } from '../../entities/guide/model/types';
 import { guideCategories } from '../../entities/guide/model/types';
 import { GuideCard } from '../../entities/guide/ui/guide-card';
-import { guides } from '../../shared/mock/guides';
+import { guides } from '../../shared/content';
 import { EmptyState } from '../../shared/ui/empty-state';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';

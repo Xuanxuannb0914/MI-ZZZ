@@ -1,9 +1,9 @@
 import { BookOpen, ChevronRight } from '@game-guide-hub/icons';
+import { Widget as WidgetShell } from '@game-guide-hub/ui';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '../../../app/stores/app-store';
-import { guides } from '../../../shared/mock/guides';
-import { WidgetShell } from './widget-shell';
+import { guides } from '../../../shared/content';
 
 const categoryGuides = [guides[0], guides[1], guides[6], guides[4], guides[21]].filter(
   (guide): guide is NonNullable<typeof guide> => Boolean(guide),
@@ -19,7 +19,7 @@ export const GuideCenterWidget = memo(function GuideCenterWidget() {
       icon={BookOpen}
       className="workspace-widget-guides"
       action={
-        <Link to="/guides" aria-label="查看全部攻略">
+        <Link to="/zzz/guides" aria-label="查看全部攻略">
           <ChevronRight aria-hidden="true" size={16} />
         </Link>
       }
@@ -27,7 +27,7 @@ export const GuideCenterWidget = memo(function GuideCenterWidget() {
       <div className="workspace-guide-list">
         {categoryGuides.map((guide) => (
           <Link
-            to={`/guide/${guide.id}`}
+            to={`/zzz/guides/${guide.id}`}
             key={guide.id}
             className="workspace-guide-item"
             onClick={() => recordGuideVisit(guide.id)}

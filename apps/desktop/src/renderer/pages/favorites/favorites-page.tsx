@@ -4,10 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app-store';
 import { AgentCard } from '../../entities/agent/ui/agent-card';
 import { GuideCard } from '../../entities/guide/ui/guide-card';
-import { agents } from '../../shared/mock/agents';
-import { events } from '../../shared/mock/events';
-import { guides } from '../../shared/mock/guides';
-import { teams } from '../../shared/mock/teams';
+import { agents, events, guides, teams } from '../../shared/content';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
 import { SectionTitle } from '../../shared/ui/section-title';
@@ -55,7 +52,7 @@ export default function FavoritesPage() {
             title="还没有收藏"
             description="在角色、攻略和活动卡片上点击心形按钮即可固定常用内容。"
             actionLabel="浏览角色"
-            onAction={() => navigate('/agents')}
+            onAction={() => navigate('/zzz/agents')}
           />
         ) : null}
 
@@ -169,7 +166,7 @@ export default function FavoritesPage() {
                 id: `guide-${guide.id}`,
                 title: guide.title,
                 meta: `攻略 · ${guide.category}`,
-                to: `/guide/${guide.id}`,
+                to: `/zzz/guides/${guide.id}`,
               })),
               ...recentAgents.slice(0, 4).map((agent) => ({
                 id: `agent-${agent.id}`,

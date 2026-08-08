@@ -1,7 +1,7 @@
 import { CalendarDays, Heart, Play, Target, Zap } from '@game-guide-hub/icons';
 import { Banner, Button } from '@game-guide-hub/ui';
 import { useAppStore } from '../../app/stores/app-store';
-import { events } from '../../shared/mock/events';
+import { events } from '../../shared/content';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
 

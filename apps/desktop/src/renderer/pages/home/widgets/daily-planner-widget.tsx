@@ -1,21 +1,22 @@
 import { CalendarDays, ChevronRight, Zap } from '@game-guide-hub/icons';
+import { Widget as WidgetShell } from '@game-guide-hub/ui';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  dailySchedules,
-  dailyTasks,
-  todaysMaterials,
-  weeklyTasks,
-} from '../../../shared/mock/daily';
-import { WidgetShell } from './widget-shell';
+import { useAppStore } from '../../../app/stores/app-store';
+import { dailySchedules, dailyTasks, todaysMaterials, weeklyTasks } from '../../../shared/content';
 
 const weekday = new Intl.DateTimeFormat('zh-CN', { weekday: 'short' }).format(new Date());
 const todaySchedule =
   dailySchedules.find((schedule) => schedule.day === weekday) ?? dailySchedules[0];
-const completedDaily = dailyTasks.filter((task) => task.isComplete).length;
-const completedWeekly = weeklyTasks.filter((task) => task.isComplete).length;
-
 export const DailyPlannerWidget = memo(function DailyPlannerWidget() {
+  const completedDailyTaskIds = useAppStore((state) => state.completedDailyTaskIds);
+  const completedWeeklyTaskIds = useAppStore((state) => state.completedWeeklyTaskIds);
+  const completedDaily = dailyTasks.filter((task) =>
+    completedDailyTaskIds.includes(task.id),
+  ).length;
+  const completedWeekly = weeklyTasks.filter((task) =>
+    completedWeeklyTaskIds.includes(task.id),
+  ).length;
   return (
     <WidgetShell
       title="今日养成"
@@ -23,7 +24,7 @@ export const DailyPlannerWidget = memo(function DailyPlannerWidget() {
       icon={CalendarDays}
       className="workspace-widget-daily"
       action={
-        <Link to="/daily" aria-label="打开完整每日养成计划">
+        <Link to="/zzz/planner" aria-label="打开完整每日养成计划">
           <ChevronRight aria-hidden="true" size={16} />
         </Link>
       }

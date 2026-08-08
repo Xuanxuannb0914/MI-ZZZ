@@ -5,6 +5,7 @@ import {
   Compass,
   Heart,
   Home,
+  PackageOpen,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
@@ -30,6 +31,7 @@ const navigationEntries: readonly NavigationEntry[] = [
   { label: '角色', to: '/zzz/agents', icon: UsersRound },
   { label: '活动', to: '/zzz/events', icon: Compass },
   { label: '养成', to: '/zzz/planner', icon: CalendarDays },
+  { label: '材料', to: '/zzz/materials', icon: PackageOpen },
   { label: '收藏', to: '/zzz/favorites', icon: Heart },
   { label: '搜索', to: '/zzz/search', icon: Search, end: true },
 ];

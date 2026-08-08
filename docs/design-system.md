@@ -86,3 +86,8 @@ text alternatives for meaningful images. Never make color the only status signal
 
 Theme modes are represented by `.theme-light` and `.theme-high-contrast`. New themes should only
 remap semantic variables; component class names and layout contracts remain unchanged.
+
+## 内容卡片
+
+材料、公告、攻略与最近阅读统一使用 `ggh-card`/`ggh-widget`
+作为容器。内容先显示名称与分类，再显示用途、来源或更新时间。卡片 hover 只使用轻微位移、边缘高光和图片缩放，不使用持续霓虹或影响布局的动画。

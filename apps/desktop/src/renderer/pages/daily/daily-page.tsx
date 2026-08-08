@@ -1,31 +1,43 @@
 import { CalendarDays, Check, Clock3, Flame, Target, Trophy, Zap } from '@game-guide-hub/icons';
-import { dailyTasks, todaysFarming, todaysMaterials, weeklyTasks } from '../../shared/mock/daily';
-import { events } from '../../shared/mock/events';
+import { useAppStore } from '../../app/stores/app-store';
+import {
+  dailyTasks,
+  events,
+  todaysFarming,
+  todaysMaterials,
+  weeklyTasks,
+} from '../../shared/content';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
 import { SectionTitle } from '../../shared/ui/section-title';
 
 interface TaskListProps {
   readonly tasks: typeof dailyTasks;
+  readonly completedTaskIds: readonly string[];
+  readonly onToggle: (taskId: string) => void;
 }
-function TaskList({ tasks }: TaskListProps) {
+function TaskList({ tasks, completedTaskIds, onToggle }: TaskListProps) {
   return (
     <ul className="divide-y divide-border-subtle">
       {tasks.map((task) => (
         <li key={task.id} className="flex items-center gap-content py-content">
-          <span
+          <button
+            type="button"
+            onClick={() => onToggle(task.id)}
             className={
-              task.isComplete
-                ? 'flex size-control items-center justify-center rounded-full bg-success/15 text-success'
-                : 'flex size-control items-center justify-center rounded-full border border-border-strong text-text-tertiary'
+              completedTaskIds.includes(task.id)
+                ? 'flex size-control items-center justify-center rounded-full bg-success/15 text-success transition-transform hover:scale-105'
+                : 'flex size-control items-center justify-center rounded-full border border-border-strong text-text-tertiary transition-colors hover:border-content-electric hover:text-content-electric'
             }
+            aria-label={`${completedTaskIds.includes(task.id) ? '取消完成' : '标记完成'}：${task.title}`}
+            aria-pressed={completedTaskIds.includes(task.id)}
           >
-            {task.isComplete ? (
+            {completedTaskIds.includes(task.id) ? (
               <Check aria-hidden="true" size={15} />
             ) : (
               <span className="size-1.5 rounded-full bg-current" />
             )}
-          </span>
+          </button>
           <div className="min-w-0 flex-1">
             <p className="text-label font-medium text-text-primary">{task.title}</p>
             <p className="text-caption text-text-tertiary">{task.detail}</p>
@@ -37,7 +49,13 @@ function TaskList({ tasks }: TaskListProps) {
 }
 
 export default function DailyPage() {
-  const completedDailyTasks = dailyTasks.filter((task) => task.isComplete).length;
+  const completedDailyTaskIds = useAppStore((state) => state.completedDailyTaskIds);
+  const completedWeeklyTaskIds = useAppStore((state) => state.completedWeeklyTaskIds);
+  const toggleDailyTask = useAppStore((state) => state.toggleDailyTask);
+  const toggleWeeklyTask = useAppStore((state) => state.toggleWeeklyTask);
+  const completedDailyTasks = dailyTasks.filter((task) =>
+    completedDailyTaskIds.includes(task.id),
+  ).length;
   return (
     <PageTransition>
       <Page className="page-surface page-daily">
@@ -82,13 +100,21 @@ export default function DailyPage() {
           <section>
             <SectionTitle eyebrow="今日" title="每日任务" />
             <div className="mt-panel rounded-lg border border-border-subtle bg-surface-1 px-panel">
-              <TaskList tasks={dailyTasks} />
+              <TaskList
+                tasks={dailyTasks}
+                completedTaskIds={completedDailyTaskIds}
+                onToggle={toggleDailyTask}
+              />
             </div>
           </section>
           <section>
             <SectionTitle eyebrow="本周" title="每周任务" />
             <div className="mt-panel rounded-lg border border-border-subtle bg-surface-1 px-panel">
-              <TaskList tasks={weeklyTasks} />
+              <TaskList
+                tasks={weeklyTasks}
+                completedTaskIds={completedWeeklyTaskIds}
+                onToggle={toggleWeeklyTask}
+              />
             </div>
           </section>
         </div>

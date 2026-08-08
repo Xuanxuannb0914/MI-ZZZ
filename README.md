@@ -32,7 +32,7 @@ Hub 是一个内容优先、键盘友好、可扩展的桌面工作台。它借�
 | [docs/architecture.md](./docs/architecture.md)   | 客户端路由、布局和场景生命周期如何组织？           |
 | [docs/design-system.md](./docs/design-system.md) | 设计令牌与玻璃材质如何使用？                       |
 | [docs/ui-guidelines.md](./docs/ui-guidelines.md) | 信息层级、视觉与动效规则是什么？                   |
-| [docs/development.md](./docs/development.md)     | 如何运行、验证和扩展当前客户端？                   |
+| [docs/development.md](./docs/development.md)     | 如何运行、验证和扩展当前客户端与内容模型？         |
 | [DATABASE.md](./DATABASE.md)                     | 数据所有权、迁移、索引、备份和一致性如何治理？     |
 | [API_GUIDELINE.md](./API_GUIDELINE.md)           | REST、WebSocket、错误、分页和兼容性契约是什么？    |
 | [CODING_RULE.md](./CODING_RULE.md)               | 代码边界、类型安全、工具职责和安全规则是什么？     |
