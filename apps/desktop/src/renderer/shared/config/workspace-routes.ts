@@ -1,5 +1,6 @@
 export const workspaceRoutes = {
   home: '/zzz',
+  gacha: '/zzz/gacha',
   guides: '/zzz/guides',
   development: {
     overview: '/zzz/development',
@@ -18,6 +19,7 @@ export const workspaceRoutes = {
     versions: '/zzz/data/versions',
   },
   encyclopedia: {
+    overview: '/zzz/encyclopedia',
     characters: '/zzz/encyclopedia/characters',
     wEngines: '/zzz/encyclopedia/w-engines',
     driveDiscs: '/zzz/encyclopedia/drive-discs',

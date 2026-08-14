@@ -29,6 +29,15 @@ export default function GachaAnalyticsPage() {
             导入记录（即将开放）
           </button>
         </header>
+        <nav className="page-tabs" aria-label="抽卡分析视图">
+          <button type="button" className="is-active">
+            数据概览
+          </button>
+          <button type="button">抽卡记录</button>
+          <button type="button">欧非分析</button>
+          <button type="button">角色统计</button>
+          <button type="button">音擎统计</button>
+        </nav>
 
         <section className="grid gap-content sm:grid-cols-2 xl:grid-cols-4" aria-label="抽卡统计">
           <Stat icon={Star} label="总抽数" value={`${analytics.totalPulls}`} detail="已解析记录" />

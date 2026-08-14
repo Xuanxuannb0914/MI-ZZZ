@@ -1,6 +1,78 @@
 @import '@game-guide-hub/theme/styles.css';
 
 @layer components {
+  .page-tabs {
+    display: flex;
+    min-width: 0;
+    gap: var(--spacing-content);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-compact);
+    border-bottom: 1px solid var(--ggh-color-border-subtle);
+    scrollbar-width: none;
+  }
+
+  .page-tabs > a,
+  .page-tabs > button,
+  .page-tabs > span {
+    position: relative;
+    display: inline-flex;
+    min-height: var(--spacing-control);
+    align-items: center;
+    flex: 0 0 auto;
+    padding: 0 var(--spacing-compact);
+    border: 0;
+    color: var(--ggh-color-text-tertiary);
+    background: transparent;
+    font-size: var(--text-label);
+    font-weight: 600;
+    transition: color var(--ggh-motion-fast) var(--ggh-ease-standard);
+  }
+
+  .page-tabs > a:hover,
+  .page-tabs > button:hover {
+    color: var(--ggh-color-text-primary);
+  }
+  .page-tabs > .is-active {
+    color: var(--ggh-color-text-primary);
+  }
+  .page-tabs > .is-active::after {
+    position: absolute;
+    right: var(--spacing-compact);
+    bottom: calc(var(--spacing-compact) * -1 - 1px);
+    left: var(--spacing-compact);
+    height: 2px;
+    content: '';
+    background: var(--ggh-color-primary);
+    box-shadow: 0 0 0.75rem var(--ggh-color-primary);
+  }
+
+  .desktop-sidebar {
+    border-right-color: color-mix(in srgb, var(--ggh-color-border-subtle) 60%, transparent);
+    background-color: color-mix(in srgb, var(--ggh-color-canvas) 48%, transparent);
+    box-shadow: 0 0 2rem rgb(1 6 18 / 12%);
+    backdrop-filter: blur(var(--ggh-glass-blur-medium)) saturate(118%);
+  }
+
+  .desktop-sidebar .desktop-sidebar-nav {
+    padding-top: var(--spacing-panel);
+  }
+
+  .desktop-sidebar .desktop-nav-entry {
+    opacity: 0.68;
+    transition:
+      color var(--ggh-motion-fast) var(--ggh-ease-standard),
+      opacity var(--ggh-motion-fast) var(--ggh-ease-standard),
+      background-color var(--ggh-motion-normal) var(--ggh-ease-enter),
+      transform var(--ggh-motion-fast) var(--ggh-ease-enter);
+  }
+
+  .desktop-sidebar .desktop-nav-entry:hover {
+    opacity: 0.92;
+    transform: translateX(2px);
+  }
+  .desktop-sidebar .desktop-nav-entry.is-active {
+    opacity: 1;
+  }
   .game-hub {
     position: relative;
     min-height: 100svh;

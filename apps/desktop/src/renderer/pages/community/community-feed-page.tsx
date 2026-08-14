@@ -32,17 +32,13 @@ export default function CommunityFeedPage() {
             发布内容（即将开放）
           </button>
         </header>
-        <nav className="flex flex-wrap gap-compact" aria-label="绳网分类">
+        <nav className="page-tabs" aria-label="绳网分类">
           {['推荐', '攻略', '配队', '抽卡记录', '心得'].map((label, index) => (
             <button
               key={label}
               type="button"
               aria-pressed={index === 0}
-              className={
-                index === 0
-                  ? 'ggh-button ggh-button-primary h-control px-panel text-label font-semibold'
-                  : 'ggh-button ggh-button-quiet h-control px-panel text-label'
-              }
+              className={index === 0 ? 'is-active' : undefined}
             >
               {label}
             </button>
