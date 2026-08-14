@@ -80,7 +80,7 @@ export const sidebarNavigationGroups: readonly SidebarNavigationGroup[] = [
     icon: Compass,
     match: ['/zzz/community'],
     items: [
-      { label: '推荐内容', status: '建设中' },
+      { label: '推荐内容', to: workspaceRoutes.community.feed },
       { label: '最新动态', status: '建设中' },
       { label: '关注动态', status: '建设中' },
     ],

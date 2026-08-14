@@ -9,6 +9,7 @@ const GameHubPage = lazy(() => import('../../pages/landing/game-hub-page'));
 const DevelopmentPage = lazy(() => import('../../pages/development/development-page'));
 const DataCenterPage = lazy(() => import('../../pages/data-center/data-center-page'));
 const GachaAnalyticsPage = lazy(() => import('../../pages/gacha/gacha-analytics-page'));
+const CommunityFeedPage = lazy(() => import('../../pages/community/community-feed-page'));
 const AgentsPage = lazy(() => import('../../pages/agents/agents-page'));
 const AgentDetailPage = lazy(() => import('../../pages/agent-detail/agent-detail-page'));
 const GuidesPage = lazy(() => import('../../pages/guides/guides-page'));
@@ -77,6 +78,8 @@ export function WorkspaceRoutes() {
         <Route path={workspaceRoutes.data.wEngines} element={<WEnginesPage />} />
         <Route path={`${workspaceRoutes.data.wEngines}/:id`} element={<WEnginesPage />} />
         <Route path={workspaceRoutes.data.versions} element={<EventsPage />} />
+
+        <Route path={workspaceRoutes.community.feed} element={<CommunityFeedPage />} />
 
         <Route path={workspaceRoutes.encyclopedia.characters} element={<AgentsPage />} />
         <Route

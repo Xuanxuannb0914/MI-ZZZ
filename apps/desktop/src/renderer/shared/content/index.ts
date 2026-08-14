@@ -1,4 +1,5 @@
 export { agents, featuredAgent, findAgentById } from '../mock/agents';
+export { type CommunityPost, communityPosts } from '../mock/community';
 export {
   dailySchedules,
   dailyTasks,

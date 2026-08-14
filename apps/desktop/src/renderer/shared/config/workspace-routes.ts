@@ -22,6 +22,9 @@ export const workspaceRoutes = {
     wEngines: '/zzz/encyclopedia/w-engines',
     driveDiscs: '/zzz/encyclopedia/drive-discs',
   },
+  community: {
+    feed: '/zzz/community/feed',
+  },
   events: '/zzz/events',
   favorites: '/zzz/favorites',
   search: '/zzz/search',
