@@ -27,6 +27,7 @@ export interface OptionWheelProps {
   readonly draggable?: boolean;
   readonly soundUrl?: string;
   readonly soundVolume?: number;
+  readonly onTick?: () => void;
   readonly disabled?: boolean;
   readonly ariaLabel?: string;
   readonly className?: string;
@@ -51,9 +52,13 @@ interface WheelConfig {
 
 const EMPTY_ITEMS: readonly string[] = [];
 const DEFAULT_ROW_HEIGHT = 72;
-const WHEEL_SETTLE_DELAY = 140;
-const TICK_THROTTLE = 70;
+const WHEEL_IDLE_DELAY = 105;
+const TICK_THROTTLE = 72;
 const DRAG_THRESHOLD = 4;
+const MAX_VELOCITY = 6.2;
+const WHEEL_IMPULSE = 0.0048;
+const SPRING = 92;
+const DAMPING = 13;
 
 function clampIndex(index: number, count: number): number {
   return Math.max(0, Math.min(index, Math.max(count - 1, 0)));
@@ -66,22 +71,20 @@ function normaliseIndex(index: number, count: number, loop: boolean): number {
 
 function calculateRowHeight(fontSize: FontSize, spacing: number, rowHeight?: number): number {
   if (rowHeight) return rowHeight;
-  if (typeof fontSize === 'number') return Math.max(fontSize * spacing * 16, 1);
-  return DEFAULT_ROW_HEIGHT;
+  return typeof fontSize === 'number' ? Math.max(fontSize * spacing * 16, 1) : DEFAULT_ROW_HEIGHT;
 }
 
 function prefersReducedMotion(): boolean {
+  const mediaQuery = (
+    window as unknown as { matchMedia?: (query: string) => MediaQueryList }
+  ).matchMedia?.bind(window);
   return (
     typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    mediaQuery?.('(prefers-reduced-motion: reduce)').matches === true
   );
 }
 
-/**
- * A DOM-driven text wheel: React owns selection semantics, while rAF owns the
- * continuous visual position between options.
- */
+/** DOM-driven wheel with inertial scrolling; React owns only semantic selection. */
 export function OptionWheel({
   items = EMPTY_ITEMS,
   defaultSelected = 0,
@@ -104,7 +107,8 @@ export function OptionWheel({
   loop = false,
   draggable = true,
   soundUrl = '',
-  soundVolume = 0.5,
+  soundVolume = 0.24,
+  onTick,
   disabled = false,
   ariaLabel = '选择选项',
   className = '',
@@ -112,46 +116,30 @@ export function OptionWheel({
   const rootRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const positionRef = useRef(defaultSelected);
+  const velocityRef = useRef(0);
   const targetRef = useRef(defaultSelected);
-  const selectedRef = useRef(defaultSelected);
-  const animationFrameRef = useRef<number | null>(null);
+  const selectedRef = useRef(normaliseIndex(defaultSelected, items.length, loop));
+  const frameRef = useRef<number | null>(null);
   const lastFrameRef = useRef(0);
-  const wheelTimerRef = useRef<number | null>(null);
-  const clickSuppressionTimerRef = useRef<number | null>(null);
-  const dragRef = useRef<{
-    readonly y: number;
-    readonly start: number;
-    readonly id: number;
-  } | null>(null);
+  const lastInputRef = useRef(0);
+  const needsSnapRef = useRef(false);
+  const dragRef = useRef<{ y: number; time: number; id: number } | null>(null);
   const dragMovedRef = useRef(false);
   const suppressClickRef = useRef(false);
+  const clickTimerRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef('');
   const lastTickRef = useRef(0);
-  const [activeIndex, setActiveIndex] = useState(() =>
-    normaliseIndex(defaultSelected, items.length, loop),
-  );
-  const configRef = useRef<WheelConfig>({
-    count: 0,
-    rowHeight: DEFAULT_ROW_HEIGHT,
-    curve,
-    tilt,
-    blur,
-    fade,
-    minOpacity,
-    side,
-    loop,
-    smoothing,
-    draggable,
-    soundUrl,
-    soundVolume,
-    reducedMotion: false,
-  });
   const onChangeRef = useRef(onChange);
   const onEnterRef = useRef(onEnter);
+  const onTickRef = useRef(onTick);
+  const lastExternalIndexRef = useRef<number | undefined>(undefined);
+  const [activeIndex, setActiveIndex] = useState(selectedRef.current);
+  const configRef = useRef<WheelConfig>({} as WheelConfig);
 
   onChangeRef.current = onChange;
   onEnterRef.current = onEnter;
+  onTickRef.current = onTick;
   configRef.current = {
     count: items.length,
     rowHeight: calculateRowHeight(fontSize, spacing, rowHeight),
@@ -169,57 +157,53 @@ export function OptionWheel({
     reducedMotion: prefersReducedMotion(),
   };
 
-  const cancelAnimation = useCallback(() => {
-    if (animationFrameRef.current === null) return;
-    window.cancelAnimationFrame(animationFrameRef.current);
-    animationFrameRef.current = null;
-  }, []);
-
   const playTick = useCallback(() => {
     const { soundUrl: url, soundVolume: volume } = configRef.current;
-    if (!url) return;
-    const now = performance.now();
-    if (now - lastTickRef.current < TICK_THROTTLE) return;
-    lastTickRef.current = now;
-
+    if (performance.now() - lastTickRef.current < TICK_THROTTLE) return;
+    lastTickRef.current = performance.now();
+    if (!url) {
+      onTickRef.current?.();
+      return;
+    }
     if (!audioRef.current || audioUrlRef.current !== url) {
       audioRef.current?.pause();
       audioRef.current = new Audio(url);
       audioRef.current.preload = 'auto';
       audioUrlRef.current = url;
     }
-
     const audio = audioRef.current;
     audio.volume = Math.max(0, Math.min(volume, 1));
     audio.currentTime = 0;
     void audio.play().catch(() => undefined);
   }, []);
 
-  const runFrame = useCallback((now: number) => {
-    const config = configRef.current;
-    const elapsed = Math.min((now - lastFrameRef.current) / 1000, 0.05);
-    lastFrameRef.current = now;
-    const smoothingFactor = config.reducedMotion
-      ? 1
-      : 1 - Math.exp(-elapsed / Math.max(config.smoothing, 1) / 1000);
-    const current = positionRef.current;
-    let next = current + (targetRef.current - current) * smoothingFactor;
-    const settled = Math.abs(targetRef.current - next) < 0.001;
-    if (settled) next = targetRef.current;
-    positionRef.current = next;
+  const commitSelection = useCallback(
+    (position: number) => {
+      const config = configRef.current;
+      if (!config.count) return;
+      const index = normaliseIndex(Math.round(position), config.count, config.loop);
+      if (index === selectedRef.current) return;
+      selectedRef.current = index;
+      setActiveIndex(index);
+      const item = items[index];
+      if (item) onChangeRef.current?.(index, item);
+      playTick();
+    },
+    [items, playTick],
+  );
 
+  const paint = useCallback((position: number) => {
+    const config = configRef.current;
     const tiltRadians = (config.tilt * Math.PI) / 180;
     const radius = tiltRadians > 0.0005 ? config.rowHeight / tiltRadians : 0;
     const mirror = config.side === 'right' ? -1 : 1;
-
     itemRefs.current.forEach((element, index) => {
       if (!element) return;
-      let distance = index - next;
+      let distance = index - position;
       if (config.loop && config.count > 1) {
         distance = ((distance % config.count) + config.count) % config.count;
         if (distance > config.count / 2) distance -= config.count;
       }
-
       const depth = Math.abs(distance);
       const angle = radius
         ? Math.max(-Math.PI / 2, Math.min(Math.PI / 2, distance * tiltRadians))
@@ -227,95 +211,118 @@ export function OptionWheel({
       const x = radius ? -mirror * radius * (1 - Math.cos(angle)) * config.curve : 0;
       const y = radius ? radius * Math.sin(angle) : distance * config.rowHeight;
       const rotation = radius ? (mirror * angle * 180) / Math.PI : 0;
-      const scale = Math.max(0.86, 1 - Math.min(depth, 3) * 0.045);
-      const opacity = Math.max(config.minOpacity, 1 - depth * config.fade);
-      const progress = Math.max(0, 1 - Math.min(depth, 1));
-
+      const scale = Math.max(0.84, 1 - Math.min(depth, 3) * 0.052);
       element.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) translateY(-50%) rotate(${rotation.toFixed(3)}deg) scale(${scale.toFixed(3)})`;
-      element.style.opacity = String(opacity);
+      element.style.opacity = String(Math.max(config.minOpacity, 1 - depth * config.fade));
       element.style.filter = config.reducedMotion
         ? 'none'
         : `blur(${(depth * config.blur).toFixed(2)}px)`;
-      element.style.setProperty('--ow-progress', progress.toFixed(4));
+      element.style.setProperty('--ow-progress', Math.max(0, 1 - Math.min(depth, 1)).toFixed(4));
     });
-
-    animationFrameRef.current = settled ? null : window.requestAnimationFrame(runFrame);
   }, []);
 
-  const startAnimation = useCallback(() => {
-    cancelAnimation();
-    lastFrameRef.current = performance.now();
-    animationFrameRef.current = window.requestAnimationFrame(runFrame);
-  }, [cancelAnimation, runFrame]);
-
-  const applyTarget = useCallback(
-    (value: number, snap: boolean) => {
+  const runFrame = useCallback(
+    (now: number) => {
       const config = configRef.current;
-      if (!config.count) return;
-      let nextTarget = snap ? Math.round(value) : value;
-      if (!config.loop) nextTarget = Math.max(0, Math.min(nextTarget, config.count - 1));
-      targetRef.current = nextTarget;
-
-      const nextIndex = normaliseIndex(Math.round(nextTarget), config.count, config.loop);
-      if (nextIndex !== selectedRef.current) {
-        selectedRef.current = nextIndex;
-        setActiveIndex(nextIndex);
-        const item = items[nextIndex];
-        if (item) onChangeRef.current?.(nextIndex, item);
-        playTick();
+      const dt = Math.min((now - lastFrameRef.current) / 1000, 0.04);
+      lastFrameRef.current = now;
+      const idle = now - lastInputRef.current > WHEEL_IDLE_DELAY;
+      if (idle && needsSnapRef.current) {
+        targetRef.current = Math.round(positionRef.current + velocityRef.current * 0.04);
       }
-      startAnimation();
+      if (!config.loop) targetRef.current = clampIndex(targetRef.current, config.count);
+      if (config.reducedMotion) {
+        positionRef.current = targetRef.current;
+        velocityRef.current = 0;
+        needsSnapRef.current = false;
+      } else {
+        if (idle) {
+          velocityRef.current += (targetRef.current - positionRef.current) * SPRING * dt;
+          velocityRef.current *= Math.exp(-DAMPING * dt);
+        } else {
+          velocityRef.current *= Math.exp(-2.2 * dt);
+        }
+        velocityRef.current = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, velocityRef.current));
+        positionRef.current += velocityRef.current * dt;
+        if (!config.loop)
+          positionRef.current = Math.max(-0.14, Math.min(positionRef.current, config.count - 0.86));
+      }
+      commitSelection(positionRef.current);
+      paint(positionRef.current);
+      const resting =
+        idle &&
+        Math.abs(targetRef.current - positionRef.current) < 0.002 &&
+        Math.abs(velocityRef.current) < 0.012;
+      if (resting) {
+        positionRef.current = targetRef.current;
+        velocityRef.current = 0;
+        paint(positionRef.current);
+        frameRef.current = null;
+        return;
+      }
+      frameRef.current = window.requestAnimationFrame(runFrame);
     },
-    [items, playTick, startAnimation],
+    [commitSelection, paint],
+  );
+
+  const start = useCallback(() => {
+    if (frameRef.current !== null) return;
+    lastFrameRef.current = performance.now();
+    frameRef.current = window.requestAnimationFrame(runFrame);
+  }, [runFrame]);
+
+  const moveTo = useCallback(
+    (next: number) => {
+      const config = configRef.current;
+      targetRef.current = config.loop ? next : clampIndex(next, config.count);
+      needsSnapRef.current = false;
+      lastInputRef.current = -Infinity;
+      commitSelection(targetRef.current);
+      start();
+    },
+    [commitSelection, start],
   );
 
   useEffect(() => {
-    const requestedIndex = selectedIndex ?? defaultSelected;
-    const normalised = normaliseIndex(requestedIndex, items.length, loop);
-    selectedRef.current = normalised;
-    setActiveIndex(normalised);
-    positionRef.current = normalised;
-    targetRef.current = normalised;
-    startAnimation();
-  }, [defaultSelected, items, loop, selectedIndex, startAnimation]);
+    const requested = normaliseIndex(selectedIndex ?? defaultSelected, items.length, loop);
+    if (lastExternalIndexRef.current === requested && requested === selectedRef.current) return;
+    lastExternalIndexRef.current = requested;
+    if (requested !== selectedRef.current || frameRef.current === null) {
+      selectedRef.current = requested;
+      setActiveIndex(requested);
+      positionRef.current = requested;
+      targetRef.current = requested;
+      velocityRef.current = 0;
+      paint(requested);
+    }
+  }, [defaultSelected, items, loop, paint, selectedIndex]);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return undefined;
-
     const onWheel = (event: WheelEvent) => {
+      if (disabled || Math.abs(event.deltaY) < 0.1) return;
       event.preventDefault();
-      if (disabled || Math.abs(event.deltaY) < 1) return;
-      const config = configRef.current;
-      const pixelDelta =
+      const delta =
         event.deltaMode === WheelEvent.DOM_DELTA_LINE ? event.deltaY * 24 : event.deltaY;
-      const step = Math.max(-1, Math.min(1, pixelDelta / config.rowHeight));
-      applyTarget(targetRef.current + step, false);
-      if (wheelTimerRef.current !== null) window.clearTimeout(wheelTimerRef.current);
-      wheelTimerRef.current = window.setTimeout(
-        () => applyTarget(targetRef.current, true),
-        WHEEL_SETTLE_DELAY,
+      velocityRef.current = Math.max(
+        -MAX_VELOCITY,
+        Math.min(MAX_VELOCITY, velocityRef.current + delta * WHEEL_IMPULSE),
       );
+      lastInputRef.current = performance.now();
+      needsSnapRef.current = true;
+      start();
     };
-
     root.addEventListener('wheel', onWheel, { passive: false });
-    return () => {
-      root.removeEventListener('wheel', onWheel);
-      if (wheelTimerRef.current !== null) window.clearTimeout(wheelTimerRef.current);
-      wheelTimerRef.current = null;
-    };
-  }, [applyTarget, disabled]);
+    return () => root.removeEventListener('wheel', onWheel);
+  }, [disabled, start]);
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (disabled || !configRef.current.draggable || event.button !== 0) return;
-      dragRef.current = { y: event.clientY, start: targetRef.current, id: event.pointerId };
+      dragRef.current = { y: event.clientY, time: performance.now(), id: event.pointerId };
       dragMovedRef.current = false;
       suppressClickRef.current = false;
-      if (clickSuppressionTimerRef.current !== null) {
-        window.clearTimeout(clickSuppressionTimerRef.current);
-        clickSuppressionTimerRef.current = null;
-      }
     },
     [disabled],
   );
@@ -324,16 +331,29 @@ export function OptionWheel({
     (event: ReactPointerEvent<HTMLDivElement>) => {
       const drag = dragRef.current;
       if (!drag) return;
-      const deltaY = event.clientY - drag.y;
-      if (!dragMovedRef.current && Math.abs(deltaY) > DRAG_THRESHOLD) {
+      const delta = event.clientY - drag.y;
+      if (!dragMovedRef.current && Math.abs(delta) > DRAG_THRESHOLD) {
         dragMovedRef.current = true;
         rootRef.current?.setPointerCapture(drag.id);
       }
-      if (dragMovedRef.current) {
-        applyTarget(drag.start - deltaY / configRef.current.rowHeight, false);
-      }
+      if (!dragMovedRef.current) return;
+      const now = performance.now();
+      const deltaTime = Math.max((now - drag.time) / 1000, 0.008);
+      const distance = drag.y - event.clientY;
+      positionRef.current += distance / configRef.current.rowHeight;
+      velocityRef.current = Math.max(
+        -MAX_VELOCITY,
+        Math.min(MAX_VELOCITY, distance / configRef.current.rowHeight / deltaTime),
+      );
+      targetRef.current = positionRef.current;
+      dragRef.current = { ...drag, y: event.clientY, time: now };
+      lastInputRef.current = now;
+      needsSnapRef.current = true;
+      commitSelection(positionRef.current);
+      paint(positionRef.current);
+      start();
     },
-    [applyTarget],
+    [commitSelection, paint, start],
   );
 
   const finishDrag = useCallback(() => {
@@ -343,30 +363,19 @@ export function OptionWheel({
     dragRef.current = null;
     if (!dragMovedRef.current) return;
     suppressClickRef.current = true;
-    clickSuppressionTimerRef.current = window.setTimeout(() => {
+    clickTimerRef.current = window.setTimeout(() => {
       suppressClickRef.current = false;
-      clickSuppressionTimerRef.current = null;
     }, 0);
-    applyTarget(targetRef.current, true);
-  }, [applyTarget]);
+    lastInputRef.current = performance.now();
+    start();
+  }, [start]);
 
-  const handleItemClick = useCallback(
+  const selectOption = useCallback(
     (index: number) => {
-      if (disabled) return;
-      if (suppressClickRef.current) {
-        suppressClickRef.current = false;
-        return;
-      }
-      const config = configRef.current;
-      const currentIndex = normaliseIndex(Math.round(targetRef.current), config.count, config.loop);
-      let delta = index - currentIndex;
-      if (config.loop && config.count > 1) {
-        if (delta > config.count / 2) delta -= config.count;
-        if (delta < -config.count / 2) delta += config.count;
-      }
-      applyTarget(targetRef.current + delta, true);
+      if (disabled || suppressClickRef.current) return;
+      moveTo(index);
     },
-    [applyTarget, disabled],
+    [disabled, moveTo],
   );
 
   const handleKeyDown = useCallback(
@@ -374,37 +383,28 @@ export function OptionWheel({
       if (disabled) return;
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
-        applyTarget(Math.round(targetRef.current) - 1, true);
+        moveTo(Math.round(targetRef.current) - 1);
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
-        applyTarget(Math.round(targetRef.current) + 1, true);
+        moveTo(Math.round(targetRef.current) + 1);
       } else if (event.key === 'Enter') {
         event.preventDefault();
         onEnterRef.current?.();
-      } else if (event.key === 'Escape') {
-        event.currentTarget.blur();
-      }
+      } else if (event.key === 'Escape') event.currentTarget.blur();
     },
-    [applyTarget, disabled],
+    [disabled, moveTo],
   );
 
-  useEffect(() => {
-    const root = rootRef.current;
-    return () => {
-      cancelAnimation();
-      if (wheelTimerRef.current !== null) window.clearTimeout(wheelTimerRef.current);
-      if (clickSuppressionTimerRef.current !== null) {
-        window.clearTimeout(clickSuppressionTimerRef.current);
-      }
-      const drag = dragRef.current;
-      if (drag && root?.hasPointerCapture(drag.id)) {
-        root.releasePointerCapture(drag.id);
-      }
+  useEffect(
+    () => () => {
+      if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
+      if (clickTimerRef.current !== null) window.clearTimeout(clickTimerRef.current);
       audioRef.current?.pause();
       if (audioRef.current) audioRef.current.src = '';
       audioRef.current = null;
-    };
-  }, [cancelAnimation]);
+    },
+    [],
+  );
 
   const rootStyle = {
     '--ow-text-color': textColor,
@@ -412,7 +412,6 @@ export function OptionWheel({
     '--ow-font-size': typeof fontSize === 'number' ? `${fontSize}rem` : fontSize,
     '--ow-inset': `${inset}px`,
   } as CSSProperties;
-
   return (
     <div
       ref={rootRef}
@@ -441,7 +440,7 @@ export function OptionWheel({
           aria-selected={activeIndex === index}
           className="option-wheel__item"
           disabled={disabled}
-          onClick={() => handleItemClick(index)}
+          onClick={() => selectOption(index)}
           onDoubleClick={() => {
             if (activeIndex === index && !disabled) onEnterRef.current?.();
           }}

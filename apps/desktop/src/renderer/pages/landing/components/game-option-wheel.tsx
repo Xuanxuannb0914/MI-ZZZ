@@ -1,5 +1,6 @@
 import type { GameDefinition } from '../../../shared/mock/games';
 import { OptionWheel } from './option-wheel';
+import { useWheelTick } from './use-wheel-tick';
 
 interface GameOptionWheelProps {
   readonly games: readonly GameDefinition[];
@@ -17,6 +18,7 @@ export function GameOptionWheel({
   onEnter,
   disabled = false,
 }: GameOptionWheelProps) {
+  const playWheelTick = useWheelTick();
   return (
     <OptionWheel
       items={games.map((game) => game.name)}
@@ -36,6 +38,7 @@ export function GameOptionWheel({
       smoothing={210}
       inset={72}
       draggable
+      onTick={playWheelTick}
       disabled={disabled}
       ariaLabel="选择游戏"
       className="game-option-wheel"
