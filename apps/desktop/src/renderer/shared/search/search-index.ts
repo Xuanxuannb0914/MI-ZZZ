@@ -2,10 +2,14 @@ import {
   agents,
   dailySchedules,
   events,
+  driveDiscs,
   guides,
   materials,
   news,
+  teams,
   todaysMaterials,
+  versions,
+  wEngines,
 } from '../content';
 
 export type SearchResultKind =
@@ -15,6 +19,7 @@ export type SearchResultKind =
   | '资讯'
   | '驱动盘'
   | '音擎'
+  | '配队'
   | '材料'
   | '版本';
 
@@ -63,26 +68,40 @@ const newsResults: readonly SearchResult[] = news.map((entry) => ({
   keywords: `${entry.title} ${entry.summary} ${entry.kind} ${entry.date}`,
 }));
 
-const driveDiscResults: readonly SearchResult[] = Array.from(
-  new Set(agents.flatMap((agent) => agent.recommendedDriveDisc)),
-).map((title, index) => ({
-  id: `disc-${index}`,
-  title,
-  description: '角色推荐驱动盘配置',
+const driveDiscResults: readonly SearchResult[] = driveDiscs.map((disc) => ({
+  id: `disc-${disc.id}`,
+  title: disc.name,
+  description: disc.fourPieceEffect,
   kind: '驱动盘',
-  to: '/zzz/guides?category=资源',
-  keywords: `${title} 驱动盘 套装 词条`,
+  to: `/zzz/drive-discs/${disc.id}`,
+  keywords: `${disc.name} ${disc.setName} ${disc.description} 驱动盘 套装 词条`,
 }));
 
-const weaponResults: readonly SearchResult[] = Array.from(
-  new Set(agents.map((agent) => agent.recommendedWeapon)),
-).map((title, index) => ({
-  id: `weapon-${index}`,
-  title,
-  description: '角色推荐音擎',
+const weaponResults: readonly SearchResult[] = wEngines.map((weapon) => ({
+  id: `weapon-${weapon.id}`,
+  title: weapon.name,
+  description: weapon.effect,
   kind: '音擎',
-  to: '/zzz/guides?category=角色养成',
-  keywords: `${title} 音擎 武器`,
+  to: `/zzz/w-engines/${weapon.id}`,
+  keywords: `${weapon.name} ${weapon.specialty} ${weapon.effect} 音擎 武器`,
+}));
+
+const teamResults: readonly SearchResult[] = teams.map((team) => ({
+  id: `team-${team.id}`,
+  title: team.name,
+  description: team.description,
+  kind: '配队',
+  to: `/zzz/teams/${team.id}`,
+  keywords: `${team.name} ${team.members.join(' ')} ${team.focus} 配队 队伍`,
+}));
+
+const versionResults: readonly SearchResult[] = versions.map((version) => ({
+  id: `version-${version.id}`,
+  title: `${version.code} ${version.name}`,
+  description: version.theme,
+  kind: '版本',
+  to: '/zzz/events',
+  keywords: `${version.code} ${version.name} ${version.theme} 版本`,
 }));
 
 const materialResults: readonly SearchResult[] = materials.map((material) => ({
@@ -112,6 +131,8 @@ export const searchIndex: readonly SearchResult[] = [
   ...newsResults,
   ...driveDiscResults,
   ...weaponResults,
+  ...teamResults,
+  ...versionResults,
   ...materialResults,
   ...scheduleMaterialResults,
 ];

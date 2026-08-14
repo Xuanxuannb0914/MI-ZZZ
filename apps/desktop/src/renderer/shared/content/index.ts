@@ -15,6 +15,7 @@ export { news } from '../mock/news';
 export { teams } from '../mock/teams';
 export { findVersionById, versions } from '../mock/versions';
 export { findWEngineById, wEngines } from '../mock/w-engines';
+export { findRelatedContent, resolveContentLinks } from './content-graph';
 export type {
   ContentEntity,
   ContentEntityType,

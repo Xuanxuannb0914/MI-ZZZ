@@ -1,6 +1,151 @@
 @import '@game-guide-hub/theme/styles.css';
 
 @layer components {
+  .content-catalog {
+    display: grid;
+    gap: var(--spacing-layout);
+  }
+
+  .content-catalog-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--spacing-panel);
+    padding: var(--spacing-panel);
+    border: 1px solid var(--ggh-color-border-subtle);
+    border-radius: var(--radius-xl);
+    background: var(--ggh-color-glass);
+    box-shadow: var(--ggh-shadow-small), inset 0 1px var(--ggh-color-reflection);
+    backdrop-filter: blur(var(--ggh-glass-blur-medium)) saturate(120%);
+  }
+
+  .content-detail-panel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .content-detail-panel::before {
+    position: absolute;
+    inset: 0;
+    content: '';
+    pointer-events: none;
+    background: linear-gradient(135deg, var(--ggh-color-reflection), transparent 34%);
+  }
+
+  .team-showcase-card,
+  .team-detail-member,
+  .article-entity-link,
+  .search-recent-chip {
+    transition:
+      transform var(--ggh-motion-hover-duration) var(--ggh-motion-ease),
+      border-color var(--ggh-motion-hover-duration) var(--ggh-motion-ease),
+      box-shadow var(--ggh-motion-hover-duration) var(--ggh-motion-ease),
+      background-color var(--ggh-motion-hover-duration) var(--ggh-motion-ease);
+  }
+
+  .team-showcase-card:hover,
+  .team-detail-member:hover,
+  .article-entity-link:hover,
+  .search-recent-chip:hover {
+    border-color: var(--ggh-color-border-strong);
+    box-shadow: var(--ggh-glow-primary), var(--ggh-shadow-small);
+    transform: translateY(-2px);
+  }
+
+  .team-member-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-compact);
+  }
+
+  .team-member-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-compact);
+    min-height: var(--spacing-control);
+    padding: 0 var(--spacing-control);
+    border: 1px solid var(--ggh-color-border-subtle);
+    border-radius: var(--radius-full);
+    color: var(--ggh-color-text-secondary);
+    background: var(--ggh-color-surface-1);
+    font-size: var(--ggh-font-size-caption);
+  }
+
+  .team-member-chip img {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+  }
+
+  .team-detail-members {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-content);
+  }
+
+  .team-detail-member {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-content);
+    min-width: 0;
+    padding: var(--spacing-content);
+    border: 1px solid var(--ggh-color-border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--ggh-color-surface-1);
+  }
+
+  .team-detail-member img {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+  }
+
+  .team-detail-member strong,
+  .team-detail-member small {
+    display: block;
+  }
+
+  .team-detail-member strong { color: var(--ggh-color-text-primary); font-size: var(--ggh-font-size-label); }
+  .team-detail-member small { margin-top: var(--spacing-compact); color: var(--ggh-color-text-tertiary); font-size: var(--ggh-font-size-caption); }
+
+  .article-entity-link,
+  .search-recent-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-compact);
+    min-height: var(--spacing-control);
+    padding: 0 var(--spacing-content);
+    border: 1px solid var(--ggh-color-border-subtle);
+    border-radius: var(--radius-full);
+    color: var(--ggh-color-text-primary);
+    background: var(--ggh-color-surface-1);
+    font-size: var(--ggh-font-size-caption);
+  }
+
+  .article-entity-link span { color: var(--ggh-color-primary); }
+
+  .search-recent-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-content);
+    padding: 0 var(--spacing-content);
+  }
+
+  .page-error-state {
+    display: grid;
+    min-height: 60vh;
+    place-items: center;
+    padding: var(--spacing-layout);
+  }
+
+  @media (max-width: 70rem) {
+    .content-catalog-header { align-items: stretch; flex-direction: column; }
+    .team-detail-members { grid-template-columns: 1fr; }
+  }
+
   .landing-act-root {
     position: relative;
     min-height: 100svh;

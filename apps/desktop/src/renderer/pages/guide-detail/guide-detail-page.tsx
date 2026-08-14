@@ -14,7 +14,7 @@ import { Banner, Button, Card, ScrollArea } from '@game-guide-hub/ui';
 import { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app-store';
-import { findGuideById, guides } from '../../shared/content';
+import { findGuideById, guides, resolveContentLinks } from '../../shared/content';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
 import { Tag } from '../../shared/ui/tag';
@@ -33,6 +33,7 @@ export default function GuideDetailPage() {
   const relatedGuides = guides
     .filter((candidate) => candidate.id !== guide.id && candidate.category === guide.category)
     .slice(0, 3);
+  const entityLinks = resolveContentLinks(guide).slice(0, 8);
 
   const shareGuide = async () => {
     recordGuideVisit(guide.id);
@@ -107,6 +108,27 @@ export default function GuideDetailPage() {
                 Mock，实际数据请以游戏内公告为准。
               </p>
             </Card>
+
+            {entityLinks.length ? (
+              <Card className="space-y-content" glass="medium">
+                <div>
+                  <p className="text-caption text-content-electric">知识网络</p>
+                  <h2 className="mt-compact text-title2 font-semibold">文中关联实体</h2>
+                </div>
+                <div className="flex flex-wrap gap-control">
+                  {entityLinks.map((entity) => (
+                    <Link
+                      key={`${entity.type}-${entity.id}`}
+                      to={entity.to}
+                      className="article-entity-link"
+                    >
+                      <span>{entity.type === 'agent' ? '角色' : entity.type === 'guide' ? '攻略' : entity.type}</span>
+                      {entity.title}
+                    </Link>
+                  ))}
+                </div>
+              </Card>
+            ) : null}
 
             {guide.sections.map((section) => (
               <section

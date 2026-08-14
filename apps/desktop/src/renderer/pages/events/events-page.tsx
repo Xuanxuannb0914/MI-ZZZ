@@ -1,6 +1,7 @@
 import { CalendarDays, Heart, Play, Target, Zap } from '@game-guide-hub/icons';
 import { Banner, Button } from '@game-guide-hub/ui';
 import { useAppStore } from '../../app/stores/app-store';
+import { Link } from 'react-router-dom';
 import { events } from '../../shared/content';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
@@ -26,10 +27,10 @@ export default function EventsPage() {
             title={featuredEvent.title}
             description={`参与活动可获取 ${featuredEvent.reward}，当前完成进度 ${featuredEvent.progress}%。`}
           >
-            <Button>
+            <Link to={`/zzz/events/${featuredEvent.id}`} className="inline-flex h-control items-center gap-control rounded-md bg-action-primary px-panel text-label font-semibold text-on-action-primary transition-transform hover:-translate-y-px">
               <Play aria-hidden="true" size={16} />
               参与指南
-            </Button>
+            </Link>
             <Button
               variant="secondary"
               onClick={() => toggleFavoriteEvent(featuredEvent.id)}
@@ -59,7 +60,7 @@ export default function EventsPage() {
                   </span>
                   <span>{event.duration}</span>
                 </div>
-                <h2 className="mt-panel text-title3 font-semibold">{event.title}</h2>
+                <Link to={`/zzz/events/${event.id}`} className="mt-panel block text-title3 font-semibold hover:text-content-electric">{event.title}</Link>
                 <p className="mt-compact text-body text-text-secondary">{event.reward}</p>
                 <div className="mt-panel flex items-center justify-between text-caption text-text-tertiary">
                   <span className="inline-flex items-center gap-compact">
