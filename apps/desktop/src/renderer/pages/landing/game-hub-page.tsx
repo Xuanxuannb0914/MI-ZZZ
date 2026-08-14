@@ -20,7 +20,7 @@ export default function GameHubPage() {
     const game = selectedGameRef.current;
     if (!game) return;
     completeStartup();
-    navigate(game.route, { replace: true });
+    navigate(game.route);
   }, [completeStartup, navigate]);
 
   const { enter, isEntering } = useLanding(completeSelection);

@@ -9,8 +9,9 @@ export function App() {
   const location = useLocation();
   const { applicationReady } = useStartup();
   const isStartupRoute = ['/', '/startup', '/games'].includes(location.pathname);
+  const isGameHubRoute = location.pathname === '/games';
 
-  if (!applicationReady) {
+  if (isGameHubRoute || !applicationReady) {
     return isStartupRoute ? (
       <LandingLayout>
         <StartupRoutes />
