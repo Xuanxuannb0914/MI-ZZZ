@@ -31,4 +31,11 @@ export interface Guide {
   readonly difficulty: GuideDifficulty;
   readonly tags: readonly string[];
   readonly sections: readonly GuideSection[];
+  readonly agentIds?: readonly string[];
+  readonly teamIds?: readonly string[];
+  readonly eventIds?: readonly string[];
+  readonly materialIds?: readonly string[];
+  readonly wEngineIds?: readonly string[];
+  readonly driveDiscIds?: readonly string[];
+  readonly versionIds?: readonly string[];
 }

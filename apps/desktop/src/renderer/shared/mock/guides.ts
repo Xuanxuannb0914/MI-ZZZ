@@ -53,6 +53,20 @@ function guide(
         ],
       },
     ],
+    agentIds: id.includes('miyabi')
+      ? ['miyabi']
+      : id.includes('jane')
+        ? ['jane-doe']
+        : id.includes('zhu-yuan')
+          ? ['zhu-yuan']
+          : [],
+    teamIds:
+      id.includes('team') || id.includes('zhu-yuan') ? ['miyabi-disorder', 'zhu-yuan-burst'] : [],
+    eventIds: category === '活动' ? ['astra-event'] : [],
+    materialIds: category === '资源' ? ['w-engine-chip', 'drive-disc-calibrator'] : [],
+    wEngineIds: id.includes('wengine') ? ['hailstorm-shrine', 'deep-sea-visitor'] : [],
+    driveDiscIds: id.includes('disc') ? ['1-折枝剑歌', '2-啄木鸟电音'] : [],
+    versionIds: ['v2-1'],
   };
 }
 

@@ -7,8 +7,13 @@ export interface VersionEvent {
   readonly type?: string;
   readonly status?: '进行中' | '即将开放' | '常驻';
   readonly startsAt?: string;
+  readonly description?: string;
+  readonly agentIds?: readonly string[];
+  readonly materialIds?: readonly string[];
+  readonly guideIds?: readonly string[];
+  readonly versionIds?: readonly string[];
 }
-export const events: readonly VersionEvent[] = [
+const eventSeeds = [
   {
     id: 'astra-event',
     title: '星见雅 · 风花之诗',
@@ -109,4 +114,18 @@ export const events: readonly VersionEvent[] = [
     status: '进行中',
     startsAt: '8 月 1 日',
   },
-];
+] satisfies readonly VersionEvent[];
+
+export const events: readonly VersionEvent[] = eventSeeds.map((event) => ({
+  ...event,
+  description: `${event.title}为本地 Mock 活动档案，开放时间请以游戏内公告为准。`,
+  agentIds: event.id === 'astra-event' || event.id === 'exclusive-banner' ? ['miyabi'] : [],
+  materialIds:
+    event.id === 'astra-event'
+      ? ['frost-core']
+      : event.id === 'anniversary'
+        ? ['festival-ticket']
+        : [],
+  guideIds: event.id === 'astra-event' ? ['event-shop', 'miyabi-frostburn'] : ['banner-planner'],
+  versionIds: ['v2-1'],
+}));

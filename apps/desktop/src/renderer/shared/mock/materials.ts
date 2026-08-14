@@ -313,6 +313,9 @@ export const materials: readonly Material[] = [
   relatedGuides:
     item.relatedGuides ??
     (item.category === '驱动盘材料' ? ['驱动盘调律不踩坑'] : ['电量规划计算器']),
+  agentIds: item.category === '角色材料' || item.category === '升级材料' ? ['miyabi'] : [],
+  wEngineIds: item.category === '音擎材料' ? ['hailstorm-shrine', 'deep-sea-visitor'] : [],
+  eventIds: item.category === '活动材料' ? ['astra-event', 'anniversary'] : [],
 }));
 
 export function findMaterialById(materialId: string): Material | undefined {
