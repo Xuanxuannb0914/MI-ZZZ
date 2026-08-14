@@ -9,8 +9,7 @@
 
 ## 1. 设计意图
 
-Game Guide
-Hub 不是传统管理后台，也不是营销落地页。界面应像长期使用的游戏研究工作台：游戏内容和当前上下文是第一视觉信号，应用框架安静稳定，交互密度高但不拥挤。
+Game Guide Hub 不是传统管理后台，也不是营销落地页。界面应像长期使用的游戏研究工作台：游戏内容和当前上下文是第一视觉信号，应用框架安静稳定，交互密度高但不拥挤。
 
 参考来源只转译原则：
 
@@ -32,13 +31,10 @@ Semantic tokens (surface/text/action/status)
 Component tokens (button/nav/dialog; 极少且可追踪)
 ```
 
-组件只能消费 semantic/component token。Primitive 是主题实现细节，不得在 `features/`
-中出现。Token 源位于 `packages/theme`，生成 CSS variables、Tailwind theme、TypeScript
-metadata 和设计工具交换格式；生成物不可手改。
+组件只能消费 semantic/component token。Primitive 是主题实现细节，不得在 `features/` 中出现。Token 源位于 `packages/theme`，生成 CSS variables、Tailwind theme、TypeScript metadata 和设计工具交换格式；生成物不可手改。
 
 命名格式：`--ggh-<category>-<role>-<state?>`，例如
-`--ggh-color-text-primary`、`--ggh-color-action-primary-hover`。Token 变更遵循 SemVer；删除或语义改变是 breaking
-change。
+`--ggh-color-text-primary`、`--ggh-color-action-primary-hover`。Token 变更遵循 SemVer；删除或语义改变是 breaking change。
 
 ## 3. 色彩系统
 
@@ -88,8 +84,7 @@ change。
 | `danger`            | `#C73535` | 危险/错误          |
 | `info`              | `#245FB8` | 信息               |
 
-这些值是设计基线，不代表未经验证即可发布。Token
-pipeline 必须自动验证实际 foreground/background 组合：普通文本 ≥ 4.5:1，大文本和关键 UI 图形 ≥
+这些值是设计基线，不代表未经验证即可发布。Token pipeline 必须自动验证实际 foreground/background 组合：普通文本 ≥ 4.5:1，大文本和关键 UI 图形 ≥
 3:1；目标正文尽量达到 7:1。状态不得只靠颜色，必须同时使用图标、文字、形状或位置。
 
 ### 3.3 游戏内容色
@@ -115,8 +110,7 @@ sans-serif。中文回退使用平台默认 CJK 字体，后续通过字体授�
 | `code`    | 13/20     | 450    | 代码、ID、Build 数值       |
 
 不随 viewport 连续缩放字体；通过离散 role 与布局重排响应。Letter spacing 默认
-`0`，不使用负字距。数字表格、计时和对齐属性使用 tabular
-figures。长文行宽 60-75 个拉丁字符或约 32-42 个中文字符；用户缩放 200% 时不得截断关键内容。
+`0`，不使用负字距。数字表格、计时和对齐属性使用 tabular figures。长文行宽 60-75 个拉丁字符或约 32-42 个中文字符；用户缩放 200% 时不得截断关键内容。
 
 ## 5. 间距与尺寸
 
@@ -133,14 +127,12 @@ px。2/6 仅用于内部光学校准；布局优先 4/8 节奏。
 | `content-max`   | 1200    | 列表/网格主内容      |
 | `reading-max`   | 760     | 攻略/Wiki 长文       |
 
-控件高度：compact 28、default 36、comfortable 44。图标按钮的 visual box 最低 32×32，触摸路径 hit
-target 44×44。固定格式 UI 必须使用稳定
+控件高度：compact 28、default 36、comfortable 44。图标按钮的 visual box 最低 32×32，触摸路径 hit target 44×44。固定格式 UI 必须使用稳定
 `min/max/aspect-ratio/grid track`，loading/hover/badge 不得改变布局尺寸。
 
 ## 6. 圆角、边框与层级
 
-Radius
-tokens：`none 0`、`xs 2`、`sm 4`、`md 6`、`lg 8`、`xl 12`、`full 9999`。卡片与重复项最大 8px；Dialog/Sheet 可使用 12px；pill 仅用于状态、标签、分段选择或头像，不作为通用按钮造型。
+Radius tokens：`none 0`、`xs 2`、`sm 4`、`md 6`、`lg 8`、`xl 12`、`full 9999`。卡片与重复项最大 8px；Dialog/Sheet 可使用 12px；pill 仅用于状态、标签、分段选择或头像，不作为通用按钮造型。
 
 Border：1px 常规、2px focus/high contrast。避免用阴影替代所有边界。Elevation：
 
@@ -150,16 +142,13 @@ Border：1px 常规、2px focus/high contrast。避免用阴影替代所有边�
 - `3`：dialog/sheet；
 - `focus`：2px action ring + 2px canvas offset。
 
-阴影在 dark theme 使用低透明黑色 + 细亮边，在 light
-theme 使用中性黑；不得出现彩色发光作为常规 elevation。
+阴影在 dark theme 使用低透明黑色 + 细亮边，在 light theme 使用中性黑；不得出现彩色发光作为常规 elevation。
 
-Z-index 仅用语义层：base 0、sticky 100、dropdown 300、popover 400、overlay 600、dialog 700、toast
-800、critical 900。业务代码禁止任意数字。Toast 不应覆盖 Dialog 的关键操作。
+Z-index 仅用语义层：base 0、sticky 100、dropdown 300、popover 400、overlay 600、dialog 700、toast 800、critical 900。业务代码禁止任意数字。Toast 不应覆盖 Dialog 的关键操作。
 
 ## 7. Glass 规范
 
-Glass 是“背景退居次要”的功能材质，仅允许 titlebar、悬浮导航、popover/dialog
-backdrop 和媒体上的临时控制层使用。内容 section、列表卡片、表单和嵌套容器禁止 glass。
+Glass 是“背景退居次要”的功能材质，仅允许 titlebar、悬浮导航、popover/dialog backdrop 和媒体上的临时控制层使用。内容 section、列表卡片、表单和嵌套容器禁止 glass。
 
 - Dark 建议 surface alpha 0.78-0.9，Light 0.84-0.94；backdrop blur 12-20px；
 - 必须有不透明 fallback、边界和独立对比测试；
@@ -182,13 +171,11 @@ backdrop 和媒体上的临时控制层使用。内容 section、列表卡片、
 进入
 `cubic-bezier(0.16, 1, 0.3, 1)`，退出更短、使用 ease-in；布局弹簧仅用于拖放/面板并限制 overshoot。只动画 transform/opacity；禁止动画 width/height/top/left 导致重排。列表 stagger 每项 24-40ms、最多前 8 项，密集数据表不 stagger。
 
-Reduced
-motion：取消 parallax、spring、scale 和大位移；route 改短 crossfade，loading 用静态/低频进度，保留 focus/pressed/success 的非运动反馈。
+Reduced motion：取消 parallax、spring、scale 和大位移；route 改短 crossfade，loading 用静态/低频进度，保留 focus/pressed/success 的非运动反馈。
 
 ## 9. 桌面布局
 
-推荐最小窗口 1024×640；低于此尺寸不承诺完整三栏，但必须保持核心阅读和关闭/返回可用。具体 hard
-minimum 需跨平台验证后 ADR 固定。
+推荐最小窗口 1024×640；低于此尺寸不承诺完整三栏，但必须保持核心阅读和关闭/返回可用。具体 hard minimum 需跨平台验证后 ADR 固定。
 
 ```text
 ┌──────────────────── Platform-aware titlebar: 40 ────────────────────┐
@@ -203,9 +190,7 @@ minimum 需跨平台验证后 ADR 固定。
 | Wide       | ≥1600     | 可持久显示右 panel；主内容仍有 max-width               |
 | Low height | <720      | 缩减垂直 padding，不缩字体/目标；工具栏可滚动/overflow |
 
-Rail 是顶级空间，Sidebar 是当前空间导航，Tabs/segmented
-control 是当前页面视图；三者不得表达同一层级。页面 section 是无框全宽布局，不包成漂浮卡；卡片只用于真正重复、可独立选择的项目。禁止 card
-inside card。
+Rail 是顶级空间，Sidebar 是当前空间导航，Tabs/segmented control 是当前页面视图；三者不得表达同一层级。页面 section 是无框全宽布局，不包成漂浮卡；卡片只用于真正重复、可独立选择的项目。禁止 card inside card。
 
 未来 Web 断点基线为 375、768、1024、1440；Mobile 采用独立适配，不把桌面多栏压扁。核心内容优先，次要面板折叠；不得产生无意水平滚动。
 
@@ -219,11 +204,9 @@ inside card。
 | Feature   | `BuildEditor`, `GuideRevisionPanel`        | 完整用例组合                  |
 
 使用 PascalCase；状态/尺寸用有限 union，不用布尔 prop 爆炸。Compound component 采用
-`Dialog.Trigger`、`Dialog.Content`。每个组件公开 anatomy、states、keyboard、ARIA、tokens 和 testing
-contract。
+`Dialog.Trigger`、`Dialog.Content`。每个组件公开 anatomy、states、keyboard、ARIA、tokens 和 testing contract。
 
-基础组件目录计划：Actions、Inputs、Navigation、Overlays、Feedback、Data
-Display、Layout、Content、Media。不要为了目录完整提前生成无需求组件。
+基础组件目录计划：Actions、Inputs、Navigation、Overlays、Feedback、Data Display、Layout、Content、Media。不要为了目录完整提前生成无需求组件。
 
 ## 11. 图标与资产
 
@@ -239,8 +222,7 @@ Display、Layout、Content、Media。不要为了目录完整提前生成无需�
 
 每个交互组件具备 default、hover、focus-visible、pressed、selected、disabled、loading 和 error（适用时）。反馈在 100ms 内出现；超过 300ms 显示局部 progress，超过 1s 用保留尺寸 skeleton。Skeleton 不模拟不可预测内容，也不无限循环吸引注意。
 
-表单始终有可见 label；blur 后验证，错误靠近字段并说明原因与修复；多错误提供 summary/focus。破坏性操作与主操作空间分离，优先 undo；不可逆动作二次确认并明确对象。Toast
-3-5 秒（错误/可操作消息不强制自动消失），`aria-live` 宣告且不抢焦点。
+表单始终有可见 label；blur 后验证，错误靠近字段并说明原因与修复；多错误提供 summary/focus。破坏性操作与主操作空间分离，优先 undo；不可逆动作二次确认并明确对象。Toast 3-5 秒（错误/可操作消息不强制自动消失），`aria-live` 宣告且不抢焦点。
 
 ## 13. 可访问性
 

@@ -56,8 +56,7 @@ JSON 字段使用 `camelCase`；时间为 RFC 3339 UTC；日期为 `YYYY-MM-DD`�
 
 ## 5. 分页、筛选与排序
 
-变化频繁/大集合默认 cursor
-pagination。Cursor 不透明、签名/防篡改并编码稳定排序边界；排序必须含唯一 tie-breaker。默认
+变化频繁/大集合默认 cursor pagination。Cursor 不透明、签名/防篡改并编码稳定排序边界；排序必须含唯一 tie-breaker。默认
 `limit=20`、最大 100，端点可收紧。
 
 筛选用明确参数，如 `filter[gameId]`、`filter[status]`；排序用 `sort=-publishedAt,title`；全文搜索用
@@ -94,8 +93,7 @@ pagination。Cursor 不透明、签名/防篡改并编码稳定排序边界；�
 
 ## 8. 长任务与流式响应
 
-耗时操作返回 202 和 operation
-resource：`/operations/{id}`，状态为 queued/running/succeeded/failed/cancelled，带 progress（可选）、结果链接和稳定错误。客户端轮询带
+耗时操作返回 202 和 operation resource：`/operations/{id}`，状态为 queued/running/succeeded/failed/cancelled，带 progress（可选）、结果链接和稳定错误。客户端轮询带
 `Retry-After`，或订阅对应 WebSocket 事件。
 
 AI 流可使用 SSE 或 WebSocket，具体由 ADR 选择；流帧带 sequence/type，最终帧包含 usage、citations、finishReason。连接断开不等于任务取消，取消必须调用显式命令并授权。
@@ -129,11 +127,9 @@ AI 流可使用 SSE 或 WebSocket，具体由 ADR 选择；流帧带 sequence/ty
 ## 11. OpenAPI 与生成客户端
 
 OpenAPI 是 CI 制品和 API 评审依据：operationId 稳定唯一；所有状态、schema、权限、分页和示例明确。生成
-`packages/api-client`，generated 文件不可手改；自定义 transport、错误映射和 query
-hooks 放在生成目录外。
+`packages/api-client`，generated 文件不可手改；自定义 transport、错误映射和 query hooks 放在生成目录外。
 
-CI 执行 schema lint、breaking-change
-diff、生成物无漂移、契约测试。API 改动顺序是 schema/评审 → 服务实现 → 客户端生成 → 兼容测试；不得先改客户端猜测响应。
+CI 执行 schema lint、breaking-change diff、生成物无漂移、契约测试。API 改动顺序是 schema/评审 → 服务实现 → 客户端生成 → 兼容测试；不得先改客户端猜测响应。
 
 ## 12. 可观测性头与元数据
 

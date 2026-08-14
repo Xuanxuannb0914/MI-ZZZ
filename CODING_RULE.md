@@ -17,8 +17,7 @@
 
 ## 2. TypeScript 基线
 
-全仓启用 `strict`，并评估开启
-`noUncheckedIndexedAccess`、`exactOptionalPropertyTypes`、`useUnknownInCatchVariables`、`noImplicitOverride`、`noFallthroughCasesInSwitch`。任何关闭项需 ADR/注释说明迁移计划。
+全仓启用 `strict`，并评估开启 `noUncheckedIndexedAccess`、`exactOptionalPropertyTypes`、`useUnknownInCatchVariables`、`noImplicitOverride`、`noFallthroughCasesInSwitch`。任何关闭项需 ADR/注释说明迁移计划。
 
 - 禁止 `any`、`as any`、`@ts-ignore` 和无说明 `@ts-expect-error`；边界数据先是
   `unknown`，运行时验证后收窄；
@@ -33,10 +32,7 @@
 
 函数应单一意图、早返回、命名表达原因。超过约 40 行或三层嵌套触发重构审查，但不是机械失败线；复杂算法可保留完整性并由测试和注释支撑。
 
-React 组件超过约 200 行、同时处理数据获取/状态/布局/业务决策，必须拆分。Nest
-Controller 不含业务逻辑，use
-case 不解析 HTTP，repository 不做授权。文件应有一个主要概念；`utils.ts`、`helpers.ts`、`common.ts`
-只能作为极小局部文件，禁止仓库级杂物箱。
+React 组件超过约 200 行、同时处理数据获取/状态/布局/业务决策，必须拆分。Nest Controller 不含业务逻辑，use case 不解析 HTTP，repository 不做授权。文件应有一个主要概念；`utils.ts`、`helpers.ts`、`common.ts` 只能作为极小局部文件，禁止仓库级杂物箱。
 
 公共抽象必须回答：谁拥有、谁消费、变化轴是什么、如何测试、如何弃用。无真实替换需求时不创建单实现接口；在 I/O、外部 provider、领域 repository 和测试隔离处使用 port。
 
@@ -51,8 +47,7 @@ case 不解析 HTTP，repository 不做授权。文件应有一个主要概念�
 
 ## 5. 不可变性与副作用
 
-默认不可变数据与纯函数；副作用集中在 adapter/use
-case。不要修改参数、共享 singleton 状态或依赖隐式全局。时间、随机数、ID、环境、文件、网络以可注入 port 提供，确保测试确定性。
+默认不可变数据与纯函数；副作用集中在 adapter/use case。不要修改参数、共享 singleton 状态或依赖隐式全局。时间、随机数、ID、环境、文件、网络以可注入 port 提供，确保测试确定性。
 
 事务、锁、缓存失效和事件发布在 application 层可见，不隐藏在通用 decorator/middleware 中导致控制流不可读。
 
@@ -66,8 +61,7 @@ case。不要修改参数、共享 singleton 状态或依赖隐式全局。时�
 
 新增运行时依赖需说明：现有工具为何不足、维护/许可证/体积/安全、替代方案、移除成本。锁定精确 lockfile；禁止重复功能库和深 import 私有路径。依赖更新由自动 PR 分组，小版本自动化仍需测试，高风险框架单独升级。
 
-Package `exports` 定义公共入口；禁止跨 package 相对路径。循环依赖、undeclared
-dependency、生产包引用 dev/test 包由 CI 阻断。
+Package `exports` 定义公共入口；禁止跨 package 相对路径。循环依赖、undeclared dependency、生产包引用 dev/test 包由 CI 阻断。
 
 ## 8. 工具职责
 
@@ -81,15 +75,11 @@ dependency、生产包引用 dev/test 包由 CI 阻断。
 | Husky + lint-staged | 在提交前运行受影响文件的快速本地反馈                                | 不复制完整 CI，不允许用 hook 代替服务端门禁          |
 | Commitlint          | 校验 Conventional Commit message                                    | 规则与 [GIT_RULE.md](./GIT_RULE.md) 保持单一来源     |
 
-每种文件只有一个 formatter。CI 顺序：format:check → lint → typecheck → test → build；本地 `check`
-可并行但结果一致。Biome/ESLint 规则冲突以职责表修复，不用 disable 注释长期压制。
+每种文件只有一个 formatter。CI 顺序：format:check → lint → typecheck → test → build；本地 `check` 可并行但结果一致。Biome/ESLint 规则冲突以职责表修复，不用 disable 注释长期压制。
 
 ## 9. 配置与常量
 
-无 magic number/string。业务阈值、timeout、尺寸、事件名、权限、route、query
-key 使用有所有权的命名常量/配置；显然值（`0`, `1`
-循环边界）无需抽象。环境配置启动时按 schema 验证，区分 secret 与非 secret，并提供 `.env.example`
-但无真实值。
+无 magic number/string。业务阈值、timeout、尺寸、事件名、权限、route、query key 使用有所有权的命名常量/配置；显然值（`0`, `1` 循环边界）无需抽象。环境配置启动时按 schema 验证，区分 secret 与非 secret，并提供 `.env.example` 但无真实值。
 
 Feature flag 有 owner、用途、默认值、创建/到期日期和删除 issue。Flag 不能绕过授权、安全或数据约束。
 
@@ -105,16 +95,13 @@ Feature flag 有 owner、用途、默认值、创建/到期日期和删除 issue
 
 ## 11. 性能规则
 
-先设预算和测量，再优化。避免无界查询/列表、N+1、重复序列化、大对象复制、main
-thread 同步 I/O 和高基数日志/指标。缓存必须定义一致性、TTL、失效、容量和观测；没有失效策略不得加缓存。
+先设预算和测量，再优化。避免无界查询/列表、N+1、重复序列化、大对象复制、main thread 同步 I/O 和高基数日志/指标。缓存必须定义一致性、TTL、失效、容量和观测；没有失效策略不得加缓存。
 
 高频路径用 benchmark/profiler 证据支撑；优化 PR 附前后数据、环境和回归测试。可读性换性能必须是经证实热点。
 
 ## 12. 测试友好性
 
-从公共行为测试，不暴露 private 只为测试。用 deterministic
-fake 隔离时间/随机/网络；mock 只在进程/网络边界。测试数据 builders 表达意图，不共享可变 fixture。详细门禁见
-[TESTING_RULE.md](./TESTING_RULE.md)。
+从公共行为测试，不暴露 private 只为测试。用 deterministic fake 隔离时间/随机/网络；mock 只在进程/网络边界。测试数据 builders 表达意图，不共享可变 fixture。详细门禁见 [TESTING_RULE.md](./TESTING_RULE.md)。
 
 ## 13. 禁止清单
 

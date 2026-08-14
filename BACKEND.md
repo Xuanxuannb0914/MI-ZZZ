@@ -37,8 +37,7 @@
 - **Interface**：Controller、Gateway、Queue processor、DTO 和协议映射；
 - **Infrastructure**：Prisma repository、Redis cache、外部 AI/媒体/邮件 adapter。
 
-Controller 只做协议解析、验证、身份上下文和响应映射。Repository 不包含业务决策。跨模块调用通过对方 application
-facade；不得跨模块 join 私有表。复杂读取可由明确所有权的 read model 提供。
+Controller 只做协议解析、验证、身份上下文和响应映射。Repository 不包含业务决策。跨模块调用通过对方 application facade；不得跨模块 join 私有表。复杂读取可由明确所有权的 read model 提供。
 
 ## 4. 请求生命周期
 
@@ -53,18 +52,14 @@ Gateway/Controller
   -> presenter / RFC 9457 error
 ```
 
-每个请求具备 request ID、trace
-context、超时和取消信号。全局 interceptor/filter 只处理横切关注点，不隐藏业务控制流。输入限制 body
-size、字段长度、数组大小和查询复杂度。
+每个请求具备 request ID、trace context、超时和取消信号。全局 interceptor/filter 只处理横切关注点，不隐藏业务控制流。输入限制 body size、字段长度、数组大小和查询复杂度。
 
 ## 5. 认证与授权
 
 认证基于 OIDC/OAuth 2.1 Authorization Code +
-PKCE；具体 Provider 由 ADR 决定。API 校验 issuer、audience、signature、expiry 和 token
-type。刷新令牌轮换与复用检测由 Identity 负责。
+PKCE；具体 Provider 由 ADR 决定。API 校验 issuer、audience、signature、expiry 和 token type。刷新令牌轮换与复用检测由 Identity 负责。
 
-授权采用 deny-by-default 的 policy/permission，资源级检查位于 application boundary。Controller
-guard 可做粗粒度检查，但不能替代对象级授权。管理员接口单独路由、权限、审计和速率限制；禁止以客户端隐藏按钮当授权。
+授权采用 deny-by-default 的 policy/permission，资源级检查位于 application boundary。Controller guard 可做粗粒度检查，但不能替代对象级授权。管理员接口单独路由、权限、审计和速率限制；禁止以客户端隐藏按钮当授权。
 
 ## 6. PostgreSQL 与 Prisma
 
@@ -101,13 +96,11 @@ Job payload 只含稳定 ID 与最少上下文，不携带大文档、令牌或�
 WebSocket 用于通知、协作状态和长任务进度，不替代 REST 事实读取。连接使用短期专用 ticket 或安全 token 协商，校验 origin/客户端版本；按用户、会话和主题授权 room。
 
 事件包含
-`id`、`type`、`version`、`occurredAt`、`correlationId`、`sequence?`、`data`。客户端必须处理重复、乱序、断线和版本未知；重连采用带抖动的指数退避，通过 cursor/REST
-snapshot 补偿丢失事件。背压时合并低价值进度事件并断开持续慢消费者。
+`id`、`type`、`version`、`occurredAt`、`correlationId`、`sequence?`、`data`。客户端必须处理重复、乱序、断线和版本未知；重连采用带抖动的指数退避，通过 cursor/REST snapshot 补偿丢失事件。背压时合并低价值进度事件并断开持续慢消费者。
 
 ## 10. AI Provider 边界
 
-AI 是外部 adapter，不进入领域核心。Assistant application
-service 管理配额、模型策略、检索、引用、超时、取消、审计与降级。Prompt 模板版本化，外部内容标记为不可信数据；工具调用使用明确 schema、能力 allowlist 和服务端授权，模型不能自行扩大权限。
+AI 是外部 adapter，不进入领域核心。Assistant application service 管理配额、模型策略、检索、引用、超时、取消、审计与降级。Prompt 模板版本化，外部内容标记为不可信数据；工具调用使用明确 schema、能力 allowlist 和服务端授权，模型不能自行扩大权限。
 
 不得记录完整敏感 Prompt/Response；调试采样需脱敏、限时保留和用户/合规授权。模型、价格和 provider 可替换，业务层只依赖能力接口。输出在展示或执行前分别通过内容安全、引用完整性和工具参数验证。
 
@@ -131,17 +124,13 @@ service 管理配额、模型策略、检索、引用、超时、取消、审计
 
 ## 13. 安全基线
 
-TLS only；Helmet/CSP（适用于 HTTP 内容）、严格 CORS
-allowlist、速率限制、输入验证、参数化查询、上传内容类型/大小/恶意文件检查。内部管理端点与公开 API 分离。Secrets 由 secret
-manager 注入并轮换，禁止进入 Git、镜像或日志。
+TLS only；Helmet/CSP（适用于 HTTP 内容）、严格 CORS allowlist、速率限制、输入验证、参数化查询、上传内容类型/大小/恶意文件检查。内部管理端点与公开 API 分离。Secrets 由 secret manager 注入并轮换，禁止进入 Git、镜像或日志。
 
-SSRF 防护需解析后校验协议、主机/IP、重定向和 DNS
-rebinding；用户 URL 抓取在隔离网络执行。Webhook（未来）必须签名、防重放、限时。依赖和容器镜像需扫描、SBOM 与签名。
+SSRF 防护需解析后校验协议、主机/IP、重定向和 DNS rebinding；用户 URL 抓取在隔离网络执行。Webhook（未来）必须签名、防重放、限时。依赖和容器镜像需扫描、SBOM 与签名。
 
 ## 14. 性能与容量
 
-所有列表分页，默认 20、最大 100（具体端点可收紧）。API 层设置 timeout 和 body budget；DB
-pool 由实例数与数据库上限反推。使用 explain/analyze 与生产相似数据优化，不凭感觉加索引。
+所有列表分页，默认 20、最大 100（具体端点可收紧）。API 层设置 timeout 和 body budget；DB pool 由实例数与数据库上限反推。使用 explain/analyze 与生产相似数据优化，不凭感觉加索引。
 
 容量测试覆盖热点游戏、发布日流量、AI 流式响应、WS 重连风暴、队列 backlog 和缓存冷启动。每项测试保留场景、数据规模、版本与结果。
 

@@ -8,8 +8,7 @@
 
 ## 1. 总则
 
-命名表达领域含义与意图，避免实现细节和含糊缩写。使用团队可搜索的统一词汇；同一概念不得在 API、数据库、事件和 UI 中分别叫不同名字。术语变化需更新 product
-glossary 和迁移说明。
+命名表达领域含义与意图，避免实现细节和含糊缩写。使用团队可搜索的统一词汇；同一概念不得在 API、数据库、事件和 UI 中分别叫不同名字。术语变化需更新 product glossary 和迁移说明。
 
 禁止：`data`、`info`、`item`、`obj`、`temp`、`manager`、`processor`、`handler`
 等无上下文名称；在有明确职责时如 `WebhookHandler` 可用。禁止 `utils2`、`newService`、`finalFinal`。
@@ -31,9 +30,7 @@ glossary 和迁移说明。
 | Zustand store        | `use<Scope>Store`                    | `useWorkspaceStore`              |
 | Query key factory    | `<feature>Keys`                      | `guideKeys.detail(id)`           |
 
-接口不加 `I`，类型不加 `T`；以角色命名
-`GuideRepository`、`Clock`。实现只有在需要区分时用 provider/技术：`PrismaGuideRepository`、`SystemClock`。DTO 明确方向与动作：`CreateGuideRequest`、`GuideResponse`，不使用泛化
-`GuideDto` 贯穿层次。
+接口不加 `I`，类型不加 `T`；以角色命名 `GuideRepository`、`Clock`。实现只有在需要区分时用 provider/技术：`PrismaGuideRepository`、`SystemClock`。DTO 明确方向与动作：`CreateGuideRequest`、`GuideResponse`，不使用泛化 `GuideDto` 贯穿层次。
 
 领域命令用祈使动作 `PublishGuideRevision`，领域事件用过去式 `GuideRevisionPublished`，查询用意图
 `GetGuideDetails`。Error 使用 `<Condition>Error`，对外稳定 code 使用 `UPPER_SNAKE_CASE`。
@@ -48,17 +45,14 @@ glossary 和迁移说明。
 - 公共入口 `index.ts` 只 re-export 公共 API，不实现逻辑；禁止层层 barrel 导致循环依赖；
 - 动态路由参数按框架约定，概念名保持一致。
 
-功能目录以用户能力命名，如 `guide-reader`、`build-editor`，不用技术层 `components`
-作为 feature。后端 bounded context 使用单数概念目录或公认集合名，并在全仓一致。
+功能目录以用户能力命名，如 `guide-reader`、`build-editor`，不用技术层 `components` 作为 feature。后端 bounded context 使用单数概念目录或公认集合名，并在全仓一致。
 
 ## 4. React 组件
 
 Primitive 使用名词：`Button`、`Dialog`、`TextField`。组合模式使用清晰领域/任务：`GameLibrarySidebar`、`GuideSourceList`。避免
 `Card` 泛滥；如果组件是 `GuideSummary`，按内容命名而非外观 `GuideCard`，除非 Card 本身是交互契约。
 
-Props 类型为 `<Component>Props`；variant 使用语义 `primary/secondary/quiet/danger`，不用颜色名
-`blue/red`。Slot 用角色 `leadingIcon`、`actions`、`footer`。禁止 `isTypeA`、`isTypeB`
-多布尔切换，改为 `variant` union 或组合。
+Props 类型为 `<Component>Props`；variant 使用语义 `primary/secondary/quiet/danger`，不用颜色名 `blue/red`。Slot 用角色 `leadingIcon`、`actions`、`footer`。禁止 `isTypeA`、`isTypeB` 多布尔切换，改为 `variant` union 或组合。
 
 ## 5. API 命名
 
@@ -82,8 +76,7 @@ Props 类型为 `<Component>Props`；variant 使用语义 `primary/secondary/qui
 | Foreign key        | `fk_<from>__<to>`    | `fk_guide_revisions__guides`              |
 | Check              | `ck_<table>__<rule>` | `ck_builds__title_not_blank`              |
 
-Join table 用两个实体复数按领域自然顺序，如 `guide_tags`；不是机械字母排序。时间列 `_at`，业务日期
-`_on`，布尔列 `is_`/`has_`。禁止 `tbl_`、`col_` 和数据库保留字。
+Join table 用两个实体复数按领域自然顺序，如 `guide_tags`；不是机械字母排序。时间列 `_at`，业务日期 `_on`，布尔列 `is_`/`has_`。禁止 `tbl_`、`col_` 和数据库保留字。
 
 ## 7. Redis、Queue 与事件
 
@@ -100,21 +93,15 @@ Join table 用两个实体复数按领域自然顺序，如 `guide_tags`；不�
 
 ## 8. Git、环境与配置
 
-Branch 见 [GIT_RULE.md](./GIT_RULE.md)：`feature/GGH-123-guide-search`。环境变量以 `GGH_`
-开头、`UPPER_SNAKE_CASE`，按作用域命名：`GGH_API_DATABASE_URL`、`GGH_DESKTOP_UPDATE_CHANNEL`。Secret 名称表达内容但不含真实环境值。
+Branch 见 [GIT_RULE.md](./GIT_RULE.md)：`feature/GGH-123-guide-search`。环境变量以 `GGH_` 开头、`UPPER_SNAKE_CASE`，按作用域命名：`GGH_API_DATABASE_URL`、`GGH_DESKTOP_UPDATE_CHANNEL`。Secret 名称表达内容但不含真实环境值。
 
-Feature flag：`<area>.<capability>.<variant?>`，例如 `assistant.citations.v2`；避免否定名。Telemetry
-event 使用 `<surface>.<object>.<action>`，属性名稳定且不含动态 ID。
+Feature flag：`<area>.<capability>.<variant?>`，例如 `assistant.citations.v2`；避免否定名。Telemetry event 使用 `<surface>.<object>.<action>`，属性名稳定且不含动态 ID。
 
 ## 9. 缩写与保留词
 
-允许行业通用：API、HTTP、URL、ID、UI、AI、DB、DTO、SLO。标识符按自然大小写：`apiClient`、`userId`、`HttpGateway`（不使用
-`APIClient`/`userID`）。领域缩写首次在 glossary 定义；单字母只用于极短数学/索引范围。
+允许行业通用：API、HTTP、URL、ID、UI、AI、DB、DTO、SLO。标识符按自然大小写：`apiClient`、`userId`、`HttpGateway`（不使用 `APIClient`/`userID`）。领域缩写首次在 glossary 定义；单字母只用于极短数学/索引范围。
 
-避免 `delete` 与 `remove` 混用：删除事实用 `delete`，从集合解除关联用 `remove`，可逆状态用
-`archive`/`deactivate`。读取远程资源用 `fetch`，从 repository 用 `find/get`（`get`
-不存在时抛/失败，`find` 可返回空），转换用 `map/to/from`，验证用
-`validate/parse`（parse 成功返回类型，失败明确）。
+避免 `delete` 与 `remove` 混用：删除事实用 `delete`，从集合解除关联用 `remove`，可逆状态用 `archive`/`deactivate`。读取远程资源用 `fetch`，从 repository 用 `find/get`（`get` 不存在时抛/失败，`find` 可返回空），转换用 `map/to/from`，验证用 `validate/parse`（parse 成功返回类型，失败明确）。
 
 ## 10. 评审清单
 

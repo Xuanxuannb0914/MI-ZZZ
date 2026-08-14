@@ -34,9 +34,7 @@ Feature 推荐结构：`api/`、`model/`、`ui/`、`routes/`、`lib/`、`testing
 Main 按 capability 组织：`windows`、`protocol`、`updates`、`credentials`、`notifications`、`files`、`telemetry`。Preload 对每项能力提供窄接口和版本；Renderer 永远不能获得原始
 `ipcRenderer`、路径或 shell 执行能力。
 
-窗口创建采用安全基线：隔离上下文、启用 sandbox、关闭 Node
-integration、限制导航/新窗口、CSP、外链 allowlist。自定义标题栏必须保留平台窗口控制、可拖拽区和无障碍名称；macOS
-traffic lights 与 Windows snap 行为分别测试。
+窗口创建采用安全基线：隔离上下文、启用 sandbox、关闭 Node integration、限制导航/新窗口、CSP、外链 allowlist。自定义标题栏必须保留平台窗口控制、可拖拽区和无障碍名称；macOS traffic lights 与 Windows snap 行为分别测试。
 
 ## 3. 状态职责
 
@@ -48,13 +46,11 @@ traffic lights 与 Windows snap 行为分别测试。
 | 表单临时状态            | 组件/表单库    | 离用户最近，提交后由 Query 刷新                    |
 | 主题/Locale/Auth facade | React Context  | 低频全局依赖；高频数据不放 Context                 |
 
-Query key 由 feature 的 key
-factory 统一生成；mutation 成功后以精确 invalidation 或缓存更新处理，禁止全局清缓存。只对幂等读请求有限重试；权限、验证和确定性 4xx 不重试。
+Query key 由 feature 的 key factory 统一生成；mutation 成功后以精确 invalidation 或缓存更新处理，禁止全局清缓存。只对幂等读请求有限重试；权限、验证和确定性 4xx 不重试。
 
 ## 4. 路由与导航
 
-建议 URI：`/games/:gameSlug`、`/games/:gameSlug/guides/:guideId`、`/builds/:buildId`、`/search?q=`、`/assistant/:conversationId`、`/settings/:section`。Desktop
-custom protocol 映射到同一内部路由，所有参数先验证。
+建议 URI：`/games/:gameSlug`、`/games/:gameSlug/guides/:guideId`、`/builds/:buildId`、`/search?q=`、`/assistant/:conversationId`、`/settings/:section`。Desktop custom protocol 映射到同一内部路由，所有参数先验证。
 
 - 每个顶级路由有独立 error boundary、loading skeleton 和 empty/offline 状态；
 - Back 必须恢复滚动、筛选、展开状态和输入；Modal 不承载主导航；
@@ -64,19 +60,16 @@ custom protocol 映射到同一内部路由，所有参数先验证。
 
 ## 5. 数据访问与契约
 
-Renderer 只能通过 `@game-guide-hub/api-client` 和经批准的 WebSocket
-client 访问服务端。生成目录只读；业务模型通过显式 mapper 与 transport DTO 分离，以隔离 API 演进。
+Renderer 只能通过 `@game-guide-hub/api-client` 和经批准的 WebSocket client 访问服务端。生成目录只读；业务模型通过显式 mapper 与 transport DTO 分离，以隔离 API 演进。
 
-每个请求注入客户端版本、locale、request ID；认证由统一 transport
-adapter 管理，功能代码不得读取 token。取消路由或搜索请求时传递 AbortSignal。错误统一映射为
+每个请求注入客户端版本、locale、request ID；认证由统一 transport adapter 管理，功能代码不得读取 token。取消路由或搜索请求时传递 AbortSignal。错误统一映射为
 `AppError`
 判别联合：network、timeout、unauthorized、forbidden、notFound、conflict、validation、rateLimited、server、unknown；UI 不显示原始异常。
 
 ## 6. 组件与样式
 
 - `packages/ui` 仅包含无业务语义的 primitives 和可组合组件；业务组件留在 feature/entity；
-- Tailwind v4 消费 `design-tokens` 生成的语义变量，组件中禁止 raw
-  hex、魔法阴影、任意 z-index 和 inline style；动态值通过受控 CSS variable API；
+- Tailwind v4 消费 `design-tokens` 生成的语义变量，组件中禁止 raw hex、魔法阴影、任意 z-index 和 inline style；动态值通过受控 CSS variable API；
 - 组件采用 `Component`, `Component.Trigger`, `Component.Content` 等组合式 API，避免几十个布尔 prop；
 - 图标通过 `packages/icons` 统一导出 Lucide，默认 1.75px stroke；品牌图标必须来自官方授权资产；
 - Storybook 覆盖 normal/loading/empty/error/disabled/focus/overflow/dark/light/reduced-motion；不得把 Storybook 当唯一测试。
@@ -92,8 +85,7 @@ adapter 管理，功能代码不得读取 token。取消路由或搜索请求时
 | 列表                     | 50+ 复杂项评估虚拟化；100+ 默认虚拟化             |
 | 图片                     | AVIF/WebP 优先，声明尺寸，非首屏 lazy load        |
 
-按路由/feature 代码拆分；重型编辑器、图表、AI 会话按需加载。使用 React
-Profiler 和实际指标后才引入 memoization。稳定 key 来自实体 ID，禁止数组索引 key。避免在 render 中创建大对象、排序大列表或同步解析文档；重计算进入 worker/缓存。
+按路由/feature 代码拆分；重型编辑器、图表、AI 会话按需加载。使用 React Profiler 和实际指标后才引入 memoization。稳定 key 来自实体 ID，禁止数组索引 key。避免在 render 中创建大对象、排序大列表或同步解析文档；重计算进入 worker/缓存。
 
 ## 8. React 19 规则
 
@@ -122,9 +114,7 @@ Foundation 只承诺最近访问内容的只读降级，不承诺离线写同步
 
 ## 11. 错误与遥测
 
-App shell、顶级路由和高风险 widget 设置分层 error
-boundary。错误界面包含稳定错误 ID、重试/返回/报告路径，不暴露堆栈或内部主机名。Renderer、Main、Preload 日志通过 correlation
-ID 关联；采集前遵循用户同意和脱敏策略。
+App shell、顶级路由和高风险 widget 设置分层 error boundary。错误界面包含稳定错误 ID、重试/返回/报告路径，不暴露堆栈或内部主机名。Renderer、Main、Preload 日志通过 correlation ID 关联；采集前遵循用户同意和脱敏策略。
 
 ## 12. 完成门禁
 

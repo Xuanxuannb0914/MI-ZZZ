@@ -4,13 +4,11 @@
 
 ## 当前状态
 
-本仓库当前处于 **Alpha 1.0 / Zenless Zone Zero Workspace**
-阶段。Desktop 端已经包含启动体验、游戏中心、绝区零工作区、角色/攻略/资讯/活动/每日养成/收藏/设置与本地全局搜索；业务数据使用可离线浏览的中文 Mock，未来可在不改变 UI 契约的前提下替换为服务端数据。
+本仓库当前处于 **Alpha 1.0 / Zenless Zone Zero Workspace** 阶段。Desktop 端已经包含启动体验、游戏中心、绝区零工作区、角色/攻略/资讯/活动/每日养成/收藏/设置与本地全局搜索；业务数据使用可离线浏览的中文 Mock，未来可在不改变 UI 契约的前提下替换为服务端数据。
 
 ## 产品定位
 
-Game Guide
-Hub 是一个内容优先、键盘友好、可扩展的桌面工作台。它借鉴现代游戏启动器的沉浸感、协作产品的信息组织和专业工具的交互效率，但不复制任何产品的视觉资产或行为。
+Game Guide Hub 是一个内容优先、键盘友好、可扩展的桌面工作台。它借鉴现代游戏启动器的沉浸感、协作产品的信息组织和专业工具的交互效率，但不复制任何产品的视觉资产或行为。
 
 核心体验边界：
 
@@ -49,12 +47,9 @@ Hub 是一个内容优先、键盘友好、可扩展的桌面工作台。它借�
 
 ## 开发入口
 
-根级命令统一为
-`pnpm install`、`pnpm dev`、`pnpm build`、`pnpm test`、`pnpm lint`、`pnpm typecheck`、`pnpm e2e` 和
-`pnpm clean`。安装、调试、贡献和故障处理见 [docs/development.md](./docs/development.md)。
+根级命令统一为 `pnpm install`、`pnpm dev`、`pnpm build`、`pnpm test`、`pnpm lint`、`pnpm typecheck`、`pnpm e2e` 和 `pnpm clean`。安装、调试、贡献和故障处理见 [docs/development.md](./docs/development.md)。
 
-本地 Web 预览默认地址为 `http://127.0.0.1:5173/#/startup`；启动流程为
-`#/startup → #/games → #/zzz`。桌面端通过同一 Renderer 架构运行，Three.js 仅用于启动场景。
+本地 Web 预览默认地址为 `http://127.0.0.1:5173/#/startup`；启动流程为 `#/startup → #/games → #/zzz`。桌面端通过同一 Renderer 架构运行，Three.js 仅用于启动场景。
 
 ## 贡献
 
