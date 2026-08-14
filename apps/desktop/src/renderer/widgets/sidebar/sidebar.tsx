@@ -1,49 +1,41 @@
-import type { LucideIcon } from '@game-guide-hub/icons';
 import {
-  BookOpen,
-  CalendarDays,
-  Compass,
-  Disc3,
+  ChevronDown,
   Heart,
   Home,
-  PackageOpen,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
   Settings,
   UserRound,
-  UsersRound,
-  Wrench,
 } from '@game-guide-hub/icons';
 import { classNames } from '@game-guide-hub/utils';
-import { NavLink } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app-store';
-
-interface NavigationEntry {
-  readonly label: string;
-  readonly to: string;
-  readonly icon: LucideIcon;
-  readonly end?: boolean;
-  readonly comingSoon?: boolean;
-}
-
-const navigationEntries: readonly NavigationEntry[] = [
-  { label: '首页', to: '/zzz', icon: Home, end: true },
-  { label: '攻略', to: '/zzz/guides', icon: BookOpen },
-  { label: '角色', to: '/zzz/agents', icon: UsersRound },
-  { label: '配队', to: '/zzz/teams', icon: UsersRound },
-  { label: '音擎', to: '/zzz/w-engines', icon: Wrench },
-  { label: '驱动盘', to: '/zzz/drive-discs', icon: Disc3 },
-  { label: '活动', to: '/zzz/events', icon: Compass },
-  { label: '养成', to: '/zzz/planner', icon: CalendarDays },
-  { label: '材料', to: '/zzz/materials', icon: PackageOpen },
-  { label: '收藏', to: '/zzz/favorites', icon: Heart },
-  { label: '搜索', to: '/zzz/search', icon: Search, end: true },
-];
+import { workspaceRoutes } from '../../shared/config/workspace-routes';
+import { sidebarNavigationGroups } from './sidebar-navigation';
 
 export function Sidebar() {
+  const location = useLocation();
   const isSidebarCollapsed = useAppStore((state) => state.isSidebarCollapsed);
   const toggleSidebarCollapsed = useAppStore((state) => state.toggleSidebarCollapsed);
+  const activeGroup = sidebarNavigationGroups.find((group) =>
+    group.match.some((path) => location.pathname.startsWith(path)),
+  );
+  const [expandedGroupId, setExpandedGroupId] = useState(activeGroup?.id ?? null);
+
+  useEffect(() => {
+    if (activeGroup) setExpandedGroupId(activeGroup.id);
+  }, [activeGroup]);
+
+  const toggleGroup = (groupId: string) => {
+    if (isSidebarCollapsed) {
+      toggleSidebarCollapsed();
+      setExpandedGroupId(groupId);
+      return;
+    }
+    setExpandedGroupId((currentGroupId) => (currentGroupId === groupId ? null : groupId));
+  };
 
   return (
     <aside
@@ -75,31 +67,94 @@ export function Sidebar() {
       </div>
 
       <nav className="desktop-sidebar-nav">
-        {navigationEntries.map(({ label, to, icon: Icon, end, comingSoon }) =>
-          comingSoon ? (
-            <div
-              key={label}
-              className="desktop-nav-entry is-coming"
-              title={isSidebarCollapsed ? `${label} · 即将上线` : undefined}
+        <NavLink
+          to={workspaceRoutes.home}
+          end
+          aria-label="首页"
+          title={isSidebarCollapsed ? '首页' : undefined}
+          className={({ isActive }) => classNames('desktop-nav-entry', isActive && 'is-active')}
+        >
+          <Home aria-hidden="true" size={18} />
+          <span className="desktop-nav-label">首页</span>
+        </NavLink>
+
+        {sidebarNavigationGroups.map((group) => {
+          const isExpanded = expandedGroupId === group.id;
+          const isActive = activeGroup?.id === group.id;
+          const panelId = `sidebar-group-${group.id}`;
+          const Icon = group.icon;
+
+          return (
+            <section
+              key={group.id}
+              className={classNames(
+                'desktop-nav-group',
+                isExpanded && 'is-expanded',
+                isActive && 'is-active',
+              )}
             >
-              <Icon aria-hidden="true" size={18} />
-              <span className="desktop-nav-label">{label}</span>
-              <small>即将上线</small>
-            </div>
-          ) : (
-            <NavLink
-              key={label}
-              to={to}
-              end={end ?? false}
-              aria-label={label}
-              title={isSidebarCollapsed ? label : undefined}
-              className={({ isActive }) => classNames('desktop-nav-entry', isActive && 'is-active')}
-            >
-              <Icon aria-hidden="true" size={18} />
-              <span className="desktop-nav-label">{label}</span>
-            </NavLink>
-          ),
-        )}
+              <button
+                type="button"
+                className="desktop-nav-entry desktop-nav-group-trigger"
+                aria-expanded={isExpanded}
+                aria-controls={panelId}
+                title={isSidebarCollapsed ? group.label : undefined}
+                onClick={() => toggleGroup(group.id)}
+              >
+                <Icon aria-hidden="true" size={18} />
+                <span className="desktop-nav-label">{group.label}</span>
+                <ChevronDown aria-hidden="true" className="desktop-nav-group-chevron" size={15} />
+              </button>
+              <div
+                id={panelId}
+                className="desktop-nav-submenu"
+                aria-hidden={!isExpanded}
+                inert={!isExpanded}
+              >
+                <div className="desktop-nav-submenu-content">
+                  {group.items.map((item) =>
+                    item.to ? (
+                      <NavLink
+                        key={item.label}
+                        to={item.to}
+                        className={({ isActive: isItemActive }) =>
+                          classNames('desktop-nav-subentry', isItemActive && 'is-active')
+                        }
+                      >
+                        <span>{item.label}</span>
+                      </NavLink>
+                    ) : (
+                      <span key={item.label} className="desktop-nav-subentry is-coming">
+                        <span>{item.label}</span>
+                        <small>{item.status}</small>
+                      </span>
+                    ),
+                  )}
+                </div>
+              </div>
+            </section>
+          );
+        })}
+
+        <NavLink
+          to={workspaceRoutes.favorites}
+          aria-label="收藏"
+          title={isSidebarCollapsed ? '收藏' : undefined}
+          className={({ isActive }) => classNames('desktop-nav-entry', isActive && 'is-active')}
+        >
+          <Heart aria-hidden="true" size={18} />
+          <span className="desktop-nav-label">收藏</span>
+        </NavLink>
+        <NavLink
+          to={workspaceRoutes.search}
+          end
+          aria-label="全局搜索"
+          title={isSidebarCollapsed ? '全局搜索' : undefined}
+          className={({ isActive }) => classNames('desktop-nav-entry', isActive && 'is-active')}
+        >
+          <Search aria-hidden="true" size={18} />
+          <span className="desktop-nav-label">全局搜索</span>
+        </NavLink>
       </nav>
 
       <div className="desktop-sidebar-footer">

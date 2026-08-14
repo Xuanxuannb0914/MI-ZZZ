@@ -1,0 +1,25 @@
+export const workspaceRoutes = {
+  home: '/zzz',
+  guides: '/zzz/guides',
+  development: {
+    characters: '/zzz/development/characters',
+    wEngines: '/zzz/development/w-engines',
+    driveDiscs: '/zzz/development/drive-discs',
+    materials: '/zzz/development/materials',
+    teams: '/zzz/development/teams',
+    calculator: '/zzz/development/calculator',
+  },
+  data: {
+    characters: '/zzz/data/characters',
+    wEngines: '/zzz/data/w-engines',
+    versions: '/zzz/data/versions',
+  },
+  encyclopedia: {
+    characters: '/zzz/encyclopedia/characters',
+    wEngines: '/zzz/encyclopedia/w-engines',
+    driveDiscs: '/zzz/encyclopedia/drive-discs',
+  },
+  events: '/zzz/events',
+  favorites: '/zzz/favorites',
+  search: '/zzz/search',
+} as const;

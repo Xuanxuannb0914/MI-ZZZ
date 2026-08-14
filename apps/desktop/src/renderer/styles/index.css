@@ -5949,6 +5949,152 @@
 }
 
 @layer components {
+  .desktop-sidebar .desktop-sidebar-nav {
+    gap: 0.2rem;
+    margin-inline: calc(var(--spacing-compact) * -1);
+    padding-inline: var(--spacing-compact);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .desktop-sidebar .desktop-nav-entry {
+    min-height: 2.7rem;
+    border-color: transparent;
+    border-radius: var(--radius-control);
+    color: var(--ggh-color-text-secondary);
+    background: transparent;
+    box-shadow: none;
+    font-weight: 620;
+  }
+
+  .desktop-sidebar .desktop-nav-entry:hover {
+    border-color: color-mix(in srgb, var(--ggh-color-border-strong) 72%, transparent);
+    color: var(--ggh-color-text-primary);
+    background: color-mix(in srgb, var(--ggh-color-primary-soft) 76%, transparent);
+    box-shadow: none;
+    transform: translateX(1px);
+  }
+
+  .desktop-sidebar .desktop-nav-entry.is-active,
+  .desktop-sidebar .desktop-nav-group.is-active > .desktop-nav-group-trigger {
+    border-color: color-mix(in srgb, var(--ggh-color-primary) 42%, var(--ggh-color-border-subtle));
+    color: var(--ggh-color-text-primary);
+    background: linear-gradient(
+      105deg,
+      color-mix(in srgb, var(--ggh-color-primary) 20%, transparent),
+      color-mix(in srgb, var(--ggh-color-secondary) 12%, transparent)
+    );
+    box-shadow:
+      inset 0 1px var(--ggh-color-reflection),
+      var(--ggh-glow-primary);
+  }
+
+  .desktop-sidebar .desktop-nav-entry.is-active::before,
+  .desktop-sidebar .desktop-nav-group.is-active > .desktop-nav-group-trigger::before {
+    left: calc(var(--spacing-compact) * -1);
+    height: 1.5rem;
+    background: var(--ggh-color-primary);
+    box-shadow: 0 0 0.75rem var(--ggh-color-primary);
+  }
+
+  .desktop-nav-group {
+    display: grid;
+  }
+
+  .desktop-nav-group-trigger {
+    width: 100%;
+    text-align: left;
+  }
+
+  .desktop-nav-group-chevron {
+    flex: 0 0 auto;
+    margin-left: auto;
+    color: var(--ggh-color-text-tertiary);
+    transition: transform var(--ggh-motion-fast) var(--ggh-ease-enter);
+  }
+
+  .desktop-nav-group.is-expanded .desktop-nav-group-chevron {
+    transform: rotate(180deg);
+  }
+
+  .desktop-nav-submenu {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows var(--ggh-motion-normal) var(--ggh-ease-enter),
+      opacity var(--ggh-motion-fast) var(--ggh-ease-standard);
+  }
+
+  .desktop-nav-submenu[aria-hidden='false'] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .desktop-nav-submenu-content {
+    display: grid;
+    min-height: 0;
+    gap: 0.125rem;
+    margin-left: 1.15rem;
+    padding: 0.25rem 0 0.45rem 1rem;
+    overflow: hidden;
+    border-left: 1px solid var(--ggh-color-border-subtle);
+  }
+
+  .desktop-nav-subentry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 1.9rem;
+    padding: 0.25rem var(--spacing-compact);
+    border-radius: var(--radius-sm);
+    color: var(--ggh-color-text-tertiary);
+    font-size: var(--text-caption);
+    font-weight: 550;
+    line-height: 1.35;
+    transition:
+      color var(--ggh-motion-fast) var(--ggh-ease-standard),
+      background-color var(--ggh-motion-fast) var(--ggh-ease-standard);
+  }
+
+  .desktop-nav-subentry:hover,
+  .desktop-nav-subentry:focus-visible,
+  .desktop-sidebar .desktop-nav-subentry.is-active[aria-current='page'] {
+    border-color: color-mix(in srgb, var(--ggh-color-primary) 55%, var(--ggh-color-border-subtle));
+    color: var(--ggh-color-primary);
+    background: var(--ggh-color-primary-soft);
+    box-shadow: none;
+    outline: none;
+  }
+
+  .desktop-sidebar .desktop-nav-subentry.is-active[aria-current='page'] {
+    font-weight: 700;
+  }
+
+  .desktop-nav-subentry.is-coming {
+    cursor: default;
+  }
+
+  .desktop-nav-subentry small {
+    margin-left: var(--spacing-content);
+    color: var(--ggh-color-text-tertiary);
+    font-size: 0.625rem;
+    white-space: nowrap;
+  }
+
+  .desktop-sidebar.is-collapsed .desktop-nav-group-chevron,
+  .desktop-sidebar.is-collapsed .desktop-nav-submenu {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .desktop-nav-group-chevron,
+    .desktop-nav-submenu,
+    .desktop-nav-subentry {
+      transition: none;
+    }
+  }
+
   .guide-reading-page {
     --guide-rail-width: minmax(10rem, 0.8fr);
     --guide-side-width: minmax(13rem, 1.2fr);

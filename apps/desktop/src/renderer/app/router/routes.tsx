@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { workspaceRoutes } from '../../shared/config/workspace-routes';
 import { LoadingState } from '../../shared/ui/loading-state';
 
 const HomePage = lazy(() => import('../../pages/home/home-page'));
@@ -42,10 +43,54 @@ export function WorkspaceRoutes() {
     <Suspense fallback={<LoadingState />}>
       <Routes>
         <Route path="/" element={<Navigate replace to="/zzz" />} />
-        <Route path="/zzz" element={<HomePage />} />
-        <Route path="/home" element={<Navigate replace to="/zzz" />} />
-        <Route path="/zzz/guides" element={<GuidesPage />} />
-        <Route path="/zzz/guides/:id" element={<GuideDetailPage />} />
+        <Route path={workspaceRoutes.home} element={<HomePage />} />
+        <Route path="/home" element={<Navigate replace to={workspaceRoutes.home} />} />
+        <Route path={workspaceRoutes.guides} element={<GuidesPage />} />
+        <Route path={`${workspaceRoutes.guides}/:id`} element={<GuideDetailPage />} />
+
+        <Route path={workspaceRoutes.development.characters} element={<AgentsPage />} />
+        <Route
+          path={`${workspaceRoutes.development.characters}/:id`}
+          element={<AgentDetailPage />}
+        />
+        <Route path={workspaceRoutes.development.wEngines} element={<WEnginesPage />} />
+        <Route path={`${workspaceRoutes.development.wEngines}/:id`} element={<WEnginesPage />} />
+        <Route path={workspaceRoutes.development.driveDiscs} element={<DriveDiscsPage />} />
+        <Route
+          path={`${workspaceRoutes.development.driveDiscs}/:id`}
+          element={<DriveDiscsPage />}
+        />
+        <Route path={workspaceRoutes.development.materials} element={<MaterialsPage />} />
+        <Route path={`${workspaceRoutes.development.materials}/:id`} element={<MaterialsPage />} />
+        <Route path={workspaceRoutes.development.teams} element={<TeamsPage />} />
+        <Route path={`${workspaceRoutes.development.teams}/:id`} element={<TeamsPage />} />
+        <Route path={workspaceRoutes.development.calculator} element={<DailyPage />} />
+
+        <Route path={workspaceRoutes.data.characters} element={<AgentsPage />} />
+        <Route path={`${workspaceRoutes.data.characters}/:id`} element={<AgentDetailPage />} />
+        <Route path={workspaceRoutes.data.wEngines} element={<WEnginesPage />} />
+        <Route path={`${workspaceRoutes.data.wEngines}/:id`} element={<WEnginesPage />} />
+        <Route path={workspaceRoutes.data.versions} element={<EventsPage />} />
+
+        <Route path={workspaceRoutes.encyclopedia.characters} element={<AgentsPage />} />
+        <Route
+          path={`${workspaceRoutes.encyclopedia.characters}/:id`}
+          element={<AgentDetailPage />}
+        />
+        <Route path={workspaceRoutes.encyclopedia.wEngines} element={<WEnginesPage />} />
+        <Route path={`${workspaceRoutes.encyclopedia.wEngines}/:id`} element={<WEnginesPage />} />
+        <Route path={workspaceRoutes.encyclopedia.driveDiscs} element={<DriveDiscsPage />} />
+        <Route
+          path={`${workspaceRoutes.encyclopedia.driveDiscs}/:id`}
+          element={<DriveDiscsPage />}
+        />
+
+        <Route path={workspaceRoutes.events} element={<EventsPage />} />
+        <Route path={`${workspaceRoutes.events}/:id`} element={<EventDetailPage />} />
+        <Route path={workspaceRoutes.favorites} element={<FavoritesPage />} />
+        <Route path={workspaceRoutes.search} element={<SearchPage />} />
+
+        {/* Legacy deep links stay available while primary navigation uses task-based routes. */}
         <Route path="/zzz/agents" element={<AgentsPage />} />
         <Route path="/zzz/agents/:id" element={<AgentDetailPage />} />
         <Route path="/zzz/events" element={<EventsPage />} />
@@ -59,8 +104,6 @@ export function WorkspaceRoutes() {
         <Route path="/zzz/drive-discs/:id" element={<DriveDiscsPage />} />
         <Route path="/zzz/teams" element={<TeamsPage />} />
         <Route path="/zzz/teams/:id" element={<TeamsPage />} />
-        <Route path="/zzz/favorites" element={<FavoritesPage />} />
-        <Route path="/zzz/search" element={<SearchPage />} />
         <Route
           path="/genshin"
           element={<GamePlaceholderPage gameName="原神" gameShortName="原神 / 开发中" />}
