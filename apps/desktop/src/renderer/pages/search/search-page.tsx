@@ -9,7 +9,18 @@ import { PageTransition } from '../../shared/ui/page-transition';
 import { SearchBar } from '../../shared/ui/search-bar';
 import { Tag } from '../../shared/ui/tag';
 
-const filters = ['全部', '角色', '攻略', '活动', '资讯', '驱动盘', '音擎', '配队', '材料', '版本'] as const;
+const filters = [
+  '全部',
+  '角色',
+  '攻略',
+  '活动',
+  '资讯',
+  '驱动盘',
+  '音擎',
+  '配队',
+  '材料',
+  '版本',
+] as const;
 type SearchFilter = (typeof filters)[number];
 
 export default function SearchPage() {
@@ -34,8 +45,6 @@ export default function SearchPage() {
       ? localResults
       : localResults.filter((result) => result.kind === filter);
   }, [filter, query]);
-
-  useEffect(() => setActiveIndex(-1), [query, filter]);
 
   const commitSearch = (keyword = searchKeyword) => {
     const normalized = keyword.trim();
@@ -87,7 +96,12 @@ export default function SearchPage() {
             <span className="text-caption text-text-tertiary">最近搜索</span>
             <div className="flex flex-wrap gap-control">
               {recentSearches.map((item) => (
-                <button key={item} type="button" className="search-recent-chip" onClick={() => commitSearch(item)}>
+                <button
+                  key={item}
+                  type="button"
+                  className="search-recent-chip"
+                  onClick={() => commitSearch(item)}
+                >
                   {item}
                 </button>
               ))}
@@ -103,7 +117,13 @@ export default function SearchPage() {
         {results.length ? (
           <div className="grid gap-content xl:grid-cols-2">
             {results.map((result, index) => (
-              <Link key={result.id} to={result.to} onClick={() => commitSearch()} className="group block" aria-current={activeIndex === index ? 'true' : undefined}>
+              <Link
+                key={result.id}
+                to={result.to}
+                onClick={() => commitSearch()}
+                className="group block"
+                aria-current={activeIndex === index ? 'true' : undefined}
+              >
                 <Card interactive className="flex items-start gap-content">
                   <span className="ggh-icon-container" aria-hidden="true">
                     <Search size={16} />

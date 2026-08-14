@@ -1,9 +1,9 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useStartup } from '../hooks/use-startup';
+import { ErrorBoundary } from '../shared/ui/error-boundary';
 import { LandingLayout } from './layouts/landing-layout';
 import { MainLayout } from './layouts/main-layout';
 import { StartupRoutes, WorkspaceRoutes } from './router/routes';
-import { ErrorBoundary } from '../shared/ui/error-boundary';
 
 export function App() {
   const location = useLocation();
@@ -20,5 +20,11 @@ export function App() {
     );
   }
 
-  return <ErrorBoundary><MainLayout><WorkspaceRoutes /></MainLayout></ErrorBoundary>;
+  return (
+    <ErrorBoundary>
+      <MainLayout>
+        <WorkspaceRoutes />
+      </MainLayout>
+    </ErrorBoundary>
+  );
 }

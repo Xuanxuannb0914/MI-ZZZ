@@ -122,7 +122,13 @@ export default function GuideDetailPage() {
                       to={entity.to}
                       className="article-entity-link"
                     >
-                      <span>{entity.type === 'agent' ? '角色' : entity.type === 'guide' ? '攻略' : entity.type}</span>
+                      <span>
+                        {entity.type === 'agent'
+                          ? '角色'
+                          : entity.type === 'guide'
+                            ? '攻略'
+                            : entity.type}
+                      </span>
                       {entity.title}
                     </Link>
                   ))}

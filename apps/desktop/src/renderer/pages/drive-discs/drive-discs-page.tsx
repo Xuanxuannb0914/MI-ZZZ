@@ -9,10 +9,115 @@ import { SearchBar } from '../../shared/ui/search-bar';
 import { Tag } from '../../shared/ui/tag';
 
 export default function DriveDiscsPage() {
-  const { id } = useParams(); const [keyword, setKeyword] = useState(''); const selected = id ? findDriveDiscById(id) : undefined;
-  const list = useMemo(() => { const normalized = keyword.trim().toLowerCase(); return driveDiscs.filter((item) => !normalized || `${item.name} ${item.setName} ${item.description}`.toLowerCase().includes(normalized)); }, [keyword]);
+  const { id } = useParams();
+  const [keyword, setKeyword] = useState('');
+  const selected = id ? findDriveDiscById(id) : undefined;
+  const list = useMemo(() => {
+    const normalized = keyword.trim().toLowerCase();
+    return driveDiscs.filter(
+      (item) =>
+        !normalized ||
+        `${item.name} ${item.setName} ${item.description}`.toLowerCase().includes(normalized),
+    );
+  }, [keyword]);
   if (id && !selected) return <Navigate replace to="/zzz/drive-discs" />;
-  return <PageTransition><Page className="page-surface content-catalog"><header className="content-catalog-header"><div><p className="text-caption font-semibold text-content-electric">装备资料库 · 本地 Mock</p><h1 className="mt-control text-title1 font-semibold">驱动盘中心</h1><p className="mt-compact text-body text-text-secondary">查看套装效果、推荐词条与关联培养攻略。</p></div><SearchBar value={keyword} onChange={setKeyword} placeholder="搜索套装、效果或词条" label="搜索驱动盘" className="w-full lg:max-w-md" /></header>{selected ? <DriveDiscDetail id={selected.id} /> : null}{list.length ? <div className="grid gap-content md:grid-cols-2 xl:grid-cols-3">{list.map((item) => <Link className="group block" key={item.id} to={`/zzz/drive-discs/${item.id}`}><Card interactive className="h-full"><div className="flex gap-content"><span className="ggh-icon-container ggh-icon-container-secondary"><Disc3 size={18} /></span><span className="min-w-0"><strong className="text-label">{item.name}</strong><span className="mt-compact block text-caption text-content-electric">{item.setName}</span><span className="mt-control block line-clamp-2 text-caption text-text-secondary">{item.fourPieceEffect}</span></span></div></Card></Link>)}</div> : <EmptyState icon={Search} title="没有找到驱动盘" description="试试套装名、效果或词条。" actionLabel="清除搜索" onAction={() => setKeyword('')} />}</Page></PageTransition>;
+  return (
+    <PageTransition>
+      <Page className="page-surface content-catalog">
+        <header className="content-catalog-header">
+          <div>
+            <p className="text-caption font-semibold text-content-electric">
+              装备资料库 · 本地 Mock
+            </p>
+            <h1 className="mt-control text-title1 font-semibold">驱动盘中心</h1>
+            <p className="mt-compact text-body text-text-secondary">
+              查看套装效果、推荐词条与关联培养攻略。
+            </p>
+          </div>
+          <SearchBar
+            value={keyword}
+            onChange={setKeyword}
+            placeholder="搜索套装、效果或词条"
+            label="搜索驱动盘"
+            className="w-full lg:max-w-md"
+          />
+        </header>
+        {selected ? <DriveDiscDetail id={selected.id} /> : null}
+        {list.length ? (
+          <div className="grid gap-content md:grid-cols-2 xl:grid-cols-3">
+            {list.map((item) => (
+              <Link className="group block" key={item.id} to={`/zzz/drive-discs/${item.id}`}>
+                <Card interactive className="h-full">
+                  <div className="flex gap-content">
+                    <span className="ggh-icon-container ggh-icon-container-secondary">
+                      <Disc3 size={18} />
+                    </span>
+                    <span className="min-w-0">
+                      <strong className="text-label">{item.name}</strong>
+                      <span className="mt-compact block text-caption text-content-electric">
+                        {item.setName}
+                      </span>
+                      <span className="mt-control block line-clamp-2 text-caption text-text-secondary">
+                        {item.fourPieceEffect}
+                      </span>
+                    </span>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            icon={Search}
+            title="没有找到驱动盘"
+            description="试试套装名、效果或词条。"
+            actionLabel="清除搜索"
+            onAction={() => setKeyword('')}
+          />
+        )}
+      </Page>
+    </PageTransition>
+  );
 }
-function DriveDiscDetail({ id }: { readonly id: string }) { const item = findDriveDiscById(id); if (!item) return null; const related = findRelatedContent('drive-disc', id).slice(0, 6); return <Card glass="strong" className="content-detail-panel"><div className="flex flex-wrap items-start justify-between gap-panel"><div><p className="text-caption text-content-electric">驱动盘套装</p><h2 className="mt-control text-title2 font-semibold">{item.name}</h2><p className="mt-compact text-body text-text-secondary">{item.description}</p></div><Link to="/zzz/drive-discs" className="text-caption text-text-secondary hover:text-text-primary">返回驱动盘列表</Link></div><div className="mt-panel grid gap-content lg:grid-cols-3"><Detail label="2 件效果" value={item.twoPieceEffect} /><Detail label="4 件效果" value={item.fourPieceEffect} /><Detail label="推荐词条" value={item.recommendedStats.join('；')} /></div><div className="mt-content flex flex-wrap gap-control">{related.map((link) => <Link key={`${link.type}-${link.id}`} to={link.to}><Tag>{link.title}</Tag></Link>)}</div></Card>; }
-function Detail({ label, value }: { readonly label: string; readonly value: string }) { return <div className="rounded-md border border-border-subtle bg-surface-1 p-content"><span className="text-caption text-text-tertiary">{label}</span><p className="mt-compact text-caption leading-relaxed text-text-primary">{value}</p></div>; }
+function DriveDiscDetail({ id }: { readonly id: string }) {
+  const item = findDriveDiscById(id);
+  if (!item) return null;
+  const related = findRelatedContent('drive-disc', id).slice(0, 6);
+  return (
+    <Card glass="strong" className="content-detail-panel">
+      <div className="flex flex-wrap items-start justify-between gap-panel">
+        <div>
+          <p className="text-caption text-content-electric">驱动盘套装</p>
+          <h2 className="mt-control text-title2 font-semibold">{item.name}</h2>
+          <p className="mt-compact text-body text-text-secondary">{item.description}</p>
+        </div>
+        <Link
+          to="/zzz/drive-discs"
+          className="text-caption text-text-secondary hover:text-text-primary"
+        >
+          返回驱动盘列表
+        </Link>
+      </div>
+      <div className="mt-panel grid gap-content lg:grid-cols-3">
+        <Detail label="2 件效果" value={item.twoPieceEffect} />
+        <Detail label="4 件效果" value={item.fourPieceEffect} />
+        <Detail label="推荐词条" value={item.recommendedStats.join('；')} />
+      </div>
+      <div className="mt-content flex flex-wrap gap-control">
+        {related.map((link) => (
+          <Link key={`${link.type}-${link.id}`} to={link.to}>
+            <Tag>{link.title}</Tag>
+          </Link>
+        ))}
+      </div>
+    </Card>
+  );
+}
+function Detail({ label, value }: { readonly label: string; readonly value: string }) {
+  return (
+    <div className="rounded-md border border-border-subtle bg-surface-1 p-content">
+      <span className="text-caption text-text-tertiary">{label}</span>
+      <p className="mt-compact text-caption leading-relaxed text-text-primary">{value}</p>
+    </div>
+  );
+}

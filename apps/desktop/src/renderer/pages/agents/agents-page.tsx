@@ -12,7 +12,7 @@ import { SearchBar } from '../../shared/ui/search-bar';
 type AttributeFilter = AgentAttribute | '全部';
 type SpecialtyFilter = AgentSpecialty | '全部';
 type RarityFilter = AgentRarity | '全部';
-type VersionFilter = '全部' | string;
+type VersionFilter = string;
 type SortMode = '推荐' | '最新' | '稀有度';
 
 export default function AgentsPage() {
@@ -27,22 +27,33 @@ export default function AgentsPage() {
   const [versionFilter, setVersionFilter] = useState<VersionFilter>('全部');
   const [sortMode, setSortMode] = useState<SortMode>('推荐');
   const normalizedKeyword = searchKeyword.trim().toLowerCase();
-  const filteredAgents = agents.filter(
-    (agent) =>
-      (attributeFilter === '全部' || agent.attribute === attributeFilter) &&
-      (specialtyFilter === '全部' || agent.specialty === specialtyFilter) &&
-      (factionFilter === '全部' || agent.faction === factionFilter) &&
-      (rarityFilter === '全部' || agent.rarity === rarityFilter) &&
-      (versionFilter === '全部' || agent.versionId === versionFilter) &&
-      (!normalizedKeyword ||
-        `${agent.name} ${agent.faction} ${agent.specialty}`
-          .toLowerCase()
-          .includes(normalizedKeyword)),
-  ).slice().sort((left, right) => {
-    if (sortMode === '稀有度') return left.rarity === right.rarity ? left.name.localeCompare(right.name, 'zh-CN') : left.rarity === 'S' ? -1 : 1;
-    if (sortMode === '最新') return (right.versionId ?? '').localeCompare(left.versionId ?? '');
-    return (right.guideIds?.length ?? 0) - (left.guideIds?.length ?? 0) || left.name.localeCompare(right.name, 'zh-CN');
-  });
+  const filteredAgents = agents
+    .filter(
+      (agent) =>
+        (attributeFilter === '全部' || agent.attribute === attributeFilter) &&
+        (specialtyFilter === '全部' || agent.specialty === specialtyFilter) &&
+        (factionFilter === '全部' || agent.faction === factionFilter) &&
+        (rarityFilter === '全部' || agent.rarity === rarityFilter) &&
+        (versionFilter === '全部' || agent.versionId === versionFilter) &&
+        (!normalizedKeyword ||
+          `${agent.name} ${agent.faction} ${agent.specialty}`
+            .toLowerCase()
+            .includes(normalizedKeyword)),
+    )
+    .slice()
+    .sort((left, right) => {
+      if (sortMode === '稀有度')
+        return left.rarity === right.rarity
+          ? left.name.localeCompare(right.name, 'zh-CN')
+          : left.rarity === 'S'
+            ? -1
+            : 1;
+      if (sortMode === '最新') return (right.versionId ?? '').localeCompare(left.versionId ?? '');
+      return (
+        (right.guideIds?.length ?? 0) - (left.guideIds?.length ?? 0) ||
+        left.name.localeCompare(right.name, 'zh-CN')
+      );
+    });
   const factions = Array.from(new Set(agents.map((agent) => agent.faction)));
 
   return (
@@ -85,19 +96,78 @@ export default function AgentsPage() {
           </fieldset>
           <fieldset className="flex flex-wrap items-center gap-compact">
             <legend className="mr-control text-caption text-text-tertiary">阵营</legend>
-            {['全部', ...factions].map((faction) => <button key={faction} type="button" onClick={() => setFactionFilter(faction)} aria-pressed={factionFilter === faction} className={factionFilter === faction ? 'h-control rounded-full bg-content-electric px-panel text-label font-semibold text-on-action-primary' : 'h-control rounded-full border border-border-subtle bg-surface-1 px-panel text-label text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary'}>{faction}</button>)}
+            {['全部', ...factions].map((faction) => (
+              <button
+                key={faction}
+                type="button"
+                onClick={() => setFactionFilter(faction)}
+                aria-pressed={factionFilter === faction}
+                className={
+                  factionFilter === faction
+                    ? 'h-control rounded-full bg-content-electric px-panel text-label font-semibold text-on-action-primary'
+                    : 'h-control rounded-full border border-border-subtle bg-surface-1 px-panel text-label text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary'
+                }
+              >
+                {faction}
+              </button>
+            ))}
           </fieldset>
           <fieldset className="flex flex-wrap items-center gap-compact">
             <legend className="mr-control text-caption text-text-tertiary">稀有度</legend>
-            {(['全部', ...agentRarities] as const).map((rarity) => <button key={rarity} type="button" onClick={() => setRarityFilter(rarity)} aria-pressed={rarityFilter === rarity} className={rarityFilter === rarity ? 'h-control rounded-full bg-content-electric px-panel text-label font-semibold text-on-action-primary' : 'h-control rounded-full border border-border-subtle bg-surface-1 px-panel text-label text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary'}>{rarity === '全部' ? rarity : `${rarity} 级`}</button>)}
+            {(['全部', ...agentRarities] as const).map((rarity) => (
+              <button
+                key={rarity}
+                type="button"
+                onClick={() => setRarityFilter(rarity)}
+                aria-pressed={rarityFilter === rarity}
+                className={
+                  rarityFilter === rarity
+                    ? 'h-control rounded-full bg-content-electric px-panel text-label font-semibold text-on-action-primary'
+                    : 'h-control rounded-full border border-border-subtle bg-surface-1 px-panel text-label text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary'
+                }
+              >
+                {rarity === '全部' ? rarity : `${rarity} 级`}
+              </button>
+            ))}
           </fieldset>
           <fieldset className="flex flex-wrap items-center gap-compact">
             <legend className="mr-control text-caption text-text-tertiary">版本</legend>
-            {['全部', ...versions.map((version) => version.id)].map((versionId) => { const version = versions.find((item) => item.id === versionId); return <button key={versionId} type="button" onClick={() => setVersionFilter(versionId)} aria-pressed={versionFilter === versionId} className={versionFilter === versionId ? 'h-control rounded-full bg-content-electric px-panel text-label font-semibold text-on-action-primary' : 'h-control rounded-full border border-border-subtle bg-surface-1 px-panel text-label text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary'}>{version ? version.code : '全部'}</button>; })}
+            {['全部', ...versions.map((version) => version.id)].map((versionId) => {
+              const version = versions.find((item) => item.id === versionId);
+              return (
+                <button
+                  key={versionId}
+                  type="button"
+                  onClick={() => setVersionFilter(versionId)}
+                  aria-pressed={versionFilter === versionId}
+                  className={
+                    versionFilter === versionId
+                      ? 'h-control rounded-full bg-content-electric px-panel text-label font-semibold text-on-action-primary'
+                      : 'h-control rounded-full border border-border-subtle bg-surface-1 px-panel text-label text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary'
+                  }
+                >
+                  {version ? version.code : '全部'}
+                </button>
+              );
+            })}
           </fieldset>
           <fieldset className="flex flex-wrap items-center gap-compact">
             <legend className="mr-control text-caption text-text-tertiary">排序</legend>
-            {(['推荐', '最新', '稀有度'] as const).map((mode) => <button key={mode} type="button" onClick={() => setSortMode(mode)} aria-pressed={sortMode === mode} className={sortMode === mode ? 'h-control rounded-full bg-content-electric px-panel text-label font-semibold text-on-action-primary' : 'h-control rounded-full border border-border-subtle bg-surface-1 px-panel text-label text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary'}>{mode}</button>)}
+            {(['推荐', '最新', '稀有度'] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setSortMode(mode)}
+                aria-pressed={sortMode === mode}
+                className={
+                  sortMode === mode
+                    ? 'h-control rounded-full bg-content-electric px-panel text-label font-semibold text-on-action-primary'
+                    : 'h-control rounded-full border border-border-subtle bg-surface-1 px-panel text-label text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary'
+                }
+              >
+                {mode}
+              </button>
+            ))}
           </fieldset>
           <fieldset className="flex flex-wrap items-center gap-compact">
             <legend className="mr-control text-caption text-text-tertiary">定位</legend>

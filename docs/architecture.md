@@ -39,6 +39,13 @@ Three.js 只存在于启动路由。`LandingScene`
 
 ## 内容 Alpha 模型
 
-绝区零内容按 `Agent`、`Guide`、`Event`、`Material`、`DailyTask`、`Announcement` 与
-`Favorite/ReadingHistory` 组织。页面不直接声明业务文案；内容通过 `shared/content`
+绝区零内容按
+`Agent`、`WEngine`、`DriveDisc`、`Team`、`Version`、`Guide`、`Event`、`Material`、`DailyTask`、`Announcement`
+与 `Favorite/ReadingHistory` 组织。页面不直接声明业务文案；内容通过 `shared/content`
 读取，便于后续将本地 Mock 替换为带来源的服务端数据。当前 Mock 明确标记为“本地 Mock”，不代表官方数据。
+
+## 内容图
+
+`shared/content/content-graph.ts` 负责把实体的 ID 关系解析为可导航的
+`ContentLink`。实体仅保存关系 ID，不复制描述性内容：角色可关联音擎、驱动盘、配队、材料、攻略、活动与版本；反向入口由内容图查询。新增实体时先补齐
+`ContentRelations`，再由列表、详情页与搜索索引消费，避免在页面内按名称匹配。

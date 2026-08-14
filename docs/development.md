@@ -30,4 +30,5 @@ Renderer 不能直接访问 Node、文件系统或通用 IPC。组件只消费�
 `useAppStore` 持久化，不新增第二套状态管理。
 
 提交前验证
-`/startup -> /games -> /zzz`、工作区核心导航、返回操作、窗口缩放、重复点击与启动 Canvas 清理。
+`/startup -> /games -> /zzz`、工作区核心导航、返回操作、窗口缩放、重复点击与启动 Canvas 清理。同时检查音擎、驱动盘、配队和活动深链，以及
+`Ctrl/Cmd + K` 搜索后的键盘选择与 Enter 跳转。

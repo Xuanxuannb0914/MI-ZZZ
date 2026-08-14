@@ -15,6 +15,8 @@ export class ErrorBoundary extends Component<PropsWithChildren, ErrorBoundarySta
 
   public override componentDidCatch(_error: Error, _info: ErrorInfo): void {
     // Renderer errors remain local so Electron can keep the workspace recoverable.
+    void _error;
+    void _info;
   }
 
   public override render(): ReactNode {
@@ -24,5 +26,24 @@ export class ErrorBoundary extends Component<PropsWithChildren, ErrorBoundarySta
 }
 
 export function PageError({ onRetry }: { readonly onRetry: () => void }) {
-  return <main className="page-error-state"><Card glass="strong" className="max-w-lg text-center"><span className="ggh-icon-container ggh-icon-container-secondary mx-auto" aria-hidden="true"><AlertCircle size={22} /></span><h1 className="mt-panel text-title2 font-semibold">页面暂时无法显示</h1><p className="mt-compact text-body text-text-secondary">请重试，或返回其他资料页面继续浏览。本地内容与收藏记录不会丢失。</p><Button className="mt-panel" onClick={onRetry}><RotateCcw size={16} />重新加载</Button></Card></main>;
+  return (
+    <main className="page-error-state">
+      <Card glass="strong" className="max-w-lg text-center">
+        <span
+          className="ggh-icon-container ggh-icon-container-secondary mx-auto"
+          aria-hidden="true"
+        >
+          <AlertCircle size={22} />
+        </span>
+        <h1 className="mt-panel text-title2 font-semibold">页面暂时无法显示</h1>
+        <p className="mt-compact text-body text-text-secondary">
+          请重试，或返回其他资料页面继续浏览。本地内容与收藏记录不会丢失。
+        </p>
+        <Button className="mt-panel" onClick={onRetry}>
+          <RotateCcw size={16} />
+          重新加载
+        </Button>
+      </Card>
+    </main>
+  );
 }

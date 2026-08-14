@@ -29,8 +29,8 @@ import {
   agents,
   findAgentById,
   findDriveDiscById,
-  findWEngineById,
   findVersionById,
+  findWEngineById,
   guides,
   resolveContentLinks,
   teams,
@@ -226,12 +226,55 @@ export default function AgentDetailPage() {
               </div>
             </DetailPanel>
             <DetailPanel title="推荐音擎" icon={WandSparkles}>
-              {recommendedWEngines.length ? <div className="flex flex-wrap gap-control">{recommendedWEngines.map((item) => <Link key={item.id} to={`/zzz/w-engines/${item.id}`} className="rounded-md border border-border-subtle bg-surface-1 p-content hover:bg-surface-2"><strong className="block text-label text-text-primary">{item.name}</strong><span className="mt-compact block text-caption">{item.effect}</span></Link>)}</div> : <><p className="text-title3 font-semibold text-text-primary">{agent.recommendedWeapon}</p><p className="mt-compact">当前版本本地培养档案中的优先推荐。</p></>}
+              {recommendedWEngines.length ? (
+                <div className="flex flex-wrap gap-control">
+                  {recommendedWEngines.map((item) => (
+                    <Link
+                      key={item.id}
+                      to={`/zzz/w-engines/${item.id}`}
+                      className="rounded-md border border-border-subtle bg-surface-1 p-content hover:bg-surface-2"
+                    >
+                      <strong className="block text-label text-text-primary">{item.name}</strong>
+                      <span className="mt-compact block text-caption">{item.effect}</span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <p className="text-title3 font-semibold text-text-primary">
+                    {agent.recommendedWeapon}
+                  </p>
+                  <p className="mt-compact">当前版本本地培养档案中的优先推荐。</p>
+                </>
+              )}
             </DetailPanel>
             <DetailPanel title="推荐驱动盘" icon={ShieldCheck}>
-              <div className="flex flex-wrap gap-control">{recommendedDriveDiscs.length ? recommendedDriveDiscs.map((disc) => <Link key={disc.id} to={`/zzz/drive-discs/${disc.id}`}><Tag>{disc.name}</Tag></Link>) : agent.recommendedDriveDisc.map((disc) => <Tag key={disc}>{disc}</Tag>)}</div>
+              <div className="flex flex-wrap gap-control">
+                {recommendedDriveDiscs.length
+                  ? recommendedDriveDiscs.map((disc) => (
+                      <Link key={disc.id} to={`/zzz/drive-discs/${disc.id}`}>
+                        <Tag>{disc.name}</Tag>
+                      </Link>
+                    ))
+                  : agent.recommendedDriveDisc.map((disc) => <Tag key={disc}>{disc}</Tag>)}
+              </div>
             </DetailPanel>
-            {recommendedTeams.length ? <DetailPanel title="成型配队" icon={UsersRound}><div className="grid gap-content sm:grid-cols-2">{recommendedTeams.map((team) => <Link key={team.id} to={`/zzz/teams/${team.id}`} className="rounded-md border border-border-subtle bg-surface-1 p-content hover:bg-surface-2"><strong className="block text-label text-text-primary">{team.name}</strong><span className="mt-compact block text-caption">{team.focus}</span></Link>)}</div></DetailPanel> : null}
+            {recommendedTeams.length ? (
+              <DetailPanel title="成型配队" icon={UsersRound}>
+                <div className="grid gap-content sm:grid-cols-2">
+                  {recommendedTeams.map((team) => (
+                    <Link
+                      key={team.id}
+                      to={`/zzz/teams/${team.id}`}
+                      className="rounded-md border border-border-subtle bg-surface-1 p-content hover:bg-surface-2"
+                    >
+                      <strong className="block text-label text-text-primary">{team.name}</strong>
+                      <span className="mt-compact block text-caption">{team.focus}</span>
+                    </Link>
+                  ))}
+                </div>
+              </DetailPanel>
+            ) : null}
             <DetailPanel title="培养思路" icon={Sparkles}>
               <p>
                 优先完成核心被动阈值，再追求完美副词条。将爆发窗口对齐队伍失衡与支援增益，在自由训练中不断优化循环。
@@ -253,7 +296,17 @@ export default function AgentDetailPage() {
                 ))}
               </div>
             </DetailPanel>
-            {relatedLinks.length ? <DetailPanel title="知识网络" icon={Sparkles}><div className="flex flex-wrap gap-control">{relatedLinks.map((item) => <Link key={`${item.type}-${item.id}`} to={item.to}><Tag>{item.title}</Tag></Link>)}</div></DetailPanel> : null}
+            {relatedLinks.length ? (
+              <DetailPanel title="知识网络" icon={Sparkles}>
+                <div className="flex flex-wrap gap-control">
+                  {relatedLinks.map((item) => (
+                    <Link key={`${item.type}-${item.id}`} to={item.to}>
+                      <Tag>{item.title}</Tag>
+                    </Link>
+                  ))}
+                </div>
+              </DetailPanel>
+            ) : null}
           </div>
           <aside className="space-y-section">
             <DetailPanel title="培养材料" icon={Star}>
@@ -293,7 +346,9 @@ export default function AgentDetailPage() {
                 <dt>阵营</dt>
                 <dd className="text-right text-text-primary">{agent.faction}</dd>
                 <dt>版本</dt>
-                <dd className="text-right text-text-primary">{version ? `${version.code} ${version.name}` : '资料整理中'}</dd>
+                <dd className="text-right text-text-primary">
+                  {version ? `${version.code} ${version.name}` : '资料整理中'}
+                </dd>
               </dl>
             </DetailPanel>
             <DetailPanel title="最近改动" icon={History}>

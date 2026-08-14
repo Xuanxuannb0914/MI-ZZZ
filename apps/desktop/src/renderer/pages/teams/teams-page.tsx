@@ -19,7 +19,9 @@ export default function TeamsPage() {
       <Page className="page-surface content-catalog">
         <header className="content-catalog-header">
           <div>
-            <p className="text-caption font-semibold text-content-electric">配队资料库 · 本地 Mock</p>
+            <p className="text-caption font-semibold text-content-electric">
+              配队资料库 · 本地 Mock
+            </p>
             <h1 className="mt-control text-title1 font-semibold">配队中心</h1>
             <p className="mt-compact text-body text-text-secondary">
               围绕核心角色、辅助位与循环思路整理的队伍方案。
@@ -35,7 +37,10 @@ export default function TeamsPage() {
             <Link key={team.id} to={`/zzz/teams/${team.id}`} className="group block">
               <Card interactive className="team-showcase-card h-full">
                 <div className="flex items-start justify-between gap-content">
-                  <span className="ggh-icon-container ggh-icon-container-secondary" aria-hidden="true">
+                  <span
+                    className="ggh-icon-container ggh-icon-container-secondary"
+                    aria-hidden="true"
+                  >
                     <UsersRound size={18} />
                   </span>
                   <Tag>{team.focus}</Tag>
@@ -89,7 +94,9 @@ function TeamDetail({ teamId }: { readonly teamId: string }) {
               <img src={member.avatar} alt="" loading="lazy" />
               <span>
                 <strong>{member.name}</strong>
-                <small>{member.specialty} · {member.attribute}</small>
+                <small>
+                  {member.specialty} · {member.attribute}
+                </small>
               </span>
             </Link>
           ) : null,
@@ -104,5 +111,14 @@ function TeamDetail({ teamId }: { readonly teamId: string }) {
 }
 
 function TeamList({ label, items }: { readonly label: string; readonly items: readonly string[] }) {
-  return <div className="rounded-md border border-border-subtle bg-surface-1 p-content"><p className="text-caption text-text-tertiary">{label}</p><ul className="mt-control space-y-compact text-caption text-text-primary">{items.map((item) => <li key={item}>{item}</li>)}</ul></div>;
+  return (
+    <div className="rounded-md border border-border-subtle bg-surface-1 p-content">
+      <p className="text-caption text-text-tertiary">{label}</p>
+      <ul className="mt-control space-y-compact text-caption text-text-primary">
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
 }
