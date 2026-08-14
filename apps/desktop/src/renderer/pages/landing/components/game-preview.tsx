@@ -60,14 +60,14 @@ export function GamePreview({ game, isExiting }: GamePreviewProps) {
         <motion.div
           key={game.id}
           className="game-preview-stage"
-          initial={{ opacity: 0, scale: 1.035, filter: 'blur(12px)' }}
+          initial={{ opacity: 0, x: 40, scale: 1.035, filter: 'blur(12px)' }}
           animate={
             isExiting
               ? { opacity: 0, scale: 1.12, filter: 'blur(16px)' }
-              : { opacity: 1, scale: 1, filter: 'blur(0px)' }
+              : { opacity: 1, x: 0, scale: 1, filter: 'blur(0px)' }
           }
-          exit={{ opacity: 0, scale: 0.985, filter: 'blur(8px)' }}
-          transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
+          exit={{ opacity: 0, x: -28, scale: 0.985, filter: 'blur(8px)' }}
+          transition={{ duration: 0.76, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="game-preview-backdrop" aria-hidden="true" />
           <div className="game-preview-atmosphere" aria-hidden="true" />

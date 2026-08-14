@@ -2,10 +2,11 @@ import { motion } from 'framer-motion';
 import type { GameDefinition } from '../../../shared/mock/games';
 
 export function GameInfo({ game }: { readonly game: GameDefinition }) {
+  const isLongTitle = game.name.length > 6;
   return (
     <motion.div
       key={game.id}
-      className="game-info"
+      className={`game-info${isLongTitle ? ' game-info--long-title' : ''}`}
       initial="hidden"
       animate="visible"
       variants={{

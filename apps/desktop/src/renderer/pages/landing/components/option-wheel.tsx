@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Side = 'left' | 'right';
 type FontSize = number | string;
+type CssLength = number | string;
 
 export interface OptionWheelProps {
   readonly items?: readonly string[];
@@ -21,13 +22,10 @@ export interface OptionWheelProps {
   readonly fade?: number;
   readonly minOpacity?: number;
   readonly smoothing?: number;
-  readonly inset?: number;
+  readonly inset?: CssLength;
   readonly rowHeight?: number;
   readonly loop?: boolean;
   readonly draggable?: boolean;
-  readonly soundUrl?: string;
-  readonly soundVolume?: number;
-  readonly onTick?: () => void;
   readonly disabled?: boolean;
   readonly ariaLabel?: string;
   readonly className?: string;
@@ -45,20 +43,17 @@ interface WheelConfig {
   readonly loop: boolean;
   readonly smoothing: number;
   readonly draggable: boolean;
-  readonly soundUrl: string;
-  readonly soundVolume: number;
   readonly reducedMotion: boolean;
 }
 
 const EMPTY_ITEMS: readonly string[] = [];
 const DEFAULT_ROW_HEIGHT = 72;
 const WHEEL_IDLE_DELAY = 105;
-const TICK_THROTTLE = 72;
 const DRAG_THRESHOLD = 4;
-const MAX_VELOCITY = 6.2;
-const WHEEL_IMPULSE = 0.0048;
-const SPRING = 92;
-const DAMPING = 13;
+const MAX_VELOCITY = 5.4;
+const WHEEL_IMPULSE = 3.2;
+const SPRING = 78;
+const DAMPING = 12.5;
 
 function clampIndex(index: number, count: number): number {
   return Math.max(0, Math.min(index, Math.max(count - 1, 0)));
@@ -72,6 +67,20 @@ function normaliseIndex(index: number, count: number, loop: boolean): number {
 function calculateRowHeight(fontSize: FontSize, spacing: number, rowHeight?: number): number {
   if (rowHeight) return rowHeight;
   return typeof fontSize === 'number' ? Math.max(fontSize * spacing * 16, 1) : DEFAULT_ROW_HEIGHT;
+}
+
+function getItemScale(label: string): number {
+  if (label.length > 6) return 0.82;
+  if (label.length > 4) return 0.91;
+  return 1;
+}
+
+function normaliseWheelDelta(event: WheelEvent): number {
+  const rawDelta = event.deltaMode === WheelEvent.DOM_DELTA_LINE ? event.deltaY * 28 : event.deltaY;
+  const constrained = Math.max(-180, Math.min(rawDelta, 180));
+  const magnitude = Math.abs(constrained);
+  const scaled = magnitude < 8 ? magnitude * 0.032 : (magnitude / 72) ** 0.68;
+  return Math.sign(constrained) * Math.max(0.045, scaled);
 }
 
 function prefersReducedMotion(): boolean {
@@ -106,9 +115,6 @@ export function OptionWheel({
   rowHeight,
   loop = false,
   draggable = true,
-  soundUrl = '',
-  soundVolume = 0.24,
-  onTick,
   disabled = false,
   ariaLabel = '选择选项',
   className = '',
@@ -127,19 +133,14 @@ export function OptionWheel({
   const dragMovedRef = useRef(false);
   const suppressClickRef = useRef(false);
   const clickTimerRef = useRef<number | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioUrlRef = useRef('');
-  const lastTickRef = useRef(0);
   const onChangeRef = useRef(onChange);
   const onEnterRef = useRef(onEnter);
-  const onTickRef = useRef(onTick);
   const lastExternalIndexRef = useRef<number | undefined>(undefined);
   const [activeIndex, setActiveIndex] = useState(selectedRef.current);
   const configRef = useRef<WheelConfig>({} as WheelConfig);
 
   onChangeRef.current = onChange;
   onEnterRef.current = onEnter;
-  onTickRef.current = onTick;
   configRef.current = {
     count: items.length,
     rowHeight: calculateRowHeight(fontSize, spacing, rowHeight),
@@ -152,30 +153,8 @@ export function OptionWheel({
     loop,
     smoothing,
     draggable,
-    soundUrl,
-    soundVolume,
     reducedMotion: prefersReducedMotion(),
   };
-
-  const playTick = useCallback(() => {
-    const { soundUrl: url, soundVolume: volume } = configRef.current;
-    if (performance.now() - lastTickRef.current < TICK_THROTTLE) return;
-    lastTickRef.current = performance.now();
-    if (!url) {
-      onTickRef.current?.();
-      return;
-    }
-    if (!audioRef.current || audioUrlRef.current !== url) {
-      audioRef.current?.pause();
-      audioRef.current = new Audio(url);
-      audioRef.current.preload = 'auto';
-      audioUrlRef.current = url;
-    }
-    const audio = audioRef.current;
-    audio.volume = Math.max(0, Math.min(volume, 1));
-    audio.currentTime = 0;
-    void audio.play().catch(() => undefined);
-  }, []);
 
   const commitSelection = useCallback(
     (position: number) => {
@@ -187,39 +166,42 @@ export function OptionWheel({
       setActiveIndex(index);
       const item = items[index];
       if (item) onChangeRef.current?.(index, item);
-      playTick();
     },
-    [items, playTick],
+    [items],
   );
 
-  const paint = useCallback((position: number) => {
-    const config = configRef.current;
-    const tiltRadians = (config.tilt * Math.PI) / 180;
-    const radius = tiltRadians > 0.0005 ? config.rowHeight / tiltRadians : 0;
-    const mirror = config.side === 'right' ? -1 : 1;
-    itemRefs.current.forEach((element, index) => {
-      if (!element) return;
-      let distance = index - position;
-      if (config.loop && config.count > 1) {
-        distance = ((distance % config.count) + config.count) % config.count;
-        if (distance > config.count / 2) distance -= config.count;
-      }
-      const depth = Math.abs(distance);
-      const angle = radius
-        ? Math.max(-Math.PI / 2, Math.min(Math.PI / 2, distance * tiltRadians))
-        : 0;
-      const x = radius ? -mirror * radius * (1 - Math.cos(angle)) * config.curve : 0;
-      const y = radius ? radius * Math.sin(angle) : distance * config.rowHeight;
-      const rotation = radius ? (mirror * angle * 180) / Math.PI : 0;
-      const scale = Math.max(0.84, 1 - Math.min(depth, 3) * 0.052);
-      element.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) translateY(-50%) rotate(${rotation.toFixed(3)}deg) scale(${scale.toFixed(3)})`;
-      element.style.opacity = String(Math.max(config.minOpacity, 1 - depth * config.fade));
-      element.style.filter = config.reducedMotion
-        ? 'none'
-        : `blur(${(depth * config.blur).toFixed(2)}px)`;
-      element.style.setProperty('--ow-progress', Math.max(0, 1 - Math.min(depth, 1)).toFixed(4));
-    });
-  }, []);
+  const paint = useCallback(
+    (position: number) => {
+      const config = configRef.current;
+      const tiltRadians = (config.tilt * Math.PI) / 180;
+      const radius = tiltRadians > 0.0005 ? config.rowHeight / tiltRadians : 0;
+      const mirror = config.side === 'right' ? -1 : 1;
+      itemRefs.current.forEach((element, index) => {
+        if (!element) return;
+        let distance = index - position;
+        if (config.loop && config.count > 1) {
+          distance = ((distance % config.count) + config.count) % config.count;
+          if (distance > config.count / 2) distance -= config.count;
+        }
+        const depth = Math.abs(distance);
+        const angle = radius
+          ? Math.max(-Math.PI / 2, Math.min(Math.PI / 2, distance * tiltRadians))
+          : 0;
+        const x = radius ? -mirror * radius * (1 - Math.cos(angle)) * config.curve : 0;
+        const y = radius ? radius * Math.sin(angle) : distance * config.rowHeight;
+        const rotation = radius ? (mirror * angle * 180) / Math.PI : 0;
+        const scale =
+          getItemScale(items[index] ?? '') * Math.max(0.84, 1 - Math.min(depth, 3) * 0.052);
+        element.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) translateY(-50%) rotate(${rotation.toFixed(3)}deg) scale(${scale.toFixed(3)})`;
+        element.style.opacity = String(Math.max(config.minOpacity, 1 - depth * config.fade));
+        element.style.filter = config.reducedMotion
+          ? 'none'
+          : `blur(${(depth * config.blur).toFixed(2)}px)`;
+        element.style.setProperty('--ow-progress', Math.max(0, 1 - Math.min(depth, 1)).toFixed(4));
+      });
+    },
+    [items],
+  );
 
   const runFrame = useCallback(
     (now: number) => {
@@ -228,7 +210,7 @@ export function OptionWheel({
       lastFrameRef.current = now;
       const idle = now - lastInputRef.current > WHEEL_IDLE_DELAY;
       if (idle && needsSnapRef.current) {
-        targetRef.current = Math.round(positionRef.current + velocityRef.current * 0.04);
+        targetRef.current = Math.round(positionRef.current + velocityRef.current * 0.12);
       }
       if (!config.loop) targetRef.current = clampIndex(targetRef.current, config.count);
       if (config.reducedMotion) {
@@ -303,8 +285,7 @@ export function OptionWheel({
     const onWheel = (event: WheelEvent) => {
       if (disabled || Math.abs(event.deltaY) < 0.1) return;
       event.preventDefault();
-      const delta =
-        event.deltaMode === WheelEvent.DOM_DELTA_LINE ? event.deltaY * 24 : event.deltaY;
+      const delta = normaliseWheelDelta(event);
       velocityRef.current = Math.max(
         -MAX_VELOCITY,
         Math.min(MAX_VELOCITY, velocityRef.current + delta * WHEEL_IMPULSE),
@@ -399,9 +380,6 @@ export function OptionWheel({
     () => () => {
       if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
       if (clickTimerRef.current !== null) window.clearTimeout(clickTimerRef.current);
-      audioRef.current?.pause();
-      if (audioRef.current) audioRef.current.src = '';
-      audioRef.current = null;
     },
     [],
   );
@@ -410,7 +388,7 @@ export function OptionWheel({
     '--ow-text-color': textColor,
     '--ow-active-color': activeColor,
     '--ow-font-size': typeof fontSize === 'number' ? `${fontSize}rem` : fontSize,
-    '--ow-inset': `${inset}px`,
+    '--ow-inset': typeof inset === 'number' ? `${inset}px` : inset,
   } as CSSProperties;
   return (
     <div

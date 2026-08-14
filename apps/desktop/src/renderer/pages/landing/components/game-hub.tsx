@@ -1,6 +1,6 @@
 import { Settings } from '@game-guide-hub/icons';
 import { motion as themeMotion } from '@game-guide-hub/theme';
-import { type MotionStyle, motion } from 'framer-motion';
+import { AnimatePresence, type MotionStyle, motion } from 'framer-motion';
 import type { GameDefinition } from '../../../shared/mock/games';
 import { games } from '../../../shared/mock/games';
 import { BackgroundScene } from '../../../shared/scene/background-scene';
@@ -65,17 +65,26 @@ export function GameHub({ isExiting, selectedGame, onGameSelect, onEnter }: Game
           </div>
           <div className="game-hub-preview-panel">
             <GamePreview game={selectedGame} isExiting={isExiting} />
-            <div className="game-hub-preview-content">
-              <GameInfo game={selectedGame} />
-              <div className="game-hub-actions">
-                <span
-                  className={`game-status ${selectedGame.status === 'available' ? 'is-available' : ''}`}
-                >
-                  {selectedGame.status === 'available' ? '已开放' : '开发中'}
-                </span>
-                <GameEnterButton game={selectedGame} disabled={isExiting} onEnter={onEnter} />
-              </div>
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedGame.id}
+                className="game-hub-preview-content"
+                initial={{ opacity: 0, x: 40, scale: 0.98, filter: 'blur(6px)' }}
+                animate={{ opacity: 1, x: 0, scale: 1, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, x: -28, scale: 0.98, filter: 'blur(5px)' }}
+                transition={{ duration: 0.52, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <GameInfo game={selectedGame} />
+                <div className="game-hub-actions">
+                  <span
+                    className={`game-status ${selectedGame.status === 'available' ? 'is-available' : ''}`}
+                  >
+                    {selectedGame.status === 'available' ? '已开放' : '开发中'}
+                  </span>
+                  <GameEnterButton game={selectedGame} disabled={isExiting} onEnter={onEnter} />
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </section>
         <footer className="game-hub-footer">

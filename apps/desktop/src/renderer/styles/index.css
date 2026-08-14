@@ -131,8 +131,8 @@
     z-index: 4;
     top: 0;
     bottom: 0;
-    left: clamp(1rem, 3.6vw, 4.5rem);
-    width: clamp(17rem, 28vw, 31rem);
+    left: 0;
+    width: min(45vw, 42rem);
     pointer-events: none;
   }
 
@@ -276,6 +276,10 @@
     letter-spacing: 0.02em;
     line-height: 0.9;
     text-shadow: 0 0 2.5rem var(--game-glow);
+  }
+  .game-info--long-title h1 {
+    font-size: clamp(2.5rem, 5.4vw, 5.6rem);
+    line-height: 0.98;
   }
   .game-info-english {
     margin-top: var(--spacing-content);
@@ -464,7 +468,7 @@
     letter-spacing: 0;
     line-height: 1;
     text-align: left;
-    text-shadow: 0 0 1.25rem color-mix(in srgb, var(--game-primary) 14%, transparent);
+    text-shadow: none;
     transform-origin: left center;
     white-space: nowrap;
     will-change: transform, opacity, filter;
