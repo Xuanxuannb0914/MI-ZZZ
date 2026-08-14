@@ -6,6 +6,7 @@ import { LoadingState } from '../../shared/ui/loading-state';
 const HomePage = lazy(() => import('../../pages/home/home-page'));
 const LandingPage = lazy(() => import('../../pages/landing/landing-page'));
 const GameHubPage = lazy(() => import('../../pages/landing/game-hub-page'));
+const DevelopmentPage = lazy(() => import('../../pages/development/development-page'));
 const AgentsPage = lazy(() => import('../../pages/agents/agents-page'));
 const AgentDetailPage = lazy(() => import('../../pages/agent-detail/agent-detail-page'));
 const GuidesPage = lazy(() => import('../../pages/guides/guides-page'));
@@ -48,6 +49,7 @@ export function WorkspaceRoutes() {
         <Route path={workspaceRoutes.guides} element={<GuidesPage />} />
         <Route path={`${workspaceRoutes.guides}/:id`} element={<GuideDetailPage />} />
 
+        <Route path={workspaceRoutes.development.overview} element={<DevelopmentPage />} />
         <Route path={workspaceRoutes.development.characters} element={<AgentsPage />} />
         <Route
           path={`${workspaceRoutes.development.characters}/:id`}

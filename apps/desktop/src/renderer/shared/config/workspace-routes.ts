@@ -2,6 +2,7 @@ export const workspaceRoutes = {
   home: '/zzz',
   guides: '/zzz/guides',
   development: {
+    overview: '/zzz/development',
     characters: '/zzz/development/characters',
     wEngines: '/zzz/development/w-engines',
     driveDiscs: '/zzz/development/drive-discs',

@@ -51,6 +51,7 @@ export const sidebarNavigationGroups: readonly SidebarNavigationGroup[] = [
       '/zzz/planner',
     ],
     items: [
+      { label: '养成总览', to: workspaceRoutes.development.overview },
       { label: '角色', to: workspaceRoutes.development.characters },
       { label: '音擎', to: workspaceRoutes.development.wEngines },
       { label: '驱动盘', to: workspaceRoutes.development.driveDiscs },
