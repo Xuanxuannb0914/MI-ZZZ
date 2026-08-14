@@ -1,0 +1,34 @@
+export const motion = {
+  duration: {
+    instant: '0ms',
+    fast: '150ms',
+    normal: '250ms',
+    slow: '400ms',
+    route: '400ms',
+    cinematic: '900ms',
+    loading: '1800ms',
+    ambient: '4800ms',
+  },
+  easing: {
+    enter: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    exit: 'cubic-bezier(0.7, 0, 0.84, 0)',
+    standard: 'cubic-bezier(0.2, 0, 0, 1)',
+  },
+  durationSeconds: {
+    fast: 0.15,
+    normal: 0.25,
+    slow: 0.4,
+    route: 0.4,
+    cinematic: 0.9,
+    loading: 1.8,
+    ambient: 4.8,
+  },
+  distance: {
+    pressed: '1px',
+    hover: '2px',
+    raised: '3px',
+  },
+  delays: {
+    tooltip: 400,
+  },
+} as const;

@@ -1,0 +1,26 @@
+export const spacing = {
+  none: '0px',
+  hairline: '2px',
+  xxs: '4px',
+  xs: '8px',
+  sm: '12px',
+  md: '16px',
+  lg: '24px',
+  xl: '32px',
+  xxl: '48px',
+  compact: '8px',
+  tight: '8px',
+  control: '8px',
+  content: '16px',
+  panel: '24px',
+  comfortable: '32px',
+  section: '48px',
+  layout: '64px',
+  wide: '40px',
+  display: '48px',
+  sectionLarge: '64px',
+  page: '32px',
+  pageWide: '48px',
+} as const;
+
+export type SpacingToken = keyof typeof spacing;
