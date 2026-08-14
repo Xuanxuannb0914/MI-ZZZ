@@ -14,7 +14,7 @@ export function GameCard({ game, onSelect }: GameCardProps) {
   return (
     <motion.button
       type="button"
-      className={`platform-game-card platform-game-card-${game.accent}`}
+      className="platform-game-card"
       aria-label={`${game.name}${isAvailable ? '，进入游戏档案' : '，开发中'}`}
       onClick={() => {
         if (isAvailable) onSelect(game);
