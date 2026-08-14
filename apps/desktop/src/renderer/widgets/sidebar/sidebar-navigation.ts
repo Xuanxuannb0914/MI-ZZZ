@@ -66,10 +66,11 @@ export const sidebarNavigationGroups: readonly SidebarNavigationGroup[] = [
     icon: Database,
     match: ['/zzz/data'],
     items: [
+      { label: '数据总览', to: workspaceRoutes.data.overview },
+      { label: '抽卡分析', to: workspaceRoutes.data.gacha },
       { label: '角色数据', to: workspaceRoutes.data.characters },
       { label: '音擎数据', to: workspaceRoutes.data.wEngines },
       { label: '版本数据', to: workspaceRoutes.data.versions },
-      { label: '抽卡分析', status: '建设中' },
       { label: '怪物图鉴', status: '建设中' },
     ],
   },

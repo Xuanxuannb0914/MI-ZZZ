@@ -11,6 +11,8 @@ export const workspaceRoutes = {
     calculator: '/zzz/development/calculator',
   },
   data: {
+    overview: '/zzz/data',
+    gacha: '/zzz/data/gacha',
     characters: '/zzz/data/characters',
     wEngines: '/zzz/data/w-engines',
     versions: '/zzz/data/versions',

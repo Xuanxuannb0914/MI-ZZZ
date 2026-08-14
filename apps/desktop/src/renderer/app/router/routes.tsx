@@ -7,6 +7,8 @@ const HomePage = lazy(() => import('../../pages/home/home-page'));
 const LandingPage = lazy(() => import('../../pages/landing/landing-page'));
 const GameHubPage = lazy(() => import('../../pages/landing/game-hub-page'));
 const DevelopmentPage = lazy(() => import('../../pages/development/development-page'));
+const DataCenterPage = lazy(() => import('../../pages/data-center/data-center-page'));
+const GachaAnalyticsPage = lazy(() => import('../../pages/gacha/gacha-analytics-page'));
 const AgentsPage = lazy(() => import('../../pages/agents/agents-page'));
 const AgentDetailPage = lazy(() => import('../../pages/agent-detail/agent-detail-page'));
 const GuidesPage = lazy(() => import('../../pages/guides/guides-page'));
@@ -68,6 +70,8 @@ export function WorkspaceRoutes() {
         <Route path={`${workspaceRoutes.development.teams}/:id`} element={<TeamsPage />} />
         <Route path={workspaceRoutes.development.calculator} element={<DailyPage />} />
 
+        <Route path={workspaceRoutes.data.overview} element={<DataCenterPage />} />
+        <Route path={workspaceRoutes.data.gacha} element={<GachaAnalyticsPage />} />
         <Route path={workspaceRoutes.data.characters} element={<AgentsPage />} />
         <Route path={`${workspaceRoutes.data.characters}/:id`} element={<AgentDetailPage />} />
         <Route path={workspaceRoutes.data.wEngines} element={<WEnginesPage />} />

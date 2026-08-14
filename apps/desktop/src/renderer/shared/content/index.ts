@@ -8,6 +8,14 @@ export {
 } from '../mock/daily';
 export { driveDiscs, findDriveDiscById } from '../mock/drive-discs';
 export { events } from '../mock/events';
+export {
+  analyzeGachaHistory,
+  type GachaAnalytics,
+  type GachaHistoryItem,
+  type GachaImportResult,
+  gachaHistory,
+  parseGachaImport,
+} from '../mock/gacha';
 export { games } from '../mock/games';
 export { findGuideById, guides } from '../mock/guides';
 export { findMaterialById, materials } from '../mock/materials';
