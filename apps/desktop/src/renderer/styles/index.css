@@ -130,19 +130,9 @@
   }
   .game-hub-wheel-panel {
     position: relative;
-    padding: clamp(1rem, 2.5vw, 2rem);
-    border-left: 1px solid color-mix(in srgb, var(--game-primary) 32%, transparent);
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--ggh-color-glass-strong) 72%, transparent),
-      transparent
-    );
-  }
-  .game-hub-stage-label {
-    color: var(--game-primary);
-    font-size: var(--text-caption);
-    font-weight: 700;
-    letter-spacing: 0.15em;
+    display: flex;
+    align-items: center;
+    min-height: min(61vh, 38rem);
   }
 
   .game-hub-preview-panel {
@@ -368,118 +358,85 @@
   }
 
   .game-option-wheel {
+    width: min(100%, 24rem);
+    height: clamp(22rem, 56vh, 38rem);
+  }
+
+  .option-wheel {
     position: relative;
-    width: min(100%, 20rem);
-    min-height: 21rem;
-    padding: var(--spacing-panel) 0;
-    outline: none;
+    overflow: hidden;
     touch-action: none;
     user-select: none;
+    cursor: grab;
+    outline: none;
   }
 
-  .game-option-wheel:focus-visible {
-    border-radius: var(--radius-lg);
-    box-shadow: inset 0 0 0 2px var(--game-primary, var(--ggh-color-primary));
+  .option-wheel:focus-visible {
+    outline: none;
   }
 
-  .game-option-wheel-items {
-    position: relative;
-    min-height: 17rem;
+  .option-wheel:focus-visible .option-wheel__item[aria-selected='true'] {
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--game-primary) 70%, transparent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.38em;
   }
 
-  .game-option-wheel-axis {
+  .option-wheel:has(.option-wheel__item:active) {
+    cursor: grabbing;
+  }
+
+  .option-wheel__item {
     position: absolute;
     top: 50%;
-    bottom: var(--spacing-panel);
-    left: 0;
-    width: 1px;
-    background: linear-gradient(
-      180deg,
-      transparent,
-      var(--game-primary, var(--ggh-color-primary)),
-      transparent
-    );
-    opacity: 0.5;
-  }
-
-  .game-option-wheel-item {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr) auto;
-    align-items: center;
-    width: 100%;
-    min-height: 3.25rem;
-    padding: 0 var(--spacing-content);
+    left: var(--ow-inset);
+    margin: 0;
+    padding: var(--spacing-compact) 0;
     border: 0;
-    border-radius: var(--radius-md);
-    color: var(--ggh-color-text-secondary);
+    color: color-mix(
+      in srgb,
+      var(--ow-active-color) calc(var(--ow-progress, 0) * 100%),
+      var(--ow-text-color)
+    );
     background: transparent;
     cursor: pointer;
-    filter: blur(var(--wheel-blur));
-    opacity: var(--wheel-opacity);
+    font: inherit;
+    font-size: var(--ow-font-size);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1;
     text-align: left;
-    transform: translateX(var(--wheel-x)) translateY(var(--wheel-y)) scale(var(--wheel-scale));
+    text-shadow: 0 0 1.25rem color-mix(in srgb, var(--game-primary) 14%, transparent);
     transform-origin: left center;
-    transition:
-      color var(--ggh-motion-normal) var(--ggh-ease-enter),
-      background-color var(--ggh-motion-normal) var(--ggh-ease-enter),
-      filter var(--ggh-motion-normal) var(--ggh-ease-enter),
-      opacity var(--ggh-motion-normal) var(--ggh-ease-enter),
-      transform var(--ggh-motion-normal) var(--ggh-ease-enter);
-  }
-
-  .game-option-wheel-item:hover:not(:disabled) {
-    color: var(--ggh-color-text-primary);
-    background: color-mix(in srgb, var(--game-primary, var(--ggh-color-primary)) 10%, transparent);
-  }
-
-  .game-option-wheel-item[aria-selected='true'] {
-    color: var(--ggh-color-text-primary);
-    background:
-      linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--game-primary, var(--ggh-color-primary)) 20%, transparent),
-        transparent
-      ),
-      var(--ggh-color-glass-light);
-    box-shadow: inset 2px 0 var(--game-primary, var(--ggh-color-primary));
-    filter: none;
-    font-weight: 700;
-    opacity: 1;
-  }
-
-  .game-option-wheel-item:disabled {
-    cursor: default;
-  }
-  .game-option-wheel-index {
-    color: var(--game-primary, var(--ggh-color-primary));
-    font-size: var(--text-caption);
-    font-variant-numeric: tabular-nums;
-  }
-  .game-option-wheel-name {
-    overflow: hidden;
-    font-size: clamp(1rem, 1.6vw, 1.35rem);
-    text-overflow: ellipsis;
     white-space: nowrap;
+    will-change: transform, opacity, filter;
   }
-  .game-option-wheel-status {
-    color: var(--ggh-color-text-tertiary);
-    font-size: var(--text-caption);
+
+  .option-wheel--right .option-wheel__item {
+    right: var(--ow-inset);
+    left: auto;
+    text-align: right;
+    transform-origin: right center;
   }
-  .game-option-wheel-hint {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    color: var(--ggh-color-text-tertiary);
-    font-size: var(--text-caption);
+
+  .option-wheel__item:hover:not(:disabled),
+  .option-wheel__item:focus-visible:not(:disabled) {
+    color: var(--ow-active-color);
+    outline: none;
+  }
+
+  .option-wheel__item[aria-selected='true'] {
+    font-weight: 560;
+  }
+
+  .option-wheel__item:disabled {
+    cursor: default;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .game-option-wheel-item {
+    .option-wheel__item {
       filter: none;
-      transition: none;
+      will-change: auto;
     }
   }
 

@@ -8,6 +8,18 @@ import { GameOptionWheel } from './game-option-wheel';
 describe('GameOptionWheel', () => {
   afterEach(cleanup);
 
+  it('starts on 绝区零 and renders only configured game names', () => {
+    render(
+      <GameOptionWheel games={games} selectedIndex={0} onSelect={vi.fn()} onEnter={vi.fn()} />,
+    );
+
+    expect(screen.getAllByRole('option')).toHaveLength(4);
+    expect(screen.getByRole('option', { name: '绝区零' }).getAttribute('aria-selected')).toBe(
+      'true',
+    );
+    expect(screen.queryByText('Ambient')).toBeNull();
+  });
+
   it('supports keyboard selection and keeps navigation outside the wheel callback', () => {
     const onSelect = vi.fn();
     const onEnter = vi.fn();
@@ -44,10 +56,8 @@ describe('GameOptionWheel', () => {
     );
 
     const wheel = screen.getByRole('listbox', { name: '选择游戏' });
-    fireEvent.wheel(wheel, { deltaY: 80 });
     fireEvent.wheel(wheel, { deltaY: -80 });
 
-    expect(onSelect).toHaveBeenCalledTimes(1);
-    expect(onSelect).toHaveBeenCalledWith(1);
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });

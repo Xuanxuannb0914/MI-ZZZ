@@ -52,7 +52,6 @@ export function GameHub({ isExiting, selectedGame, onGameSelect, onEnter }: Game
         </header>
         <section className="game-hub-stage" aria-label="游戏选择舞台">
           <div className="game-hub-wheel-panel">
-            <p className="game-hub-stage-label">选择世界</p>
             <GameOptionWheel
               games={games}
               selectedIndex={selectedIndex}
