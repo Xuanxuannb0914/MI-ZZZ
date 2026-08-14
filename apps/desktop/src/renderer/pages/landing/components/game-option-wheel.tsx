@@ -26,8 +26,16 @@ export function GameOptionWheel({
 }: GameOptionWheelProps) {
   const [dragOffset, setDragOffset] = useState(0);
   const pointerStartYRef = useRef<number | null>(null);
+  const lastPointerSampleRef = useRef<{ y: number; time: number } | null>(null);
   const dragOffsetRef = useRef(0);
+  const dragVelocityRef = useRef(0);
   const animationFrameRef = useRef<number | null>(null);
+
+  const cancelPendingFrame = useCallback(() => {
+    if (animationFrameRef.current === null) return;
+    window.cancelAnimationFrame(animationFrameRef.current);
+    animationFrameRef.current = null;
+  }, []);
 
   const setDragOffsetInFrame = useCallback((value: number) => {
     dragOffsetRef.current = Math.max(-MAX_DRAG_DISTANCE, Math.min(MAX_DRAG_DISTANCE, value));
@@ -41,19 +49,29 @@ export function GameOptionWheel({
   const moveSelection = useCallback(
     (delta: number) => {
       if (disabled) return;
-      onSelect(clampIndex(selectedIndex + delta, games.length));
+      const nextIndex = clampIndex(selectedIndex + delta, games.length);
+      if (nextIndex !== selectedIndex) onSelect(nextIndex);
     },
     [disabled, games.length, onSelect, selectedIndex],
   );
 
   const finishDrag = useCallback(() => {
     if (pointerStartYRef.current === null) return;
-    const dragSteps = Math.round(-dragOffsetRef.current / ITEM_STEP);
+    // Preserve a short, bounded momentum before snapping to the next option.
+    const momentumOffset = dragVelocityRef.current * 90;
+    const projectedOffset = Math.max(
+      -MAX_DRAG_DISTANCE,
+      Math.min(MAX_DRAG_DISTANCE, dragOffsetRef.current + momentumOffset),
+    );
+    const dragSteps = Math.round(-projectedOffset / ITEM_STEP);
     pointerStartYRef.current = null;
+    lastPointerSampleRef.current = null;
+    dragVelocityRef.current = 0;
     dragOffsetRef.current = 0;
+    cancelPendingFrame();
     setDragOffset(0);
     if (dragSteps) moveSelection(dragSteps);
-  }, [moveSelection]);
+  }, [cancelPendingFrame, moveSelection]);
 
   const handleWheel = useCallback(
     (event: WheelEvent<HTMLDivElement>) => {
@@ -68,6 +86,8 @@ export function GameOptionWheel({
     (event: PointerEvent<HTMLDivElement>) => {
       if (disabled || event.button !== 0) return;
       pointerStartYRef.current = event.clientY;
+      lastPointerSampleRef.current = { y: event.clientY, time: event.timeStamp };
+      dragVelocityRef.current = 0;
       event.currentTarget.setPointerCapture(event.pointerId);
     },
     [disabled],
@@ -76,6 +96,12 @@ export function GameOptionWheel({
   const handlePointerMove = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
       if (pointerStartYRef.current === null) return;
+      const previousSample = lastPointerSampleRef.current;
+      if (previousSample) {
+        const elapsed = Math.max(event.timeStamp - previousSample.time, 1);
+        dragVelocityRef.current = (event.clientY - previousSample.y) / elapsed;
+      }
+      lastPointerSampleRef.current = { y: event.clientY, time: event.timeStamp };
       setDragOffsetInFrame(event.clientY - pointerStartYRef.current);
     },
     [setDragOffsetInFrame],
@@ -101,10 +127,9 @@ export function GameOptionWheel({
 
   useEffect(() => {
     return () => {
-      if (animationFrameRef.current !== null)
-        window.cancelAnimationFrame(animationFrameRef.current);
+      cancelPendingFrame();
     };
-  }, []);
+  }, [cancelPendingFrame]);
 
   return (
     <div

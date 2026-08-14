@@ -9,7 +9,6 @@ interface GamePreviewProps {
 }
 
 export function GamePreview({ game, isExiting }: GamePreviewProps) {
-  const [hasImageError, setHasImageError] = useState(false);
   const artworkStyle = {
     '--game-artwork': `url(${game.artwork})`,
     '--game-background': `url(${game.background})`,
@@ -31,21 +30,26 @@ export function GamePreview({ game, isExiting }: GamePreviewProps) {
           transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="game-preview-backdrop" aria-hidden="true" />
-          {!hasImageError ? (
-            <img
-              key={game.artwork}
-              className="game-preview-artwork"
-              src={game.artwork}
-              alt=""
-              onError={() => setHasImageError(true)}
-            />
-          ) : (
-            <div className="game-preview-artwork-fallback" aria-hidden="true" />
-          )}
+          <GamePreviewArtwork key={game.artwork} artwork={game.artwork} />
           <span className="game-preview-noise" aria-hidden="true" />
           <span className="game-preview-sweep" aria-hidden="true" />
         </motion.div>
       </AnimatePresence>
     </section>
+  );
+}
+
+function GamePreviewArtwork({ artwork }: { readonly artwork: string }) {
+  const [hasImageError, setHasImageError] = useState(false);
+
+  return hasImageError ? (
+    <div className="game-preview-artwork-fallback" aria-hidden="true" />
+  ) : (
+    <img
+      className="game-preview-artwork"
+      src={artwork}
+      alt=""
+      onError={() => setHasImageError(true)}
+    />
   );
 }
