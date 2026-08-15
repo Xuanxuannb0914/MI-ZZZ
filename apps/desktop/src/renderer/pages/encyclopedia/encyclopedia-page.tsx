@@ -1,8 +1,9 @@
 import { ChevronRight, Disc3, ShieldCheck, UsersRound, Wrench } from '@game-guide-hub/icons';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { workspaceRoutes } from '../../shared/config/workspace-routes';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
+import { MonsterViewer } from './monster-viewer';
 
 const entries = [
   {
@@ -26,6 +27,8 @@ const entries = [
 ] as const;
 
 export default function EncyclopediaPage() {
+  const [params] = useSearchParams();
+  const enemyTab = params.get('tab');
   return (
     <PageTransition>
       <Page className="page-surface">
@@ -43,31 +46,47 @@ export default function EncyclopediaPage() {
           <Link to={workspaceRoutes.encyclopedia.characters}>角色</Link>
           <Link to={workspaceRoutes.encyclopedia.wEngines}>音擎</Link>
           <Link to={workspaceRoutes.encyclopedia.driveDiscs}>驱动盘</Link>
-          <span aria-disabled="true">怪物</span>
-          <span aria-disabled="true">Boss</span>
+          <Link
+            className={enemyTab === 'monsters' ? 'is-active' : undefined}
+            to={workspaceRoutes.encyclopedia.monsters}
+          >
+            怪物
+          </Link>
+          <Link
+            className={enemyTab === 'bosses' ? 'is-active' : undefined}
+            to={workspaceRoutes.encyclopedia.bosses}
+          >
+            Boss
+          </Link>
         </nav>
-        <section className="grid gap-content md:grid-cols-3">
-          {entries.map(({ label, description, to, icon: Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              className="ggh-glass glass-light ggh-card ggh-card-interactive flex min-h-44 flex-col p-panel"
-            >
-              <Icon aria-hidden="true" className="text-content-electric" size={20} />
-              <h2 className="mt-panel text-title3 font-semibold text-text-primary">{label}</h2>
-              <p className="mt-compact text-caption leading-relaxed text-text-secondary">
-                {description}
-              </p>
-              <span className="mt-auto pt-panel text-caption font-semibold text-text-primary">
-                查看图鉴 <ChevronRight aria-hidden="true" className="inline" size={15} />
-              </span>
-            </Link>
-          ))}
-        </section>
-        <p className="flex items-center gap-compact border-l-2 border-content-ether pl-content text-caption text-text-secondary">
-          <ShieldCheck aria-hidden="true" size={16} />
-          怪物与 Boss 数据、3D Viewer 将作为图鉴内部功能上线。
-        </p>
+        {enemyTab === 'monsters' || enemyTab === 'bosses' ? (
+          <MonsterViewer />
+        ) : (
+          <>
+            <section className="grid gap-content md:grid-cols-3">
+              {entries.map(({ label, description, to, icon: Icon }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className="ggh-glass glass-light ggh-card ggh-card-interactive flex min-h-44 flex-col p-panel"
+                >
+                  <Icon aria-hidden="true" className="text-content-electric" size={20} />
+                  <h2 className="mt-panel text-title3 font-semibold text-text-primary">{label}</h2>
+                  <p className="mt-compact text-caption leading-relaxed text-text-secondary">
+                    {description}
+                  </p>
+                  <span className="mt-auto pt-panel text-caption font-semibold text-text-primary">
+                    查看图鉴 <ChevronRight aria-hidden="true" className="inline" size={15} />
+                  </span>
+                </Link>
+              ))}
+            </section>
+            <p className="flex items-center gap-compact border-l-2 border-content-ether pl-content text-caption text-text-secondary">
+              <ShieldCheck aria-hidden="true" size={16} />
+              怪物与 Boss 数据、3D Viewer 将作为图鉴内部功能上线。
+            </p>
+          </>
+        )}
       </Page>
     </PageTransition>
   );

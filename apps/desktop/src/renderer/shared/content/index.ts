@@ -8,6 +8,7 @@ export {
   weeklyTasks,
 } from '../mock/daily';
 export { driveDiscs, findDriveDiscById } from '../mock/drive-discs';
+export { type Enemy, type EnemyCategory, type EnemyRank, enemies } from '../mock/enemies';
 export { events } from '../mock/events';
 export {
   analyzeGachaHistory,

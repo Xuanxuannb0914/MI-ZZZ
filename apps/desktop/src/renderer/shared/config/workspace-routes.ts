@@ -23,6 +23,8 @@ export const workspaceRoutes = {
     characters: '/zzz/encyclopedia/characters',
     wEngines: '/zzz/encyclopedia/w-engines',
     driveDiscs: '/zzz/encyclopedia/drive-discs',
+    monsters: '/zzz/encyclopedia?tab=monsters',
+    bosses: '/zzz/encyclopedia?tab=bosses',
   },
   community: {
     feed: '/zzz/community/feed',
