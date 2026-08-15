@@ -21,11 +21,13 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   buildGachaAnalysis,
+  exportZenlessUigf,
   type GachaBannerType,
-  type GachaDataSource,
   type GachaHistoryItem,
+  type GachaImportResult,
   type GachaImportSummary,
   LocalGachaDataProvider,
+  ZenlessGachaParser,
 } from '../../shared/content';
 import { EmptyState } from '../../shared/ui/empty-state';
 import { Page } from '../../shared/ui/page';
@@ -52,6 +54,7 @@ type HistoryRarityFilter = 'all' | 3 | 4 | 5;
 type HistoryItemFilter = 'all' | GachaHistoryItem['itemType'];
 type HistorySort = 'newest' | 'oldest' | 'rarity';
 type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
+type ImportMode = 'file' | 'json' | 'uigf' | 'clipboard' | 'link';
 
 export default function GachaAnalyticsPage() {
   const providerRef = useRef<LocalGachaDataProvider | null>(null);
@@ -62,10 +65,13 @@ export default function GachaAnalyticsPage() {
   const [historyBanner, setHistoryBanner] = useState<HistoryBannerFilter>('all');
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [importValue, setImportValue] = useState('');
-  const [source, setSource] = useState<Exclude<GachaDataSource, 'local-cache'>>('json');
+  const [source, setSource] = useState<ImportMode>('json');
   const [importError, setImportError] = useState('');
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [summary, setSummary] = useState<GachaImportSummary | null>(null);
+  const [preview, setPreview] = useState<GachaImportResult | null>(null);
+  const [preparedImport, setPreparedImport] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const cached = provider.load();
@@ -73,9 +79,38 @@ export default function GachaAnalyticsPage() {
     setSyncStatus(cached.length ? 'success' : 'idle');
   }, [provider]);
 
+  const reviewImport = useCallback(() => {
+    let payload: unknown;
+    try {
+      payload = JSON.parse(importValue);
+    } catch {
+      setPreview(null);
+      setPreparedImport(null);
+      setImportError('JSON 格式无效，请检查逗号、引号和括号。');
+      return;
+    }
+    const parser = new ZenlessGachaParser();
+    const result = parser.canParse(payload)
+      ? parser.parse(payload)
+      : provider.previewText(importValue, source === 'clipboard' ? 'clipboard' : 'json');
+    if (!result.records.length) {
+      setPreview(null);
+      setPreparedImport(null);
+      setImportError(result.issues[0] ?? '未解析到有效抽卡记录。');
+      return;
+    }
+    setPreview(result);
+    setPreparedImport(JSON.stringify({ records: result.records }));
+    setImportError('');
+  }, [importValue, provider, source]);
+
   const importRecords = useCallback(() => {
+    if (!preparedImport) return;
     setSyncStatus('syncing');
-    const result = provider.importText(importValue, source);
+    const result = provider.importText(
+      preparedImport,
+      source === 'clipboard' ? 'clipboard' : 'json',
+    );
     setSummary(result.summary);
     setRecords(result.records);
     if (!result.summary.records.length) {
@@ -86,17 +121,46 @@ export default function GachaAnalyticsPage() {
     setImportError('');
     setSyncStatus('success');
     setView('overview');
-  }, [importValue, provider, source]);
+  }, [preparedImport, provider, source]);
 
   const readClipboard = useCallback(async () => {
     try {
       setSource('clipboard');
       setImportValue(await navigator.clipboard.readText());
+      setPreview(null);
+      setPreparedImport(null);
       setImportError('');
     } catch {
       setImportError('无法读取剪贴板。请授予剪贴板权限或直接粘贴 JSON 数据。');
     }
   }, []);
+
+  const readFile = useCallback(async (file: File | undefined) => {
+    if (!file) return;
+    try {
+      setSource(file.name.toLowerCase().includes('uigf') ? 'uigf' : 'file');
+      setImportValue(await file.text());
+      setPreview(null);
+      setPreparedImport(null);
+      setImportError('');
+    } catch {
+      setImportError('文件无法读取，请确认它是 UTF-8 JSON 文件。');
+    }
+  }, []);
+
+  const exportRecords = useCallback(
+    (format: 'json' | 'uigf') => {
+      const payload = format === 'uigf' ? exportZenlessUigf(records) : { records };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = format === 'uigf' ? 'asteris-zzz-uigf.json' : 'asteris-zzz-gacha.json';
+      link.click();
+      URL.revokeObjectURL(url);
+    },
+    [records],
+  );
 
   const clearRecords = useCallback(() => {
     provider.clear();
@@ -130,13 +194,16 @@ export default function GachaAnalyticsPage() {
               <DialogContent aria-describedby="gacha-import-description">
                 <DialogTitle>同步抽卡数据</DialogTitle>
                 <DialogDescription id="gacha-import-description">
-                  仅解析本地数据，不会访问或模拟游戏官方接口。支持导入 JSON 或读取剪贴板中的 JSON。
+                  仅解析本地数据，不会访问或模拟游戏官方接口，也不会保存账号凭据。
                 </DialogDescription>
                 <Tabs
                   className="mt-panel"
                   items={[
+                    { value: 'file', label: '记录文件' },
                     { value: 'json', label: 'JSON 导入' },
+                    { value: 'uigf', label: 'UIGF' },
                     { value: 'clipboard', label: '剪贴板' },
+                    { value: 'link', label: '记录链接' },
                   ]}
                   value={source}
                   onValueChange={setSource}
@@ -151,11 +218,37 @@ export default function GachaAnalyticsPage() {
                     <RotateCcw aria-hidden="true" size={15} /> 读取剪贴板
                   </button>
                 ) : null}
+                {source === 'link' ? (
+                  <p className="mt-content text-caption leading-relaxed text-text-secondary">
+                    当前不直接请求记录链接，以避免读取或保存账号 Cookie、Token
+                    等敏感凭据。请从可信工具导出 JSON 或 UIGF 后导入。
+                  </p>
+                ) : null}
+                {source === 'file' || source === 'uigf' ? (
+                  <>
+                    <input
+                      ref={fileInputRef}
+                      className="sr-only"
+                      type="file"
+                      accept="application/json,.json"
+                      onChange={(event) => void readFile(event.target.files?.[0])}
+                    />
+                    <button
+                      type="button"
+                      className="ggh-button ggh-button-quiet mt-content h-control px-panel text-label"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      选择 JSON 文件
+                    </button>
+                  </>
+                ) : null}
                 <label
                   className="mt-panel block text-label font-semibold text-text-primary"
                   htmlFor="gacha-import-json"
                 >
-                  抽卡记录 JSON（必须包含 records、id、itemName、rarity、pulledAt）
+                  {source === 'uigf'
+                    ? 'UIGF JSON（识别到 ZZZ 标识后解析）'
+                    : '抽卡记录 JSON（必须包含 records、id、itemName、rarity、pulledAt）'}
                 </label>
                 <textarea
                   id="gacha-import-json"
@@ -166,6 +259,7 @@ export default function GachaAnalyticsPage() {
                 {importError ? (
                   <p className="mt-compact text-caption text-danger">{importError}</p>
                 ) : null}
+                {preview ? <ImportPreview result={preview} /> : null}
                 {summary ? <ImportSummary summary={summary} /> : null}
                 <div className="mt-panel flex flex-wrap justify-end gap-content">
                   <DialogClose className="ggh-button ggh-button-quiet h-control px-panel text-label">
@@ -174,22 +268,38 @@ export default function GachaAnalyticsPage() {
                   <button
                     type="button"
                     className="ggh-button ggh-button-primary inline-flex h-control items-center gap-compact px-panel text-label font-semibold"
-                    onClick={importRecords}
+                    onClick={preview ? importRecords : reviewImport}
                   >
                     <Download aria-hidden="true" size={16} />
-                    解析并同步
+                    {preview ? '确认导入' : '检测并预览'}
                   </button>
                 </div>
               </DialogContent>
             </Dialog>
             {records.length ? (
-              <button
-                type="button"
-                onClick={clearRecords}
-                className="inline-flex h-control items-center gap-compact px-compact text-caption text-text-tertiary hover:text-danger"
-              >
-                <Trash2 aria-hidden="true" size={15} /> 清空本地数据
-              </button>
+              <span className="flex flex-wrap items-center gap-compact">
+                <button
+                  type="button"
+                  onClick={() => exportRecords('uigf')}
+                  className="inline-flex h-control items-center px-compact text-caption text-text-secondary hover:text-text-primary"
+                >
+                  导出 UIGF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => exportRecords('json')}
+                  className="inline-flex h-control items-center px-compact text-caption text-text-secondary hover:text-text-primary"
+                >
+                  导出 JSON
+                </button>
+                <button
+                  type="button"
+                  onClick={clearRecords}
+                  className="inline-flex h-control items-center gap-compact px-compact text-caption text-text-tertiary hover:text-danger"
+                >
+                  <Trash2 aria-hidden="true" size={15} /> 清空本地数据
+                </button>
+              </span>
             ) : null}
           </div>
         </header>
@@ -521,6 +631,44 @@ function ImportSummary({ summary }: { readonly summary: GachaImportSummary }) {
       <SummaryItem label="异常" value={`${summary.rejectedRecords} 条`} />
       <SummaryItem label="本地合计" value={`${summary.totalRecords} 条`} />
     </dl>
+  );
+}
+
+function ImportPreview({ result }: { readonly result: GachaImportResult }) {
+  const overview = useMemo(() => {
+    const sorted = [...result.records].sort((left, right) =>
+      left.pulledAt.localeCompare(right.pulledAt),
+    );
+    return {
+      uid: result.records.find((record) => record.uid)?.uid ?? '未提供',
+      agents: result.records.filter((record) => record.itemType === 'agent').length,
+      engines: result.records.filter((record) => record.itemType === 'w-engine').length,
+      fiveStars: result.records.filter((record) => record.rarity === 5).length,
+      fourStars: result.records.filter((record) => record.rarity === 4).length,
+      earliest: sorted[0]?.pulledAt,
+      latest: sorted.at(-1)?.pulledAt,
+    };
+  }, [result.records]);
+  return (
+    <section className="mt-content border-y border-border-subtle py-content" aria-label="导入预览">
+      <p className="text-label font-semibold text-text-primary">
+        检测到 {result.records.length} 条抽卡记录
+      </p>
+      <dl className="mt-content grid grid-cols-2 gap-content text-caption sm:grid-cols-3">
+        <SummaryItem label="账号 UID" value={overview.uid} />
+        <SummaryItem label="角色 / 音擎" value={`${overview.agents} / ${overview.engines}`} />
+        <SummaryItem label="S / A 级" value={`${overview.fiveStars} / ${overview.fourStars}`} />
+        <SummaryItem
+          label="最早记录"
+          value={overview.earliest ? formatDate(overview.earliest) : '--'}
+        />
+        <SummaryItem
+          label="最新记录"
+          value={overview.latest ? formatDate(overview.latest) : '--'}
+        />
+        <SummaryItem label="校验异常" value={`${result.rejectedRecords} 条`} />
+      </dl>
+    </section>
   );
 }
 
