@@ -78,7 +78,7 @@ export default function GachaAnalyticsPage() {
     const result = provider.importText(importValue, source);
     setSummary(result.summary);
     setRecords(result.records);
-    if (!result.summary.acceptedRecords) {
+    if (!result.summary.records.length) {
       setImportError(result.summary.issues[0] ?? '未解析到可导入的新记录。');
       setSyncStatus('error');
       return;
@@ -283,6 +283,7 @@ function Overview({ records }: { readonly records: readonly GachaHistoryItem[] }
               />
             )}
           </div>
+          <PullTrend records={records} />
         </div>
         <aside className="border-l border-border-subtle pl-panel lg:pl-layout">
           <p className="text-caption font-semibold text-content-electric">限定池状态</p>
@@ -668,6 +669,41 @@ function ItemStatsView({
             description="导入对应道具类型的记录后显示统计。"
           />
         )}
+      </div>
+    </section>
+  );
+}
+
+function PullTrend({ records }: { readonly records: readonly GachaHistoryItem[] }) {
+  const data = useMemo(() => {
+    const pullsByMonth = new Map<string, number>();
+    for (const record of records) {
+      const month = record.pulledAt.slice(0, 7);
+      pullsByMonth.set(month, (pullsByMonth.get(month) ?? 0) + 1);
+    }
+    return [...pullsByMonth.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([month, pulls]) => ({ month: month.slice(5), pulls }));
+  }, [records]);
+  const maxPulls = Math.max(1, ...data.map((item) => item.pulls));
+  return (
+    <section className="mt-layout" aria-label="抽卡次数趋势">
+      <SectionTitle
+        eyebrow="导入记录时间"
+        title="抽卡次数趋势"
+        description="按导入记录中的实际日期汇总，不推测未导入的历史。"
+      />
+      <div className="mt-panel flex h-32 items-end gap-compact border-b border-border-subtle pb-compact">
+        {data.map((item) => (
+          <div key={item.month} className="flex min-w-8 flex-1 flex-col items-center gap-compact">
+            <span
+              className="w-full rounded-t-sm bg-content-electric/80 transition-opacity hover:opacity-75"
+              style={{ height: `${Math.max(8, (item.pulls / maxPulls) * 100)}%` }}
+              title={`${item.month} 月：${item.pulls} 抽`}
+            />
+            <span className="text-caption text-text-tertiary">{item.month} 月</span>
+          </div>
+        ))}
       </div>
     </section>
   );
