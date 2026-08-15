@@ -11,11 +11,17 @@ export { driveDiscs, findDriveDiscById } from '../mock/drive-discs';
 export { events } from '../mock/events';
 export {
   analyzeGachaHistory,
+  buildGachaAnalysis,
+  type GachaAnalysis,
   type GachaAnalytics,
+  type GachaBannerSummary,
+  type GachaBannerType,
   type GachaHistoryItem,
   type GachaImportResult,
+  type GachaStatistics,
   gachaHistory,
   parseGachaImport,
+  sampleGachaImport,
 } from '../mock/gacha';
 export { games } from '../mock/games';
 export { findGuideById, guides } from '../mock/guides';

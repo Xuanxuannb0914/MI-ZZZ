@@ -26,6 +26,26 @@ export interface GachaAnalytics {
   readonly luckLabel: GachaLuckLabel;
 }
 
+export interface GachaStatistics extends GachaAnalytics {
+  readonly threeStarCount: number;
+  readonly fourStarCount: number;
+  readonly limitedLossCount: number;
+  readonly limitedWinRate: number | null;
+  readonly fiveStarPities: readonly number[];
+}
+
+export interface GachaBannerSummary {
+  readonly bannerType: GachaBannerType;
+  readonly pullCount: number;
+  readonly fiveStarCount: number;
+  readonly currentPity: number;
+}
+
+export interface GachaAnalysis {
+  readonly statistics: GachaStatistics;
+  readonly banners: readonly GachaBannerSummary[];
+}
+
 export interface GachaImportResult {
   readonly records: readonly GachaHistoryItem[];
   readonly rejectedRecords: number;
@@ -65,6 +85,8 @@ export const gachaHistory: readonly GachaHistoryItem[] = samplePulls.map(
     pulledAt: `2026-08-${String(20 - index).padStart(2, '0')}T12:00:00.000Z`,
   }),
 );
+
+export const sampleGachaImport = JSON.stringify({ records: gachaHistory }, null, 2);
 
 function getFiveStarPities(records: readonly GachaHistoryItem[]) {
   const pities: number[] = [];
@@ -112,6 +134,42 @@ export function analyzeGachaHistory(records: readonly GachaHistoryItem[]): Gacha
     guaranteeCount: records.filter((record) => record.rarity === 5 && !record.isLimited).length,
     luckScore,
     luckLabel: getLuckLabel(luckScore),
+  };
+}
+
+export function buildGachaAnalysis(records: readonly GachaHistoryItem[]): GachaAnalysis {
+  const analytics = analyzeGachaHistory(records);
+  const fiveStarPities = getFiveStarPities(records);
+  const fiveStarRecords = records.filter((record) => record.rarity === 5);
+  const limitedWinCount = fiveStarRecords.filter((record) => record.isLimited).length;
+  const limitedLossCount = fiveStarRecords.length - limitedWinCount;
+  const bannerTypes: readonly GachaBannerType[] = ['limited-agent', 'limited-w-engine', 'standard'];
+
+  return {
+    statistics: {
+      ...analytics,
+      threeStarCount: records.filter((record) => record.rarity === 3).length,
+      fourStarCount: records.filter((record) => record.rarity === 4).length,
+      limitedLossCount,
+      limitedWinRate: fiveStarRecords.length ? limitedWinCount / fiveStarRecords.length : null,
+      fiveStarPities,
+    },
+    banners: bannerTypes
+      .map((bannerType) => {
+        const bannerRecords = records.filter((record) => record.bannerType === bannerType);
+        if (!bannerRecords.length) return null;
+        const latestFiveStarIndex = bannerRecords.map((record) => record.rarity).lastIndexOf(5);
+        return {
+          bannerType,
+          pullCount: bannerRecords.length,
+          fiveStarCount: bannerRecords.filter((record) => record.rarity === 5).length,
+          currentPity:
+            latestFiveStarIndex === -1
+              ? bannerRecords.length
+              : bannerRecords.length - latestFiveStarIndex - 1,
+        } satisfies GachaBannerSummary;
+      })
+      .filter((summary): summary is GachaBannerSummary => summary !== null),
   };
 }
 
