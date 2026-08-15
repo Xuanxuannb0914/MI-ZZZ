@@ -6,12 +6,17 @@ export type GachaLuckLabel = '极欧' | '欧' | '正常' | '偏非' | '非' | '�
 
 export interface GachaRecord {
   readonly id: string;
-  readonly gameId?: GachaGameId;
+  readonly gameId?: GachaGameId | undefined;
+  readonly uid?: string | undefined;
   readonly bannerType: GachaBannerType;
+  readonly bannerId?: string | undefined;
   readonly itemName: string;
+  readonly itemId?: string | undefined;
   readonly itemType: GachaItemType;
   readonly rarity: 3 | 4 | 5;
   readonly pulledAt: string;
+  readonly pullIndex?: number | undefined;
+  readonly source?: GachaDataSource | undefined;
   readonly isLimited: boolean;
 }
 
@@ -71,6 +76,7 @@ export interface GachaRepository {
 
 export interface GachaDataProvider {
   load(): readonly GachaRecord[];
+  previewText(text: string, source: Exclude<GachaDataSource, 'local-cache'>): GachaImportResult;
   importText(
     text: string,
     source: Exclude<GachaDataSource, 'local-cache'>,
@@ -143,11 +149,19 @@ export function parseGachaImport(payload: unknown): GachaImportResult {
     records.push({
       id: item.id.trim(),
       gameId: 'zenless-zone-zero',
+      uid: typeof item.uid === 'string' && item.uid.trim() ? item.uid.trim() : undefined,
       bannerType: isBannerType(item.bannerType) ? item.bannerType : 'limited-agent',
+      bannerId: typeof item.bannerId === 'string' ? item.bannerId : undefined,
       itemName: item.itemName.trim(),
+      itemId: typeof item.itemId === 'string' ? item.itemId : undefined,
       itemType: item.itemType === 'w-engine' ? 'w-engine' : 'agent',
       rarity: item.rarity,
       pulledAt,
+      pullIndex:
+        typeof item.pullIndex === 'number' && Number.isInteger(item.pullIndex)
+          ? item.pullIndex
+          : undefined,
+      source: item.source === 'clipboard' ? 'clipboard' : 'json',
       isLimited: item.isLimited === true,
     });
   }
@@ -159,11 +173,13 @@ export function mergeGachaRecords(
   incoming: readonly GachaRecord[],
 ): { readonly records: readonly GachaRecord[]; readonly duplicateRecords: number } {
   const known = new Set(
-    existing.map((record) => `${record.gameId ?? 'zenless-zone-zero'}:${record.id}`),
+    existing.map(
+      (record) => `${record.gameId ?? 'zenless-zone-zero'}:${record.uid ?? ''}:${record.id}`,
+    ),
   );
   let duplicateRecords = 0;
   const additions = incoming.filter((record) => {
-    const key = `${record.gameId ?? 'zenless-zone-zero'}:${record.id}`;
+    const key = `${record.gameId ?? 'zenless-zone-zero'}:${record.uid ?? ''}:${record.id}`;
     if (known.has(key)) {
       duplicateRecords += 1;
       return false;
@@ -209,24 +225,31 @@ export class LocalGachaDataProvider implements GachaDataProvider {
     return this.repository.load();
   }
 
-  importText(text: string, source: Exclude<GachaDataSource, 'local-cache'>) {
-    void source;
-    let parsed: unknown;
+  previewText(text: string, _source: Exclude<GachaDataSource, 'local-cache'>) {
+    void _source;
     try {
-      parsed = JSON.parse(text);
+      return parseGachaImport(JSON.parse(text));
     } catch {
-      const summary: GachaImportSummary = {
+      return {
         records: [],
         rejectedRecords: 0,
         normalizedRecords: 0,
         issues: ['JSON 格式无效，请检查逗号、引号和括号。'],
+      };
+    }
+  }
+
+  importText(text: string, source: Exclude<GachaDataSource, 'local-cache'>) {
+    const result = this.previewText(text, source);
+    if (!result.records.length) {
+      const summary: GachaImportSummary = {
+        ...result,
         acceptedRecords: 0,
         duplicateRecords: 0,
         totalRecords: this.load().length,
       };
       return { records: this.load(), summary };
     }
-    const result = parseGachaImport(parsed);
     const merged = mergeGachaRecords(this.load(), result.records);
     this.repository.save(merged.records);
     return {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { exportZenlessUigf, ZenlessGachaParser } from '../gacha/zenless-gacha-parser';
 import {
   analyzeGachaHistory,
   buildGachaAnalysis,
@@ -166,5 +167,53 @@ describe('gacha analytics', () => {
 
     expect(analysis.statistics.totalPulls).toBe(240);
     expect(analysis.statistics.fiveStarCount).toBe(3);
+  });
+
+  it('parses ZZZ UIGF records into internal records with a stable identifier', () => {
+    const parser = new ZenlessGachaParser();
+    const result = parser.parse({
+      info: { game: 'zzz', uid: '100000001' },
+      list: [
+        {
+          gacha_type: '1',
+          name: '测试代理人',
+          item_type: 'Character',
+          rank_type: '5',
+          time: '2026-08-15 12:00:00',
+        },
+      ],
+    });
+
+    expect(result.records).toEqual([
+      expect.objectContaining({
+        gameId: 'zenless-zone-zero',
+        uid: '100000001',
+        itemType: 'agent',
+        rarity: 5,
+      }),
+    ]);
+    expect(result.records[0]?.id).toMatch(/^uigf-/);
+  });
+
+  it('rejects a UIGF payload explicitly marked for another game and exports local records', () => {
+    const parser = new ZenlessGachaParser();
+    expect(parser.parse({ info: { game: 'genshin' }, list: [] }).issues[0]).toContain(
+      '不属于绝区零',
+    );
+    const exported = exportZenlessUigf([
+      {
+        id: 'export-1',
+        gameId: 'zenless-zone-zero',
+        itemName: '测试音擎',
+        itemType: 'w-engine',
+        bannerType: 'limited-w-engine',
+        rarity: 4,
+        pulledAt: '2026-08-15T00:00:00.000Z',
+        isLimited: false,
+      },
+    ]);
+
+    expect(exported.info.game).toBe('zzz');
+    expect(exported.list[0]).toMatchObject({ name: '测试音擎', rank_type: '4' });
   });
 });
