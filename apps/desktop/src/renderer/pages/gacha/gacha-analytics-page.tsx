@@ -1,4 +1,15 @@
-import { Database, Download, List, Radio, Sparkles, Star, Target } from '@game-guide-hub/icons';
+import {
+  Database,
+  Download,
+  List,
+  Radio,
+  RotateCcw,
+  Search,
+  Sparkles,
+  Star,
+  Target,
+  Trash2,
+} from '@game-guide-hub/icons';
 import {
   Dialog,
   DialogClose,
@@ -7,14 +18,14 @@ import {
   DialogTitle,
   Tabs,
 } from '@game-guide-hub/ui';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   buildGachaAnalysis,
   type GachaBannerType,
+  type GachaDataSource,
   type GachaHistoryItem,
-  gachaHistory,
-  parseGachaImport,
-  sampleGachaImport,
+  type GachaImportSummary,
+  LocalGachaDataProvider,
 } from '../../shared/content';
 import { EmptyState } from '../../shared/ui/empty-state';
 import { Page } from '../../shared/ui/page';
@@ -37,32 +48,62 @@ const bannerLabels: Readonly<Record<GachaBannerType, string>> = {
 
 type GachaView = (typeof views)[number]['value'];
 type HistoryBannerFilter = GachaBannerType | 'all';
+type HistoryRarityFilter = 'all' | 3 | 4 | 5;
+type HistoryItemFilter = 'all' | GachaHistoryItem['itemType'];
+type HistorySort = 'newest' | 'oldest' | 'rarity';
+type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
 
 export default function GachaAnalyticsPage() {
-  const [records, setRecords] = useState<readonly GachaHistoryItem[]>(gachaHistory);
+  const providerRef = useRef<LocalGachaDataProvider | null>(null);
+  if (!providerRef.current) providerRef.current = new LocalGachaDataProvider();
+  const provider = providerRef.current;
+  const [records, setRecords] = useState<readonly GachaHistoryItem[]>([]);
   const [view, setView] = useState<GachaView>('overview');
   const [historyBanner, setHistoryBanner] = useState<HistoryBannerFilter>('all');
   const [isImportOpen, setIsImportOpen] = useState(false);
-  const [importValue, setImportValue] = useState(sampleGachaImport);
+  const [importValue, setImportValue] = useState('');
+  const [source, setSource] = useState<Exclude<GachaDataSource, 'local-cache'>>('json');
   const [importError, setImportError] = useState('');
-  const importRecords = () => {
-    try {
-      const payload: unknown = JSON.parse(importValue);
-      const result = parseGachaImport(payload);
-      if (!result.records.length) {
-        setImportError(
-          '未解析到有效记录。请确认 JSON 包含 records 数组以及 id、itemName、rarity 字段。',
-        );
-        return;
-      }
-      setRecords(result.records);
-      setImportError('');
-      setIsImportOpen(false);
-      setView('overview');
-    } catch {
-      setImportError('JSON 格式无效，请检查逗号、引号和括号。');
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+  const [summary, setSummary] = useState<GachaImportSummary | null>(null);
+
+  useEffect(() => {
+    const cached = provider.load();
+    setRecords(cached);
+    setSyncStatus(cached.length ? 'success' : 'idle');
+  }, [provider]);
+
+  const importRecords = useCallback(() => {
+    setSyncStatus('syncing');
+    const result = provider.importText(importValue, source);
+    setSummary(result.summary);
+    setRecords(result.records);
+    if (!result.summary.acceptedRecords) {
+      setImportError(result.summary.issues[0] ?? '未解析到可导入的新记录。');
+      setSyncStatus('error');
+      return;
     }
-  };
+    setImportError('');
+    setSyncStatus('success');
+    setView('overview');
+  }, [importValue, provider, source]);
+
+  const readClipboard = useCallback(async () => {
+    try {
+      setSource('clipboard');
+      setImportValue(await navigator.clipboard.readText());
+      setImportError('');
+    } catch {
+      setImportError('无法读取剪贴板。请授予剪贴板权限或直接粘贴 JSON 数据。');
+    }
+  }, []);
+
+  const clearRecords = useCallback(() => {
+    provider.clear();
+    setRecords([]);
+    setSummary(null);
+    setSyncStatus('idle');
+  }, [provider]);
 
   return (
     <PageTransition>
@@ -75,51 +116,82 @@ export default function GachaAnalyticsPage() {
               导入后仅在当前设备中解析。本地模型会计算出货、保底、限定命中与欧非指数，可直接替换为后续官方接口。
             </p>
           </div>
-          <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
-            <button
-              className="ggh-button ggh-button-secondary inline-flex h-control items-center justify-center gap-compact px-panel text-label font-semibold"
-              type="button"
-              onClick={() => setIsImportOpen(true)}
-            >
-              <Download aria-hidden="true" size={16} />
-              导入记录
-            </button>
-            <DialogContent aria-describedby="gacha-import-description">
-              <DialogTitle>导入抽卡记录</DialogTitle>
-              <DialogDescription id="gacha-import-description">
-                粘贴包含 records 数组的 JSON。每项需要 id、itemName 与
-                rarity；其余字段会按可用数据补全。
-              </DialogDescription>
-              <label
-                className="mt-panel block text-label font-semibold text-text-primary"
-                htmlFor="gacha-import-json"
+          <div className="flex flex-wrap items-center gap-content">
+            <SyncIndicator status={syncStatus} recordCount={records.length} />
+            <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
+              <button
+                className="ggh-button ggh-button-secondary inline-flex h-control items-center justify-center gap-compact px-panel text-label font-semibold"
+                type="button"
+                onClick={() => setIsImportOpen(true)}
               >
-                抽卡记录 JSON
-              </label>
-              <textarea
-                id="gacha-import-json"
-                value={importValue}
-                onChange={(event) => setImportValue(event.target.value)}
-                className="mt-compact min-h-56 w-full resize-y rounded-md border border-border-subtle bg-canvas/60 p-content font-mono text-caption text-text-primary outline-none transition-colors focus:border-content-electric"
-              />
-              {importError ? (
-                <p className="mt-compact text-caption text-danger">{importError}</p>
-              ) : null}
-              <div className="mt-panel flex flex-wrap justify-end gap-content">
-                <DialogClose className="ggh-button ggh-button-quiet h-control px-panel text-label">
-                  取消
-                </DialogClose>
-                <button
-                  type="button"
-                  className="ggh-button ggh-button-primary inline-flex h-control items-center gap-compact px-panel text-label font-semibold"
-                  onClick={importRecords}
+                <Download aria-hidden="true" size={16} />
+                获取抽卡数据
+              </button>
+              <DialogContent aria-describedby="gacha-import-description">
+                <DialogTitle>同步抽卡数据</DialogTitle>
+                <DialogDescription id="gacha-import-description">
+                  仅解析本地数据，不会访问或模拟游戏官方接口。支持导入 JSON 或读取剪贴板中的 JSON。
+                </DialogDescription>
+                <Tabs
+                  className="mt-panel"
+                  items={[
+                    { value: 'json', label: 'JSON 导入' },
+                    { value: 'clipboard', label: '剪贴板' },
+                  ]}
+                  value={source}
+                  onValueChange={setSource}
+                  label="数据来源"
+                />
+                {source === 'clipboard' ? (
+                  <button
+                    type="button"
+                    className="ggh-button ggh-button-quiet mt-content h-control px-panel text-label"
+                    onClick={readClipboard}
+                  >
+                    <RotateCcw aria-hidden="true" size={15} /> 读取剪贴板
+                  </button>
+                ) : null}
+                <label
+                  className="mt-panel block text-label font-semibold text-text-primary"
+                  htmlFor="gacha-import-json"
                 >
-                  <Download aria-hidden="true" size={16} />
-                  解析并应用
-                </button>
-              </div>
-            </DialogContent>
-          </Dialog>
+                  抽卡记录 JSON（必须包含 records、id、itemName、rarity、pulledAt）
+                </label>
+                <textarea
+                  id="gacha-import-json"
+                  value={importValue}
+                  onChange={(event) => setImportValue(event.target.value)}
+                  className="mt-compact min-h-56 w-full resize-y rounded-md border border-border-subtle bg-canvas/60 p-content font-mono text-caption text-text-primary outline-none transition-colors focus:border-content-electric"
+                />
+                {importError ? (
+                  <p className="mt-compact text-caption text-danger">{importError}</p>
+                ) : null}
+                {summary ? <ImportSummary summary={summary} /> : null}
+                <div className="mt-panel flex flex-wrap justify-end gap-content">
+                  <DialogClose className="ggh-button ggh-button-quiet h-control px-panel text-label">
+                    取消
+                  </DialogClose>
+                  <button
+                    type="button"
+                    className="ggh-button ggh-button-primary inline-flex h-control items-center gap-compact px-panel text-label font-semibold"
+                    onClick={importRecords}
+                  >
+                    <Download aria-hidden="true" size={16} />
+                    解析并同步
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            {records.length ? (
+              <button
+                type="button"
+                onClick={clearRecords}
+                className="inline-flex h-control items-center gap-compact px-compact text-caption text-text-tertiary hover:text-danger"
+              >
+                <Trash2 aria-hidden="true" size={15} /> 清空本地数据
+              </button>
+            ) : null}
+          </div>
         </header>
 
         <Tabs items={views} value={view} onValueChange={setView} label="抽卡分析视图" />
@@ -138,6 +210,14 @@ export default function GachaAnalyticsPage() {
 function Overview({ records }: { readonly records: readonly GachaHistoryItem[] }) {
   const { statistics, banners } = useMemo(() => buildGachaAnalysis(records), [records]);
   const fiveStarRecords = records.filter((record) => record.rarity === 5);
+  if (!records.length) {
+    return (
+      <EmptyState
+        title="等待抽卡数据"
+        description="通过“获取抽卡数据”导入 JSON，或从剪贴板读取已导出的本地记录。"
+      />
+    );
+  }
   return (
     <>
       <section className="grid gap-content sm:grid-cols-2 xl:grid-cols-4" aria-label="抽卡统计">
@@ -247,8 +327,39 @@ function HistoryView({
   readonly filter: HistoryBannerFilter;
   readonly onFilterChange: (value: HistoryBannerFilter) => void;
 }) {
-  const filtered =
-    filter === 'all' ? records : records.filter((record) => record.bannerType === filter);
+  const [keyword, setKeyword] = useState('');
+  const [rarity, setRarity] = useState<HistoryRarityFilter>('all');
+  const [itemType, setItemType] = useState<HistoryItemFilter>('all');
+  const [sort, setSort] = useState<HistorySort>('newest');
+  const [page, setPage] = useState(0);
+  const filtered = useMemo(() => {
+    const normalized = keyword.trim().toLowerCase();
+    return records
+      .filter(
+        (record) =>
+          (filter === 'all' || record.bannerType === filter) &&
+          (rarity === 'all' || record.rarity === rarity) &&
+          (itemType === 'all' || record.itemType === itemType) &&
+          (!normalized ||
+            `${record.itemName} ${bannerLabels[record.bannerType]}`
+              .toLowerCase()
+              .includes(normalized)),
+      )
+      .sort((left, right) => {
+        if (sort === 'rarity')
+          return right.rarity - left.rarity || right.pulledAt.localeCompare(left.pulledAt);
+        return sort === 'newest'
+          ? right.pulledAt.localeCompare(left.pulledAt)
+          : left.pulledAt.localeCompare(right.pulledAt);
+      });
+  }, [filter, itemType, keyword, rarity, records, sort]);
+  const pageSize = 40;
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const visibleRecords = filtered.slice(page * pageSize, (page + 1) * pageSize);
+  const updateFilter = <Value extends string>(setter: (value: Value) => void, value: Value) => {
+    setter(value);
+    setPage(0);
+  };
   const filters: readonly { readonly value: HistoryBannerFilter; readonly label: string }[] = [
     { value: 'all', label: '全部' },
     ...Object.entries(bannerLabels).map(([value, label]) => ({
@@ -266,9 +377,54 @@ function HistoryView({
         />
         <Tabs items={filters} value={filter} onValueChange={onFilterChange} label="抽卡池筛选" />
       </div>
+      <div className="mt-panel grid gap-content md:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
+        <label className="flex min-w-0 items-center gap-compact border-b border-border-subtle py-compact text-text-tertiary">
+          <Search aria-hidden="true" size={15} />
+          <span className="sr-only">搜索抽卡记录</span>
+          <input
+            className="min-w-0 flex-1 bg-transparent text-label text-text-primary outline-none"
+            value={keyword}
+            onChange={(event) => updateFilter(setKeyword, event.target.value)}
+            placeholder="搜索物品或卡池"
+          />
+        </label>
+        <Tabs
+          items={[
+            { value: 'all', label: '全部' },
+            { value: 'agent', label: '角色' },
+            { value: 'w-engine', label: '音擎' },
+          ]}
+          value={itemType}
+          onValueChange={(value) => updateFilter(setItemType, value)}
+          label="物品类型筛选"
+        />
+        <Tabs
+          items={[
+            { value: 'all', label: '全稀有度' },
+            { value: '5', label: '五星' },
+            { value: '4', label: '四星' },
+          ]}
+          value={rarity === 'all' ? 'all' : String(rarity)}
+          onValueChange={(value) => {
+            setRarity(value === 'all' ? 'all' : value === '5' ? 5 : 4);
+            setPage(0);
+          }}
+          label="稀有度筛选"
+        />
+        <Tabs
+          items={[
+            { value: 'newest', label: '最新' },
+            { value: 'oldest', label: '最早' },
+            { value: 'rarity', label: '稀有度' },
+          ]}
+          value={sort}
+          onValueChange={(value) => updateFilter(setSort, value)}
+          label="排序方式"
+        />
+      </div>
       <div className="mt-panel divide-y divide-border-subtle border-y border-border-subtle">
-        {filtered.length ? (
-          filtered.map((record, index) => (
+        {visibleRecords.length ? (
+          visibleRecords.map((record, index) => (
             <article
               key={record.id}
               className="grid grid-cols-[2.4rem_minmax(0,1fr)_auto] items-center gap-content py-content"
@@ -288,7 +444,7 @@ function HistoryView({
                 </p>
               </div>
               <span className="text-right text-caption text-text-tertiary">
-                #{index + 1}
+                #{page * pageSize + index + 1}
                 <br />
                 {formatDate(record.pulledAt)}
               </span>
@@ -298,7 +454,81 @@ function HistoryView({
           <InlineEmpty title="当前卡池没有记录" description="切换筛选或导入对应卡池的抽卡记录。" />
         )}
       </div>
+      {filtered.length > pageSize ? (
+        <div className="mt-content flex items-center justify-between text-caption text-text-secondary">
+          <span>
+            显示 {page * pageSize + 1}-{Math.min((page + 1) * pageSize, filtered.length)} /{' '}
+            {filtered.length}
+          </span>
+          <span className="flex gap-compact">
+            <button
+              type="button"
+              className="ggh-button ggh-button-quiet h-control px-content text-label"
+              disabled={page === 0}
+              onClick={() => setPage((value) => value - 1)}
+            >
+              上一页
+            </button>
+            <button
+              type="button"
+              className="ggh-button ggh-button-quiet h-control px-content text-label"
+              disabled={page >= pageCount - 1}
+              onClick={() => setPage((value) => value + 1)}
+            >
+              下一页
+            </button>
+          </span>
+        </div>
+      ) : null}
     </section>
+  );
+}
+
+function SyncIndicator({
+  status,
+  recordCount,
+}: {
+  readonly status: SyncStatus;
+  readonly recordCount: number;
+}) {
+  const label =
+    status === 'syncing'
+      ? '正在同步'
+      : status === 'success'
+        ? '已同步'
+        : status === 'error'
+          ? '同步异常'
+          : '等待同步';
+  const color =
+    status === 'success'
+      ? 'text-success'
+      : status === 'error'
+        ? 'text-danger'
+        : 'text-text-tertiary';
+  return (
+    <p className={`text-caption ${color}`}>
+      <span aria-hidden="true">●</span> {label} · {recordCount} 条本地记录
+    </p>
+  );
+}
+
+function ImportSummary({ summary }: { readonly summary: GachaImportSummary }) {
+  return (
+    <dl className="mt-content grid grid-cols-2 gap-content border-y border-border-subtle py-content text-caption sm:grid-cols-4">
+      <SummaryItem label="已导入" value={`${summary.acceptedRecords} 条`} />
+      <SummaryItem label="重复" value={`${summary.duplicateRecords} 条`} />
+      <SummaryItem label="异常" value={`${summary.rejectedRecords} 条`} />
+      <SummaryItem label="本地合计" value={`${summary.totalRecords} 条`} />
+    </dl>
+  );
+}
+
+function SummaryItem({ label, value }: { readonly label: string; readonly value: string }) {
+  return (
+    <div>
+      <dt className="text-text-tertiary">{label}</dt>
+      <dd className="mt-compact font-semibold text-text-primary">{value}</dd>
+    </div>
   );
 }
 

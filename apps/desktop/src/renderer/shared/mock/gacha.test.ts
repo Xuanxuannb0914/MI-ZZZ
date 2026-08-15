@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { analyzeGachaHistory, buildGachaAnalysis, parseGachaImport } from './gacha';
+import {
+  analyzeGachaHistory,
+  buildGachaAnalysis,
+  type GachaHistoryItem,
+  LocalGachaDataProvider,
+  mergeGachaRecords,
+  parseGachaImport,
+} from './gacha';
 
 describe('gacha analytics', () => {
   it('derives pity and an explainable luck score from records', () => {
@@ -43,16 +50,22 @@ describe('gacha analytics', () => {
     expect(analytics.luckScore).toBeGreaterThan(50);
   });
 
-  it('accepts only records with required import fields', () => {
+  it('validates date and required import fields before accepting records', () => {
     const result = parseGachaImport({
       records: [
-        { id: 'valid', itemName: '测试代理人', rarity: 5 },
+        {
+          id: 'valid',
+          itemName: '测试代理人',
+          rarity: 5,
+          pulledAt: '2026-01-01T00:00:00.000Z',
+        },
         { id: 42, itemName: '无效记录', rarity: 4 },
+        { id: 'invalid-date', itemName: '无效时间', rarity: 4, pulledAt: 'not-a-date' },
       ],
     });
 
     expect(result.records).toHaveLength(1);
-    expect(result.rejectedRecords).toBe(1);
+    expect(result.rejectedRecords).toBe(2);
   });
 
   it('aggregates rarity and per-banner pity without random data', () => {
@@ -97,5 +110,61 @@ describe('gacha analytics', () => {
     expect(analysis.banners).toContainEqual(
       expect.objectContaining({ bannerType: 'limited-agent', currentPity: 1, pullCount: 2 }),
     );
+  });
+
+  it('deduplicates records and persists imports through the provider boundary', () => {
+    let stored: readonly GachaHistoryItem[] = [];
+    const provider = new LocalGachaDataProvider({
+      load: () => stored,
+      save: (records) => {
+        stored = records;
+      },
+      clear: () => {
+        stored = [];
+      },
+    });
+    const payload = JSON.stringify({
+      records: [
+        {
+          id: 'same-record',
+          itemName: '测试代理人',
+          rarity: 5,
+          pulledAt: '2026-02-01T00:00:00.000Z',
+          bannerType: 'limited-agent',
+          itemType: 'agent',
+          isLimited: true,
+        },
+      ],
+    });
+
+    expect(provider.importText(payload, 'json').summary).toMatchObject({
+      acceptedRecords: 1,
+      duplicateRecords: 0,
+      totalRecords: 1,
+    });
+    expect(provider.importText(payload, 'clipboard').summary).toMatchObject({
+      acceptedRecords: 0,
+      duplicateRecords: 1,
+      totalRecords: 1,
+    });
+    provider.clear();
+    expect(provider.load()).toEqual([]);
+  });
+
+  it('handles a large chronological record set without changing calculated totals', () => {
+    const records: GachaHistoryItem[] = Array.from({ length: 240 }, (_, index) => ({
+      id: `record-${index}`,
+      bannerType: index % 3 === 0 ? 'standard' : 'limited-agent',
+      itemName: `测试物品 ${index}`,
+      itemType: index % 2 === 0 ? 'agent' : 'w-engine',
+      rarity: index % 80 === 79 ? 5 : index % 10 === 0 ? 4 : 3,
+      pulledAt: `2026-03-${String((index % 28) + 1).padStart(2, '0')}T${String(index % 24).padStart(2, '0')}:00:00.000Z`,
+      isLimited: index % 160 === 159,
+    }));
+    const merged = mergeGachaRecords(records.slice(0, 120), records.slice(120));
+    const analysis = buildGachaAnalysis(merged.records);
+
+    expect(analysis.statistics.totalPulls).toBe(240);
+    expect(analysis.statistics.fiveStarCount).toBe(3);
   });
 });
