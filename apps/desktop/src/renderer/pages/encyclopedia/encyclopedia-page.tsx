@@ -1,9 +1,21 @@
-import { ChevronRight, Disc3, ShieldCheck, UsersRound, Wrench } from '@game-guide-hub/icons';
+import {
+  ChevronRight,
+  Disc3,
+  ShieldCheck,
+  Swords,
+  UsersRound,
+  Wrench,
+} from '@game-guide-hub/icons';
+import { lazy, Suspense } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { workspaceRoutes } from '../../shared/config/workspace-routes';
+import { LoadingState } from '../../shared/ui/loading-state';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
-import { MonsterViewer } from './monster-viewer';
+
+const MonsterViewer = lazy(() =>
+  import('./monster-viewer').then((module) => ({ default: module.MonsterViewer })),
+);
 
 const entries = [
   {
@@ -24,6 +36,12 @@ const entries = [
     to: workspaceRoutes.encyclopedia.driveDiscs,
     icon: Disc3,
   },
+  {
+    label: '怪物与 Boss',
+    description: '敌人弱点、机制、掉落与 3D 查看。',
+    to: workspaceRoutes.encyclopedia.monsters,
+    icon: Swords,
+  },
 ] as const;
 
 export default function EncyclopediaPage() {
@@ -36,7 +54,7 @@ export default function EncyclopediaPage() {
           <p className="text-caption font-semibold text-content-electric">图鉴中心</p>
           <h1 className="mt-control text-title1 font-semibold">新艾利都资料库</h1>
           <p className="mt-compact max-w-2xl text-body text-text-secondary">
-            角色、装备与敌人资料在同一模块中浏览；怪物与 Boss 三栏图鉴将在此页面内接入。
+            角色、装备与敌人资料在同一模块中浏览；怪物与 Boss 支持三栏资料与 3D 查看。
           </p>
         </header>
         <nav className="page-tabs" aria-label="图鉴分类">
@@ -60,7 +78,9 @@ export default function EncyclopediaPage() {
           </Link>
         </nav>
         {enemyTab === 'monsters' || enemyTab === 'bosses' ? (
-          <MonsterViewer />
+          <Suspense fallback={<LoadingState />}>
+            <MonsterViewer />
+          </Suspense>
         ) : (
           <>
             <section className="grid gap-content md:grid-cols-3">
@@ -83,7 +103,7 @@ export default function EncyclopediaPage() {
             </section>
             <p className="flex items-center gap-compact border-l-2 border-content-ether pl-content text-caption text-text-secondary">
               <ShieldCheck aria-hidden="true" size={16} />
-              怪物与 Boss 数据、3D Viewer 将作为图鉴内部功能上线。
+              所有资料入口均在图鉴模块内组织，支持从角色、装备延伸到怪物机制。
             </p>
           </>
         )}
