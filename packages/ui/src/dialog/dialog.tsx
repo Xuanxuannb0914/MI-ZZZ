@@ -16,7 +16,7 @@ export const DialogContent = forwardRef<
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay
         className={classNames(
-          'fixed inset-0 z-overlay bg-canvas/70 backdrop-blur-sm transition-opacity duration-(--ggh-motion-normal)',
+          'fixed inset-0 z-[var(--z-overlay)] bg-canvas/70 backdrop-blur-sm transition-opacity duration-(--ggh-motion-normal)',
           'data-[state=open]:opacity-100 data-[state=closed]:opacity-0',
         )}
       />
@@ -24,7 +24,7 @@ export const DialogContent = forwardRef<
         {...props}
         ref={ref}
         className={classNames(
-          'fixed left-1/2 top-1/2 z-dialog w-full max-w-dialog -translate-x-1/2 -translate-y-1/2',
+          'fixed left-1/2 top-1/2 z-[var(--z-dialog)] max-h-[calc(100dvh-2rem)] w-full max-w-dialog -translate-x-1/2 -translate-y-1/2 overflow-y-auto',
           'ggh-glass glass-strong rounded-xl p-section text-text-primary shadow-level-3',
           'focus-visible:outline-none',
           className,

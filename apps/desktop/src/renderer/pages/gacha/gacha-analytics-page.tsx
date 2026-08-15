@@ -73,6 +73,21 @@ export default function GachaAnalyticsPage() {
   const [preparedImport, setPreparedImport] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const resetImportReview = useCallback(() => {
+    setPreview(null);
+    setPreparedImport(null);
+    setSummary(null);
+    setImportError('');
+  }, []);
+
+  const selectSource = useCallback(
+    (value: ImportMode) => {
+      setSource(value);
+      resetImportReview();
+    },
+    [resetImportReview],
+  );
+
   useEffect(() => {
     const cached = provider.load();
     setRecords(cached);
@@ -127,26 +142,25 @@ export default function GachaAnalyticsPage() {
     try {
       setSource('clipboard');
       setImportValue(await navigator.clipboard.readText());
-      setPreview(null);
-      setPreparedImport(null);
-      setImportError('');
+      resetImportReview();
     } catch {
       setImportError('无法读取剪贴板。请授予剪贴板权限或直接粘贴 JSON 数据。');
     }
-  }, []);
+  }, [resetImportReview]);
 
-  const readFile = useCallback(async (file: File | undefined) => {
-    if (!file) return;
-    try {
-      setSource(file.name.toLowerCase().includes('uigf') ? 'uigf' : 'file');
-      setImportValue(await file.text());
-      setPreview(null);
-      setPreparedImport(null);
-      setImportError('');
-    } catch {
-      setImportError('文件无法读取，请确认它是 UTF-8 JSON 文件。');
-    }
-  }, []);
+  const readFile = useCallback(
+    async (file: File | undefined) => {
+      if (!file) return;
+      try {
+        setSource(file.name.toLowerCase().includes('uigf') ? 'uigf' : 'file');
+        setImportValue(await file.text());
+        resetImportReview();
+      } catch {
+        setImportError('文件无法读取，请确认它是 UTF-8 JSON 文件。');
+      }
+    },
+    [resetImportReview],
+  );
 
   const exportRecords = useCallback(
     (format: 'json' | 'uigf') => {
@@ -186,7 +200,10 @@ export default function GachaAnalyticsPage() {
               <button
                 className="ggh-button ggh-button-secondary inline-flex h-control items-center justify-center gap-compact px-panel text-label font-semibold"
                 type="button"
-                onClick={() => setIsImportOpen(true)}
+                onClick={() => {
+                  resetImportReview();
+                  setIsImportOpen(true);
+                }}
               >
                 <Download aria-hidden="true" size={16} />
                 获取抽卡数据
@@ -206,7 +223,7 @@ export default function GachaAnalyticsPage() {
                     { value: 'link', label: '记录链接' },
                   ]}
                   value={source}
-                  onValueChange={setSource}
+                  onValueChange={selectSource}
                   label="数据来源"
                 />
                 {source === 'clipboard' ? (
@@ -253,7 +270,10 @@ export default function GachaAnalyticsPage() {
                 <textarea
                   id="gacha-import-json"
                   value={importValue}
-                  onChange={(event) => setImportValue(event.target.value)}
+                  onChange={(event) => {
+                    setImportValue(event.target.value);
+                    resetImportReview();
+                  }}
                   className="mt-compact min-h-56 w-full resize-y rounded-md border border-border-subtle bg-canvas/60 p-content font-mono text-caption text-text-primary outline-none transition-colors focus:border-content-electric"
                 />
                 {importError ? (
@@ -268,10 +288,16 @@ export default function GachaAnalyticsPage() {
                   <button
                     type="button"
                     className="ggh-button ggh-button-primary inline-flex h-control items-center gap-compact px-panel text-label font-semibold"
-                    onClick={preview ? importRecords : reviewImport}
+                    onClick={
+                      summary
+                        ? () => setIsImportOpen(false)
+                        : preview
+                          ? importRecords
+                          : reviewImport
+                    }
                   >
                     <Download aria-hidden="true" size={16} />
-                    {preview ? '确认导入' : '检测并预览'}
+                    {summary ? '完成' : preview ? '确认导入' : '检测并预览'}
                   </button>
                 </div>
               </DialogContent>
