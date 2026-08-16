@@ -11,21 +11,27 @@ export function App() {
   const isStartupRoute = ['/', '/startup', '/games'].includes(location.pathname);
   const isGameHubRoute = location.pathname === '/games';
 
-  if (isGameHubRoute || !applicationReady) {
-    return isStartupRoute ? (
-      <LandingLayout>
-        <StartupRoutes />
-      </LandingLayout>
+  const layout =
+    isGameHubRoute || !applicationReady ? (
+      isStartupRoute ? (
+        <LandingLayout>
+          <StartupRoutes />
+        </LandingLayout>
+      ) : (
+        <Navigate replace to="/startup" />
+      )
     ) : (
-      <Navigate replace to="/startup" />
+      <ErrorBoundary>
+        <MainLayout>
+          <WorkspaceRoutes />
+        </MainLayout>
+      </ErrorBoundary>
     );
-  }
 
   return (
-    <ErrorBoundary>
-      <MainLayout>
-        <WorkspaceRoutes />
-      </MainLayout>
-    </ErrorBoundary>
+    <>
+      {layout}
+      <div className="grain-overlay" aria-hidden="true" />
+    </>
   );
 }

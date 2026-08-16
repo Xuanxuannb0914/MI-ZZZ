@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStartup } from '../../hooks/use-startup';
 import { type GameDefinition, games } from '../../shared/mock/games';
 import { GameHub } from './components/game-hub';
+import { GameIntroOverlay } from './components/game-intro-overlay';
 import { TransitionLayer } from './components/transition-layer';
 import { useLanding } from './hooks/use-landing';
 
@@ -11,6 +12,7 @@ export default function GameHubPage() {
   const { completeStartup } = useStartup();
   const selectedGameRef = useRef<GameDefinition | null>(null);
   const [isExiting, setIsExiting] = useState(false);
+  const [introGame, setIntroGame] = useState<GameDefinition | null>(null);
   const [params, setParams] = useSearchParams();
   const defaultGame = games[0];
   if (!defaultGame) throw new Error('游戏配置不能为空。');
@@ -29,12 +31,18 @@ export default function GameHubPage() {
     (game: GameDefinition) => setParams({ game: game.id }, { replace: true }),
     [setParams],
   );
-  const handleEnter = useCallback(() => {
-    if (selectedGame.status !== 'available' || isEntering || isExiting) return;
-    selectedGameRef.current = selectedGame;
+
+  const finishIntro = useCallback(() => {
+    setIntroGame(null);
     setIsExiting(true);
     enter();
-  }, [enter, isEntering, isExiting, selectedGame]);
+  }, [enter]);
+
+  const handleEnter = useCallback(() => {
+    if (isEntering || isExiting) return;
+    selectedGameRef.current = selectedGame;
+    setIntroGame(selectedGame);
+  }, [isEntering, isExiting, selectedGame]);
 
   return (
     <div className="landing-act-root">
@@ -43,8 +51,10 @@ export default function GameHubPage() {
         selectedGame={selectedGame}
         onGameSelect={handleGameSelect}
         onEnter={handleEnter}
+        allowComingSoon
       />
       <TransitionLayer isActive={isEntering} />
+      <GameIntroOverlay game={introGame} onDone={finishIntro} />
     </div>
   );
 }

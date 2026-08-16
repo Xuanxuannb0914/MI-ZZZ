@@ -14,14 +14,23 @@ interface GameHubProps {
   readonly selectedGame: GameDefinition;
   readonly onGameSelect: (game: GameDefinition) => void;
   readonly onEnter: () => void;
+  /** 演示模式：允许进入「敬请期待」的游戏以预览开场动画。 */
+  readonly allowComingSoon?: boolean;
 }
 
-export function GameHub({ isExiting, selectedGame, onGameSelect, onEnter }: GameHubProps) {
+export function GameHub({
+  isExiting,
+  selectedGame,
+  onGameSelect,
+  onEnter,
+  allowComingSoon = false,
+}: GameHubProps) {
   const selectedIndex = games.findIndex((game) => game.id === selectedGame.id);
   const gameTheme = {
     '--game-primary': selectedGame.accentColor,
     '--game-secondary': selectedGame.secondaryColor,
     '--game-glow': selectedGame.glowColor,
+    '--game-font': selectedGame.fontFamily,
   } as MotionStyle;
   return (
     <motion.main
@@ -81,7 +90,12 @@ export function GameHub({ isExiting, selectedGame, onGameSelect, onEnter }: Game
                   >
                     {selectedGame.status === 'available' ? '已开放' : '开发中'}
                   </span>
-                  <GameEnterButton game={selectedGame} disabled={isExiting} onEnter={onEnter} />
+                  <GameEnterButton
+                    game={selectedGame}
+                    disabled={isExiting}
+                    onEnter={onEnter}
+                    allowComingSoon={allowComingSoon}
+                  />
                 </div>
               </motion.div>
             </AnimatePresence>

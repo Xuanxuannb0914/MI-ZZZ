@@ -25,7 +25,9 @@ export const HomeHero = memo(function HomeHero() {
           </span>
         </div>
         <p className="workspace-hero-kicker">当前限定活动</p>
-        <h1 id="workspace-hero-title">霜月映照，新章已启。</h1>
+        <h1 id="workspace-hero-title" className="ggh-text-glow">
+          霜月映照，<span className="ggh-text-gradient">新章已启</span>。
+        </h1>
         <p className="workspace-hero-description">
           星见雅限定频段与周年庆活动进行中。今日材料、活动进度与培养计划已经同步。
         </p>

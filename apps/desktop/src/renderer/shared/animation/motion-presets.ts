@@ -55,9 +55,9 @@ export const motionPresets = {
     transition: { duration: motionDurations.fast, ease: standardEase },
   },
   page: {
-    initial: { opacity: 0, y: 12, filter: 'blur(8px)' },
-    animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
-    exit: { opacity: 0, y: -6, filter: 'blur(5px)' },
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -6 },
     transition: { duration: motionDurations.route, ease: premiumEase },
   },
   sidebar: {

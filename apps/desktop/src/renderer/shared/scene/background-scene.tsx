@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { scenePalette } from './scene-tokens';
 
-const PARTICLE_COUNT = 320;
-const MAX_DPR = 1.5;
+const PARTICLE_COUNT = 220;
+const MAX_DPR = 1.25;
 const CONNECTION_DISTANCE = 120;
 const CAMERA_DEPTH = 680;
 
@@ -55,6 +55,7 @@ export function BackgroundScene({ className }: BackgroundSceneProps) {
 
     const particles = createParticles();
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tinted = particles.map((particle) => particle.tint !== 0);
     let viewport = resizeCanvas(canvas, context);
     let animationFrame = 0;
     let isDisposed = false;
@@ -122,11 +123,13 @@ export function BackgroundScene({ className }: BackgroundSceneProps) {
           particle.y > height + 20
         )
           continue;
+        const tintA = tinted[index];
         for (let nextIndex = index + 1; nextIndex < projected.length; nextIndex += 1) {
+          if (!tintA && !tinted[nextIndex]) continue;
           const next = projected[nextIndex];
           if (!next) continue;
           const distance = Math.hypot(particle.x - next.x, particle.y - next.y);
-          if (distance < CONNECTION_DISTANCE && particle.tint + next.tint > 0) {
+          if (distance < CONNECTION_DISTANCE) {
             context.strokeStyle = `rgba(${scenePalette.primaryRgb}, ${Math.max(0, 0.08 - distance / 1800)})`;
             context.lineWidth = 0.5;
             context.beginPath();
