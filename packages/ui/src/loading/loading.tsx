@@ -6,8 +6,6 @@ export interface LoadingProps {
   readonly label: string;
   readonly size?: LoadingSize;
   readonly className?: string;
-  /** 可选进度值（0-100）。传入后以数字百分比展示，用于创意加载态。 */
-  readonly progress?: number;
 }
 
 const sizeClasses: Record<LoadingSize, string> = {
@@ -16,7 +14,7 @@ const sizeClasses: Record<LoadingSize, string> = {
   large: 'size-icon-lg',
 };
 
-export function Loading({ label, size = 'medium', className, progress }: LoadingProps) {
+export function Loading({ label, size = 'medium', className }: LoadingProps) {
   return (
     <span
       role="status"
@@ -33,11 +31,6 @@ export function Loading({ label, size = 'medium', className, progress }: Loading
           style={{ boxShadow: '0 0 12px var(--ggh-color-glow)' }}
         />
       </span>
-      {typeof progress === 'number' && (
-        <span className="text-caption font-mono tabular-nums text-text-secondary">
-          {Math.round(progress)}%
-        </span>
-      )}
     </span>
   );
 }
