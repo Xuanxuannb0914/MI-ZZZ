@@ -1,12 +1,7 @@
 import { readFileSync } from 'node:fs';
 import type { CacheFileReaderLike } from './types';
 
-export type CacheReadStatus =
-  | 'ok'
-  | 'not-found'
-  | 'in-use'
-  | 'permission-denied'
-  | 'unknown-error';
+export type CacheReadStatus = 'ok' | 'not-found' | 'in-use' | 'permission-denied' | 'unknown-error';
 
 export interface CacheReadResult {
   readonly status: CacheReadStatus;

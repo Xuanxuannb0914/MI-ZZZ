@@ -14,8 +14,43 @@ export interface DesktopEnvironmentInfo {
   readonly version: string;
 }
 
+export type StarRailGachaScanPhase =
+  | 'locating-cache'
+  | 'scanning-versions'
+  | 'reading-cache'
+  | 'parsing-urls'
+  | 'validating-urls';
+
+export type StarRailGachaErrorCode =
+  | 'cache-dir-not-found'
+  | 'no-version-dirs'
+  | 'no-cache-file'
+  | 'file-in-use'
+  | 'permission-denied'
+  | 'no-url-found'
+  | 'invalid-url'
+  | 'clipboard-failed'
+  | 'unknown';
+
+export interface StarRailGachaLinkResult {
+  readonly status: 'success' | 'error';
+  /** The extracted link. Only present on success; kept in memory, never persisted. */
+  readonly link?: string | undefined;
+  readonly candidateCount: number;
+  readonly message: string;
+  readonly errorCode?: StarRailGachaErrorCode | undefined;
+}
+
+export interface StarRailGachaScanProgress {
+  readonly phase: StarRailGachaScanPhase;
+  readonly message: string;
+}
+
 export interface DesktopBridge {
   readonly app: {
     getEnvironment(): Promise<DesktopEnvironmentInfo>;
+  };
+  readonly starRail: {
+    getGachaLink(): Promise<StarRailGachaLinkResult>;
   };
 }

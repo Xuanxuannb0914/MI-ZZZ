@@ -6785,3 +6785,251 @@
     background-clip: text;
   }
 }
+
+@layer components {
+  .starrail-gacha-page {
+    position: relative;
+    display: grid;
+    min-height: calc(100vh - var(--spacing-app-header));
+    place-items: center;
+    overflow: hidden;
+    background: #090b0e;
+  }
+
+  .starrail-gacha-glow {
+    position: absolute;
+    width: 28rem;
+    height: 28rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 114 194 / 16%), transparent 68%);
+    filter: blur(12px);
+  }
+
+  .starrail-gacha-panel {
+    position: relative;
+    z-index: 1;
+    width: min(32rem, calc(100% - 2rem));
+    padding: 3rem 2.5rem;
+    border: 1px solid rgb(255 255 255 / 12%);
+    border-radius: 1.3rem;
+    background: rgb(19 25 28 / 76%);
+    box-shadow: 0 2rem 5rem rgb(0 0 0 / 34%);
+    text-align: center;
+    backdrop-filter: blur(22px);
+  }
+
+  .starrail-gacha-icon {
+    display: inline-grid;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border: 1px solid rgb(255 114 194 / 32%);
+    border-radius: 0.9rem;
+    color: rgb(255 114 194 / 90%);
+    background: rgb(255 114 194 / 8%);
+  }
+
+  .starrail-gacha-kicker {
+    margin-top: 1.4rem;
+    color: rgb(255 114 194 / 75%);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+  }
+
+  .starrail-gacha-panel h1 {
+    margin-top: 0.6rem;
+    color: #f5f8f5;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    letter-spacing: -0.04em;
+  }
+
+  .starrail-gacha-desc {
+    margin: 1rem auto 1.8rem;
+    color: rgb(214 223 225 / 68%);
+    line-height: 1.7;
+  }
+
+  .starrail-gacha-acquire {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 14rem;
+    min-height: 3rem;
+    padding: 0.75rem 1.8rem;
+    border: 1px solid rgb(255 114 194 / 40%);
+    border-radius: 0.75rem;
+    color: #f5f8f5;
+    background: linear-gradient(135deg, rgb(255 114 194 / 24%), rgb(138 80 255 / 24%));
+    font-size: 0.95rem;
+    font-weight: 620;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .starrail-gacha-acquire:hover {
+    border-color: rgb(255 114 194 / 65%);
+    background: linear-gradient(135deg, rgb(255 114 194 / 38%), rgb(138 80 255 / 38%));
+    transform: scale(1.02);
+  }
+
+  .starrail-gacha-scanning {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 0;
+  }
+
+  .starrail-gacha-spin {
+    animation: starrail-spin 1.2s linear infinite;
+    color: rgb(255 114 194 / 80%);
+  }
+
+  @keyframes starrail-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .starrail-gacha-scan-text {
+    color: rgb(214 223 225 / 80%);
+    font-size: 0.9rem;
+  }
+
+  .starrail-gacha-progress {
+    width: 100%;
+    max-width: 16rem;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 10%);
+  }
+
+  .starrail-gacha-progress > span {
+    display: block;
+    width: 40%;
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, rgb(255 114 194), rgb(138 80 255));
+    animation: starrail-progress 1.6s ease-in-out infinite;
+  }
+
+  @keyframes starrail-progress {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(350%);
+    }
+  }
+
+  .starrail-gacha-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 0;
+  }
+
+  .starrail-gacha-success-icon {
+    display: inline-grid;
+    width: 2.6rem;
+    height: 2.6rem;
+    place-items: center;
+    border-radius: 50%;
+    color: #0f0;
+    background: rgb(0 255 0 / 12%);
+  }
+
+  .starrail-gacha-success-title {
+    color: #f5f8f5;
+    font-size: 1rem;
+    font-weight: 620;
+  }
+
+  .starrail-gacha-success-note {
+    color: rgb(255 200 80 / 80%);
+    font-size: 0.78rem;
+  }
+
+  .starrail-gacha-success-count {
+    color: rgb(214 223 225 / 56%);
+    font-size: 0.72rem;
+  }
+
+  .starrail-gacha-success-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+
+  .starrail-gacha-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 2.4rem;
+    padding: 0.4rem 1.2rem;
+    border: 1px solid rgb(255 255 255 / 16%);
+    border-radius: 0.6rem;
+    color: #f5f8f5;
+    background: rgb(255 255 255 / 8%);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .starrail-gacha-button:hover {
+    background: rgb(255 255 255 / 14%);
+  }
+
+  .starrail-gacha-button-primary {
+    border-color: rgb(255 114 194 / 40%);
+    background: linear-gradient(135deg, rgb(255 114 194 / 24%), rgb(138 80 255 / 24%));
+  }
+
+  .starrail-gacha-button-primary:hover {
+    border-color: rgb(255 114 194 / 65%);
+    background: linear-gradient(135deg, rgb(255 114 194 / 38%), rgb(138 80 255 / 38%));
+  }
+
+  .starrail-gacha-button-quiet {
+    border: none;
+    background: transparent;
+    color: rgb(214 223 225 / 56%);
+  }
+
+  .starrail-gacha-button-quiet:hover {
+    color: rgb(214 223 225 / 90%);
+    background: transparent;
+  }
+
+  .starrail-gacha-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 0;
+  }
+
+  .starrail-gacha-error-text {
+    color: rgb(255 120 120 / 85%);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .starrail-gacha-privacy {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(255 255 255 / 6%);
+    color: rgb(214 223 225 / 40%);
+    font-size: 0.7rem;
+  }
+}

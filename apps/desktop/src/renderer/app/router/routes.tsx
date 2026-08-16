@@ -29,6 +29,7 @@ const SettingsPage = lazy(() => import('../../pages/settings/settings-page'));
 const GamePlaceholderPage = lazy(
   () => import('../../pages/game-placeholder/game-placeholder-page'),
 );
+const StarRailGachaPage = lazy(() => import('../../pages/star-rail-gacha/star-rail-gacha-page'));
 
 export function StartupRoutes() {
   return (
@@ -124,12 +125,7 @@ export function WorkspaceRoutes() {
           path="/genshin"
           element={<GamePlaceholderPage gameName="原神" gameShortName="原神 / 开发中" />}
         />
-        <Route
-          path="/starrail"
-          element={
-            <GamePlaceholderPage gameName="崩坏：星穹铁道" gameShortName="星穹铁道 / 开发中" />
-          }
-        />
+        <Route path="/starrail" element={<StarRailGachaPage />} />
         <Route
           path="/wuwa"
           element={<GamePlaceholderPage gameName="鸣潮" gameShortName="鸣潮 / 开发中" />}
