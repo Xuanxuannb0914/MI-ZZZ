@@ -1,7 +1,7 @@
 import { ArrowUpRight, Search } from '@game-guide-hub/icons';
 import { Card, EmptyState, Tabs } from '@game-guide-hub/ui';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app-store';
 import { searchLocal } from '../../shared/search/search-index';
 import { Page } from '../../shared/ui/page';
@@ -9,15 +9,30 @@ import { PageTransition } from '../../shared/ui/page-transition';
 import { SearchBar } from '../../shared/ui/search-bar';
 import { Tag } from '../../shared/ui/tag';
 
-const filters = ['全部', '角色', '攻略', '活动', '资讯', '驱动盘', '音擎', '材料', '版本'] as const;
+const filters = [
+  '全部',
+  '角色',
+  '攻略',
+  '活动',
+  '资讯',
+  '驱动盘',
+  '音擎',
+  '配队',
+  '材料',
+  '版本',
+] as const;
 type SearchFilter = (typeof filters)[number];
 
 export default function SearchPage() {
   const [params, setParams] = useSearchParams();
   const searchKeyword = useAppStore((state) => state.searchKeyword);
   const setSearchKeyword = useAppStore((state) => state.setSearchKeyword);
+  const recentSearches = useAppStore((state) => state.recentSearches);
+  const addRecentSearch = useAppStore((state) => state.addRecentSearch);
   const query = params.get('q') ?? searchKeyword;
   const [filter, setFilter] = useState<SearchFilter>('全部');
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (params.get('q') !== searchKeyword && searchKeyword)
@@ -30,6 +45,14 @@ export default function SearchPage() {
       ? localResults
       : localResults.filter((result) => result.kind === filter);
   }, [filter, query]);
+
+  const commitSearch = (keyword = searchKeyword) => {
+    const normalized = keyword.trim();
+    if (!normalized) return;
+    addRecentSearch(normalized);
+    setSearchKeyword(normalized);
+    setParams({ q: normalized }, { replace: true });
+  };
 
   return (
     <PageTransition>
@@ -49,10 +72,42 @@ export default function SearchPage() {
             label="搜索本地资料"
             className="w-full lg:max-w-lg"
             onKeyDown={(event) => {
-              if (event.key === 'Enter') setParams({ q: searchKeyword }, { replace: true });
+              if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                setActiveIndex((index) => Math.min(index + 1, results.length - 1));
+              } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                setActiveIndex((index) => Math.max(index - 1, 0));
+              } else if (event.key === 'Enter') {
+                event.preventDefault();
+                const active = results[activeIndex];
+                if (active) {
+                  commitSearch();
+                  navigate(active.to);
+                } else commitSearch();
+              } else if (event.key === 'Escape') {
+                setActiveIndex(-1);
+              }
             }}
           />
         </header>
+        {!query && recentSearches.length ? (
+          <section className="search-recent-panel" aria-label="最近搜索">
+            <span className="text-caption text-text-tertiary">最近搜索</span>
+            <div className="flex flex-wrap gap-control">
+              {recentSearches.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className="search-recent-chip"
+                  onClick={() => commitSearch(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : null}
         <Tabs
           items={filters.map((item) => ({ value: item, label: item }))}
           value={filter}
@@ -61,8 +116,14 @@ export default function SearchPage() {
         />
         {results.length ? (
           <div className="grid gap-content xl:grid-cols-2">
-            {results.map((result) => (
-              <Link key={result.id} to={result.to} className="group block">
+            {results.map((result, index) => (
+              <Link
+                key={result.id}
+                to={result.to}
+                onClick={() => commitSearch()}
+                className="group block"
+                aria-current={activeIndex === index ? 'true' : undefined}
+              >
                 <Card interactive className="flex items-start gap-content">
                   <span className="ggh-icon-container" aria-hidden="true">
                     <Search size={16} />

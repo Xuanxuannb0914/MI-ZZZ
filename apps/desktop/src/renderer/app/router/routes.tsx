@@ -14,6 +14,10 @@ const NewsPage = lazy(() => import('../../pages/news/news-page'));
 const DailyPage = lazy(() => import('../../pages/daily/daily-page'));
 const EventsPage = lazy(() => import('../../pages/events/events-page'));
 const MaterialsPage = lazy(() => import('../../pages/materials/materials-page'));
+const WEnginesPage = lazy(() => import('../../pages/w-engines/w-engines-page'));
+const DriveDiscsPage = lazy(() => import('../../pages/drive-discs/drive-discs-page'));
+const TeamsPage = lazy(() => import('../../pages/teams/teams-page'));
+const EventDetailPage = lazy(() => import('../../pages/event-detail/event-detail-page'));
 const FavoritesPage = lazy(() => import('../../pages/favorites/favorites-page'));
 const SettingsPage = lazy(() => import('../../pages/settings/settings-page'));
 const GamePlaceholderPage = lazy(
@@ -45,9 +49,16 @@ export function WorkspaceRoutes() {
         <Route path="/zzz/agents" element={<AgentsPage />} />
         <Route path="/zzz/agents/:id" element={<AgentDetailPage />} />
         <Route path="/zzz/events" element={<EventsPage />} />
+        <Route path="/zzz/events/:id" element={<EventDetailPage />} />
         <Route path="/zzz/planner" element={<DailyPage />} />
         <Route path="/zzz/materials" element={<MaterialsPage />} />
         <Route path="/zzz/materials/:id" element={<MaterialsPage />} />
+        <Route path="/zzz/w-engines" element={<WEnginesPage />} />
+        <Route path="/zzz/w-engines/:id" element={<WEnginesPage />} />
+        <Route path="/zzz/drive-discs" element={<DriveDiscsPage />} />
+        <Route path="/zzz/drive-discs/:id" element={<DriveDiscsPage />} />
+        <Route path="/zzz/teams" element={<TeamsPage />} />
+        <Route path="/zzz/teams/:id" element={<TeamsPage />} />
         <Route path="/zzz/favorites" element={<FavoritesPage />} />
         <Route path="/zzz/search" element={<SearchPage />} />
         <Route

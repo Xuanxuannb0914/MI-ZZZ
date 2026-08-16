@@ -101,7 +101,8 @@ Prompt 应描述问题和约束，不要过度规定实现细节；当实现方�
 
 ### 5.3 Bug 修复任务
 
-提供可复现输入、期望/实际、环境和回归范围。要求先写/证明失败测试，定位 root cause，修复最小原因，验证相邻场景；不得只掩盖症状或扩大 catch/retry。
+提供可复现输入、期望/实际、环境和回归范围。要求先写/证明失败测试，定位 root
+cause，修复最小原因，验证相邻场景；不得只掩盖症状或扩大 catch/retry。
 
 ### 5.4 Review 任务
 
@@ -155,13 +156,15 @@ AI 生成代码必须遵循 [CODING_RULE.md](./CODING_RULE.md) 和 [NAMING_RULE.
 
 ## 9. 验证协议
 
-AI 的“完成”必须附证据：执行的命令、退出状态和关键结果；UI 还需规定 viewport 的截图/交互验证；数据库需 migration dry-run/查询计划；性能需基准环境与前后值；安全需 threat model delta/扫描。
+AI 的“完成”必须附证据：执行的命令、退出状态和关键结果；UI 还需规定 viewport 的截图/交互验证；数据库需 migration
+dry-run/查询计划；性能需基准环境与前后值；安全需 threat model delta/扫描。
 
 验证失败时先定位并修复；若是环境阻塞，说明已尝试、具体错误和剩余风险。不得把“测试未运行”写成“应可通过”。不得通过删除/skip 测试或放宽规则获得绿色。
 
 ## 10. 人工评审与责任
 
-每个 AI 辅助 PR 仍由人类作者签署。作者必须理解全部差异、能解释方案、验证来源/许可证、确认无秘密和无未经授权代码。Reviewer 不因“AI generated”降低或提高标准，但对大规模机械变更、隐蔽依赖和虚构测试保持额外警惕。
+每个 AI 辅助 PR 仍由人类作者签署。作者必须理解全部差异、能解释方案、验证来源/许可证、确认无秘密和无未经授权代码。Reviewer 不因“AI
+generated”降低或提高标准，但对大规模机械变更、隐蔽依赖和虚构测试保持额外警惕。
 
 高风险输出（认证、密码学、权限、迁移、自动更新、插件沙箱、AI 工具调用）必须专项 owner 审核；AI 不能审核并批准自己的变更。
 
@@ -170,11 +173,14 @@ AI 的“完成”必须附证据：执行的命令、退出状态和关键结�
 不要求保存每次对话全文。PR 记录：使用的模型/工具类别、关键 Prompt/约束摘要、人工修改范围、验证证据；不得包含秘密或个人数据。影响架构的决定进入 ADR，不把聊天记录当唯一依据。
 
 可复用 Prompt 存放 `docs/product/prompts/`
-或专用目录，包含 owner、version、用途、输入 schema、输出 schema、评测集、风险和 Changelog。运行时 AI Prompt 与开发 Prompt 分开治理。
+或专用目录，包含 owner、version、用途、输入 schema、输出 schema、评测集、风险和 Changelog。运行时 AI
+Prompt 与开发 Prompt 分开治理。
 
 ## 12. 运行时 Prompt 管理
 
-Assistant 的 system prompt、retrieval template、tool definition、safety policy 分别版本化，不把所有规则塞入单个字符串。版本与模型、检索配置、评测结果、发布日期关联；使用 feature flag/canary 部署。
+Assistant 的 system prompt、retrieval template、tool definition、safety
+policy 分别版本化，不把所有规则塞入单个字符串。版本与模型、检索配置、评测结果、发布日期关联；使用 feature
+flag/canary 部署。
 
 Prompt 变更视为代码：review、测试、注入红队、成本/延迟评测、回滚版本齐全。用户内容绝不拼接进高权限指令段。工具执行前展示/记录具体动作，破坏性或外部副作用要求用户确认。
 
@@ -203,7 +209,9 @@ Prompt 变更视为代码：review、测试、注入红队、成本/延迟评测
 ## 15. 示例：合格的短 Prompt
 
 ```markdown
-目标：修复搜索结果返回后快速切换游戏会显示旧结果的问题。范围：仅 desktop renderer 的 search feature 和相关测试；不改 API、不引入依赖。约束：TanStack Query 负责远端状态，支持 AbortSignal；保留用户现有改动；禁止 any。验收：连续切换 A→B 时只显示 B；A 的迟到响应不覆盖 B；错误和 loading 不闪回；回归测试先失败后通过。验证：运行该 feature 的 Vitest、typecheck、lint；报告实际输出。若根因在 API 契约，停止编辑并说明证据。
+目标：修复搜索结果返回后快速切换游戏会显示旧结果的问题。范围：仅 desktop renderer 的 search
+feature 和相关测试；不改 API、不引入依赖。约束：TanStack
+Query 负责远端状态，支持 AbortSignal；保留用户现有改动；禁止 any。验收：连续切换 A→B 时只显示 B；A 的迟到响应不覆盖 B；错误和 loading 不闪回；回归测试先失败后通过。验证：运行该 feature 的 Vitest、typecheck、lint；报告实际输出。若根因在 API 契约，停止编辑并说明证据。
 ```
 
 这个 Prompt 短，但包含问题、边界、架构约束、竞态验收、验证和停止条件；比堆叠角色描述更可执行。

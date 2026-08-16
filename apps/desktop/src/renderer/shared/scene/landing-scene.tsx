@@ -1,7 +1,7 @@
 import { PerspectiveCamera } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Bloom, ChromaticAberration, EffectComposer, Noise } from '@react-three/postprocessing';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { Bloom, EffectComposer, Noise } from '@react-three/postprocessing';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { scenePalette, scenePerformance } from './scene-tokens';
 
@@ -180,17 +180,12 @@ function LandingWorld({ isTransitioning }: LandingWorldProps) {
       </mesh>
       <EffectComposer multisampling={0}>
         <Bloom
-          intensity={isTransitioning ? 1.5 : 0.64}
+          intensity={isTransitioning ? 1.1 : 0.5}
           luminanceThreshold={0.55}
           luminanceSmoothing={0.28}
           mipmapBlur
         />
-        <Noise premultiply opacity={0.08} />
-        <ChromaticAberration
-          offset={new THREE.Vector2(0.0007, 0.0007)}
-          radialModulation={false}
-          modulationOffset={0.15}
-        />
+        <Noise premultiply opacity={0.06} />
       </EffectComposer>
       <SceneLifecycle />
     </>
@@ -202,9 +197,19 @@ interface LandingSceneProps {
 }
 
 export const LandingScene = memo(function LandingScene({ isTransitioning }: LandingSceneProps) {
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    const onVisibility = () => setPaused(document.hidden);
+    document.addEventListener('visibilitychange', onVisibility);
+    onVisibility();
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
   return (
     <Canvas
       className="startup-scene-canvas"
+      frameloop={paused ? 'never' : 'always'}
       dpr={[1, scenePerformance.maxDpr]}
       gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
       camera={{ position: [0, 0, 8.2], fov: 42 }}

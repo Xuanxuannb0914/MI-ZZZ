@@ -1,6 +1,693 @@
 @import '@game-guide-hub/theme/styles.css';
+@import './genjyuu-gothic/GenJyuuGothic-Bold.css';
+
+/* 游戏官方字体（含商用字体的免费替代） */
+@font-face {
+  font-family: 'GenshinHyWenHei';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/assets/fonts/genshin-hywenhei-85w.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/assets/fonts/zzz-harmonyos-bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JitingSans';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/assets/fonts/wuwa-jitingsans.otf') format('opentype');
+}
 
 @layer components {
+  .game-hub {
+    position: relative;
+    min-height: 100svh;
+    overflow: hidden;
+    isolation: isolate;
+    color: var(--ggh-color-text-primary);
+    background:
+      radial-gradient(circle at 72% 42%, var(--game-glow), transparent 34%),
+      linear-gradient(125deg, var(--ggh-color-canvas), var(--ggh-color-canvas-secondary));
+  }
+
+  .game-hub::before,
+  .game-hub::after {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    content: '';
+    pointer-events: none;
+  }
+
+  .game-hub::before {
+    opacity: 0.4;
+    background-image:
+      linear-gradient(
+        color-mix(in srgb, var(--game-primary) 12%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--game-primary) 12%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: clamp(2.75rem, 5vw, 4.75rem) clamp(2.75rem, 5vw, 4.75rem);
+    mask-image: radial-gradient(ellipse at 62% 46%, black, transparent 68%);
+  }
+
+  .game-hub::after {
+    background: linear-gradient(
+      90deg,
+      var(--ggh-color-canvas) 0%,
+      transparent 40%,
+      transparent 66%,
+      var(--ggh-color-canvas) 100%
+    );
+  }
+  .game-hub-background-canvas {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.34;
+    pointer-events: none;
+  }
+
+  .game-hub-shell {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-height: 100svh;
+    width: min(92vw, 100rem);
+    margin: 0 auto;
+    padding: clamp(1.25rem, 3vh, 2.5rem) 0 clamp(1rem, 2.5vh, 2rem);
+  }
+
+  .game-hub-header,
+  .game-hub-footer,
+  .game-hub-header-meta,
+  .game-hub-brand,
+  .game-hub-actions {
+    display: flex;
+    align-items: center;
+  }
+  .game-hub-header {
+    justify-content: space-between;
+    min-height: var(--spacing-control);
+  }
+  .game-hub-brand {
+    gap: var(--spacing-compact);
+  }
+  .game-hub-brand > span {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--game-primary) 56%, transparent);
+    border-radius: var(--radius-md);
+    color: var(--ggh-color-on-action-primary);
+    background: var(--game-primary);
+    box-shadow: 0 0 1.5rem var(--game-glow);
+    font-weight: 800;
+  }
+  .game-hub-brand strong {
+    font-size: var(--text-label);
+    letter-spacing: 0.06em;
+  }
+  .game-hub-header-meta {
+    gap: var(--spacing-content);
+    color: var(--ggh-color-text-tertiary);
+    font-size: var(--text-caption);
+    letter-spacing: 0.08em;
+  }
+  .game-hub-header-meta button {
+    display: grid;
+    width: var(--spacing-control);
+    height: var(--spacing-control);
+    place-items: center;
+    border: 1px solid var(--ggh-color-border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--ggh-color-text-secondary);
+    background: var(--ggh-color-glass-light);
+    cursor: pointer;
+  }
+  .game-hub-header-meta button:hover {
+    color: var(--game-primary);
+    border-color: var(--game-primary);
+  }
+
+  .game-hub-stage {
+    position: relative;
+    isolation: isolate;
+    min-height: 0;
+    padding: clamp(1.5rem, 4vh, 4rem) 0;
+  }
+  .game-hub-wheel-panel {
+    position: absolute;
+    z-index: 4;
+    top: 0;
+    bottom: 0;
+    left: clamp(1rem, 3.6vw, 4.5rem);
+    width: clamp(17rem, 28vw, 31rem);
+    pointer-events: none;
+  }
+
+  .game-hub-preview-panel {
+    position: relative;
+    z-index: 1;
+    min-height: min(70vh, 50rem);
+    overflow: hidden;
+  }
+  .game-preview,
+  .game-preview-stage,
+  .game-preview-backdrop,
+  .game-preview-artwork,
+  .game-preview-artwork-fallback,
+  .game-preview-atmosphere,
+  .game-preview-artwork-halo,
+  .game-preview-noise,
+  .game-preview-sweep {
+    position: absolute;
+    inset: 0;
+  }
+  .game-preview-stage {
+    overflow: hidden;
+    background: color-mix(in srgb, var(--ggh-color-canvas-secondary) 88%, var(--game-primary));
+  }
+  .game-preview-backdrop {
+    background-image: var(--game-background);
+    background-size: cover;
+    background-position: center;
+    filter: blur(26px) saturate(0.8);
+    opacity: 0.44;
+    transform: scale(1.16)
+      translate3d(
+        calc(var(--game-parallax-x, 0px) * -0.35),
+        calc(var(--game-parallax-y, 0px) * -0.35),
+        0
+      );
+  }
+  .game-preview-atmosphere {
+    background:
+      radial-gradient(
+        circle at 75% 34%,
+        color-mix(in srgb, var(--game-primary) 38%, transparent),
+        transparent 32%
+      ),
+      radial-gradient(
+        circle at 33% 80%,
+        color-mix(in srgb, var(--game-secondary) 20%, transparent),
+        transparent 40%
+      );
+    filter: blur(8px);
+    mix-blend-mode: screen;
+    opacity: 0.72;
+    animation: game-preview-ambient 10s ease-in-out infinite alternate;
+  }
+  .game-preview-artwork {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.84;
+    filter: saturate(0.9) contrast(1.04);
+    transform: scale(1.035) translate3d(var(--game-parallax-x, 0px), var(--game-parallax-y, 0px), 0);
+    transition: transform 420ms var(--ggh-ease-standard);
+  }
+  .game-preview-artwork-halo {
+    background: radial-gradient(
+      circle at 70% 48%,
+      color-mix(in srgb, var(--game-primary) 44%, transparent),
+      transparent 42%
+    );
+    filter: blur(24px);
+    mix-blend-mode: screen;
+    opacity: 0.56;
+  }
+  .game-preview-artwork-fallback {
+    background:
+      radial-gradient(
+        circle at 70% 26%,
+        color-mix(in srgb, var(--game-primary) 42%, transparent),
+        transparent 32%
+      ),
+      linear-gradient(135deg, var(--ggh-color-surface-3), var(--ggh-color-canvas));
+  }
+  .game-preview-stage::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    background:
+      linear-gradient(
+        90deg,
+        var(--ggh-color-canvas) 0%,
+        color-mix(in srgb, var(--ggh-color-canvas) 46%, transparent) 42%,
+        transparent 85%
+      ),
+      linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--ggh-color-canvas) 88%, transparent),
+        transparent 56%
+      );
+  }
+  .game-preview-noise {
+    opacity: 0.28;
+    background-image: radial-gradient(var(--ggh-color-noise) 0.5px, transparent 0.7px);
+    background-size: 5px 5px;
+    mix-blend-mode: screen;
+  }
+  .game-preview-sweep {
+    width: 24%;
+    opacity: 0.24;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--game-primary) 64%, transparent),
+      transparent
+    );
+    filter: blur(13px);
+    transform: translateX(-160%) skewX(-18deg);
+    animation: game-hub-sweep 7s var(--ggh-ease-standard) infinite;
+  }
+
+  .game-hub-preview-content {
+    position: absolute;
+    z-index: 2;
+    right: clamp(1.5rem, 5vw, 5rem);
+    bottom: clamp(1.5rem, 6vh, 5rem);
+    left: clamp(20rem, 38vw, 42rem);
+    max-width: min(54%, 42rem);
+  }
+  .game-info-kicker,
+  .game-info-english {
+    font-family: var(--game-font);
+    color: var(--game-primary);
+    font-size: var(--text-caption);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+  }
+  .game-info h1 {
+    margin-top: var(--spacing-compact);
+    font-family: var(--game-font);
+    font-size: clamp(3rem, 8vw, 8rem);
+    font-weight: 760;
+    letter-spacing: 0.02em;
+    line-height: 0.9;
+    text-shadow: 0 0 2.5rem var(--game-glow);
+  }
+  .game-info-english {
+    margin-top: var(--spacing-content);
+    color: var(--game-secondary);
+  }
+  .game-info-description {
+    max-width: 32rem;
+    margin-top: var(--spacing-panel);
+    font-family: var(--game-font);
+    color: var(--ggh-color-text-secondary);
+    font-size: clamp(var(--text-body), 1.2vw, var(--text-body-lg));
+  }
+  .game-hub-actions {
+    flex-wrap: wrap;
+    gap: var(--spacing-content);
+    margin-top: var(--spacing-panel);
+  }
+  .game-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-compact);
+    min-height: auto;
+    padding: 0;
+    border: 0;
+    color: var(--ggh-color-text-secondary);
+    background: transparent;
+    font-size: var(--text-caption);
+  }
+  .game-status.is-available {
+    color: var(--game-secondary);
+  }
+  .game-status::before {
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0.75rem currentColor;
+    content: '';
+  }
+  .game-enter-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-compact);
+    min-height: var(--spacing-control-comfortable);
+    padding: 0 var(--spacing-panel);
+    border: 1px solid color-mix(in srgb, var(--game-primary) 65%, transparent);
+    border-radius: var(--radius-full);
+    color: var(--ggh-color-text-primary);
+    background: color-mix(in srgb, var(--ggh-color-canvas) 44%, transparent);
+    box-shadow:
+      0 0 1.5rem var(--game-glow),
+      inset 0 1px color-mix(in srgb, white 22%, transparent);
+    cursor: pointer;
+    font-size: var(--text-label);
+    font-weight: 750;
+    transition:
+      transform var(--ggh-motion-fast) var(--ggh-ease-enter),
+      box-shadow var(--ggh-motion-fast) var(--ggh-ease-standard);
+  }
+  .game-enter-button:hover:not(:disabled) {
+    border-color: var(--game-primary);
+    box-shadow:
+      0 0 2.5rem var(--game-glow),
+      inset 0 1px color-mix(in srgb, white 34%, transparent);
+    transform: translateY(-1px);
+  }
+  .game-enter-button svg {
+    transition: transform var(--ggh-motion-fast) var(--ggh-ease-enter);
+  }
+  .game-enter-button:hover:not(:disabled) svg {
+    transform: translateX(0.3rem);
+  }
+  .game-enter-button:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+  .game-enter-button:disabled {
+    border-color: var(--ggh-color-border-subtle);
+    color: var(--ggh-color-text-tertiary);
+    background: var(--ggh-color-glass-strong);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .game-hub-footer {
+    justify-content: space-between;
+    color: var(--ggh-color-text-tertiary);
+    font-size: var(--text-caption);
+    letter-spacing: 0.08em;
+  }
+
+  @keyframes game-hub-sweep {
+    0%,
+    64% {
+      transform: translateX(-160%) skewX(-18deg);
+    }
+    100% {
+      transform: translateX(620%) skewX(-18deg);
+    }
+  }
+  @keyframes game-preview-ambient {
+    from {
+      transform: scale(1) translate3d(-1%, -1%, 0);
+      opacity: 0.5;
+    }
+    to {
+      transform: scale(1.08) translate3d(2%, 1%, 0);
+      opacity: 0.82;
+    }
+  }
+  @media (max-aspect-ratio: 5 / 4) {
+    .game-hub-preview-panel {
+      min-height: min(61vh, 38rem);
+    }
+    .game-hub-preview-content {
+      left: clamp(17rem, 34vw, 30rem);
+      max-width: 58%;
+    }
+  }
+  @media (max-width: 52rem) {
+    .game-hub-preview-panel {
+      min-height: 32rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .game-preview-sweep {
+      animation: none;
+    }
+    .game-preview-backdrop {
+      filter: none;
+    }
+    .game-preview-atmosphere {
+      animation: none;
+    }
+    .game-preview-artwork {
+      transform: scale(1.02);
+    }
+  }
+
+  .game-option-wheel {
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+  }
+
+  .option-wheel {
+    position: relative;
+    overflow: visible;
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+    outline: none;
+    mask-image: linear-gradient(to bottom, transparent 2%, black 18%, black 82%, transparent 98%);
+  }
+
+  .option-wheel:focus-visible {
+    outline: none;
+  }
+
+  .option-wheel:focus-visible .option-wheel__item[aria-selected='true'] {
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--game-primary) 70%, transparent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.38em;
+  }
+
+  .option-wheel:has(.option-wheel__item:active) {
+    cursor: grabbing;
+  }
+
+  .option-wheel__item {
+    position: absolute;
+    top: 50%;
+    left: var(--ow-inset);
+    margin: 0;
+    padding: var(--spacing-compact) 0;
+    border: 0;
+    color: color-mix(
+      in srgb,
+      var(--ow-active-color) calc(var(--ow-progress, 0) * 100%),
+      var(--ow-text-color)
+    );
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    font-size: var(--ow-font-size);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1;
+    text-align: left;
+    text-shadow: 0 0 1.25rem color-mix(in srgb, var(--game-primary) 14%, transparent);
+    transform-origin: left center;
+    white-space: nowrap;
+    will-change: transform, opacity, filter;
+  }
+
+  .option-wheel--right .option-wheel__item {
+    right: var(--ow-inset);
+    left: auto;
+    text-align: right;
+    transform-origin: right center;
+  }
+
+  .option-wheel__item:hover:not(:disabled),
+  .option-wheel__item:focus-visible:not(:disabled) {
+    color: var(--ow-active-color);
+    outline: none;
+  }
+
+  .option-wheel__item[aria-selected='true'] {
+    font-weight: 560;
+  }
+
+  .option-wheel__item:disabled {
+    cursor: default;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .option-wheel__item {
+      filter: none;
+      will-change: auto;
+    }
+  }
+
+  .content-catalog {
+    display: grid;
+    gap: var(--spacing-layout);
+  }
+
+  .content-catalog-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--spacing-panel);
+    padding: var(--spacing-panel);
+    border: 1px solid var(--ggh-color-border-subtle);
+    border-radius: var(--radius-xl);
+    background: var(--ggh-color-glass);
+    box-shadow:
+      var(--ggh-shadow-small),
+      inset 0 1px var(--ggh-color-reflection);
+    backdrop-filter: blur(var(--ggh-glass-blur-medium)) saturate(120%);
+  }
+
+  .content-detail-panel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .content-detail-panel::before {
+    position: absolute;
+    inset: 0;
+    content: '';
+    pointer-events: none;
+    background: linear-gradient(135deg, var(--ggh-color-reflection), transparent 34%);
+  }
+
+  .team-showcase-card,
+  .team-detail-member,
+  .article-entity-link,
+  .search-recent-chip {
+    transition:
+      transform var(--ggh-motion-hover-duration) var(--ggh-motion-ease),
+      border-color var(--ggh-motion-hover-duration) var(--ggh-motion-ease),
+      box-shadow var(--ggh-motion-hover-duration) var(--ggh-motion-ease),
+      background-color var(--ggh-motion-hover-duration) var(--ggh-motion-ease);
+  }
+
+  .team-showcase-card:hover,
+  .team-detail-member:hover,
+  .article-entity-link:hover,
+  .search-recent-chip:hover {
+    border-color: var(--ggh-color-border-strong);
+    box-shadow: var(--ggh-glow-primary), var(--ggh-shadow-small);
+    transform: translateY(-2px);
+  }
+
+  .team-member-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-compact);
+  }
+
+  .team-member-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-compact);
+    min-height: var(--spacing-control);
+    padding: 0 var(--spacing-control);
+    border: 1px solid var(--ggh-color-border-subtle);
+    border-radius: var(--radius-full);
+    color: var(--ggh-color-text-secondary);
+    background: var(--ggh-color-surface-1);
+    font-size: var(--ggh-font-size-caption);
+  }
+
+  .team-member-chip img {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+  }
+
+  .team-detail-members {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-content);
+  }
+
+  .team-detail-member {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-content);
+    min-width: 0;
+    padding: var(--spacing-content);
+    border: 1px solid var(--ggh-color-border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--ggh-color-surface-1);
+  }
+
+  .team-detail-member img {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+  }
+
+  .team-detail-member strong,
+  .team-detail-member small {
+    display: block;
+  }
+
+  .team-detail-member strong {
+    color: var(--ggh-color-text-primary);
+    font-size: var(--ggh-font-size-label);
+  }
+  .team-detail-member small {
+    margin-top: var(--spacing-compact);
+    color: var(--ggh-color-text-tertiary);
+    font-size: var(--ggh-font-size-caption);
+  }
+
+  .article-entity-link,
+  .search-recent-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-compact);
+    min-height: var(--spacing-control);
+    padding: 0 var(--spacing-content);
+    border: 1px solid var(--ggh-color-border-subtle);
+    border-radius: var(--radius-full);
+    color: var(--ggh-color-text-primary);
+    background: var(--ggh-color-surface-1);
+    font-size: var(--ggh-font-size-caption);
+  }
+
+  .article-entity-link span {
+    color: var(--ggh-color-primary);
+  }
+
+  .search-recent-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-content);
+    padding: 0 var(--spacing-content);
+  }
+
+  .page-error-state {
+    display: grid;
+    min-height: 60vh;
+    place-items: center;
+    padding: var(--spacing-layout);
+  }
+
+  @media (max-width: 70rem) {
+    .content-catalog-header {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .team-detail-members {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .landing-act-root {
     position: relative;
     min-height: 100svh;
@@ -857,6 +1544,15 @@
 }
 
 @layer components {
+  #main-content {
+    font-family:
+      var(--game-font, Inter),
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
+  }
+
   .app-shell-main {
     padding-left: var(--spacing-app-sidebar);
     transition: padding-left var(--ggh-motion-slow) cubic-bezier(0.16, 1, 0.3, 1);
@@ -1598,7 +2294,10 @@
       11rem 9rem,
       14rem 12rem,
       13rem 10rem;
-    animation: workspace-particle-drift 12s linear infinite;
+    /* transform-only 动画，GPU 合成不触发重绘（原 background-position 逐帧重绘） */
+    transform: scale(1.12) translate3d(-1.5%, 0, 0);
+    will-change: transform;
+    animation: workspace-particle-drift 18s ease-in-out infinite alternate;
   }
 
   .workspace-hero-copy {
@@ -1787,6 +2486,8 @@
   }
 
   .workspace-dashboard {
+    container-type: inline-size;
+    container-name: workspace-dashboard;
     display: grid;
     grid-template-rows: auto auto;
     gap: var(--spacing-content);
@@ -2505,40 +3206,6 @@
     border-bottom: 0;
   }
 
-  .workspace-widget-ai .ggh-widget-body {
-    position: absolute;
-    inset: 0 10rem 0 18rem;
-    display: flex;
-    align-items: center;
-    padding: 0;
-    pointer-events: none;
-  }
-
-  .workspace-ai-content {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    gap: var(--spacing-content);
-  }
-
-  .workspace-ai-orb {
-    color: var(--ggh-color-secondary);
-    background: var(--ggh-color-secondary-soft);
-    box-shadow: var(--ggh-glow-secondary);
-  }
-
-  .workspace-ai-content p {
-    min-width: 0;
-    flex: 1;
-    color: var(--ggh-color-text-secondary);
-    font-size: var(--text-caption);
-  }
-
-  .workspace-ai-content > div {
-    display: flex;
-    gap: var(--spacing-compact);
-  }
-
   @keyframes workspace-light-sweep {
     0%,
     72% {
@@ -2566,16 +3233,10 @@
 
   @keyframes workspace-particle-drift {
     from {
-      background-position:
-        0 0,
-        0 0,
-        0 0;
+      transform: scale(1.12) translate3d(-1.5%, 0, 0);
     }
     to {
-      background-position:
-        2rem -1rem,
-        -2rem 1rem,
-        1rem 2rem;
+      transform: scale(1.12) translate3d(1.5%, 0, 0);
     }
   }
 
@@ -2618,10 +3279,15 @@
     }
   }
 
-  @media (max-width: 80rem) {
-    .workspace-priority-grid,
-    .workspace-recommendation-grid,
+  @container workspace-dashboard (max-width: 70rem) {
     .workspace-secondary-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @container workspace-dashboard (max-width: 58rem) {
+    .workspace-priority-grid,
+    .workspace-recommendation-grid {
       grid-template-columns: minmax(0, 1fr);
     }
   }
@@ -5354,5 +6020,727 @@
   .home-v2-hero h1 span {
     background: var(--ggh-gradient-primary);
     background-clip: text;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 颗粒纹理                                                           */
+/* ------------------------------------------------------------------ */
+
+.grain-overlay {
+  position: fixed;
+  z-index: var(--z-sticky);
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.game-intro {
+  position: fixed;
+  z-index: var(--z-critical);
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  cursor: default;
+  color: var(--ggh-color-text-primary);
+  user-select: none;
+}
+
+.game-intro::after {
+  content: '';
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 44%, transparent 40%, rgb(0 0 0 / 58%) 100%);
+}
+
+.game-intro--genshin {
+  --intro-primary: #f3c96b;
+  --intro-secondary: #fff3c4;
+  --intro-accent: #7fb2ff;
+}
+
+.game-intro--starrail {
+  --intro-primary: #8fb6ff;
+  --intro-secondary: #e6eeff;
+  --intro-accent: #67ddff;
+}
+
+.game-intro--zzz {
+  --intro-primary: #ffd84d;
+  --intro-secondary: #fff3b0;
+  --intro-accent: #c77bff;
+}
+
+.game-intro--wuwa {
+  --intro-primary: #6fe3c1;
+  --intro-secondary: #c8ffe9;
+  --intro-accent: #8be0ff;
+}
+
+.gi-scene {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+}
+
+.gi-scene--genshin {
+  background: linear-gradient(180deg, #030a1c 0%, #0a1233 55%, #171042 100%);
+}
+
+.gi-scene--starrail {
+  background: linear-gradient(180deg, #04061a 0%, #0a1038 55%, #111a4a 100%);
+}
+
+.gi-scene--zzz {
+  background: radial-gradient(circle at 50% 42%, #1c1a0e 0%, #0d0d07 55%, #050503 100%);
+}
+
+.gi-scene--wuwa {
+  background: radial-gradient(circle at 50% 46%, #062a30 0%, #021722 52%, #010b12 100%);
+}
+
+/* ---- 通用：官方美术背景 + 渐晕 ---- */
+
+.gi-backdrop {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  animation: gi-kenburns 6.5s cubic-bezier(0.22, 0.7, 0.3, 1) forwards;
+}
+
+.gi-scene--genshin .gi-backdrop {
+  background-position: center 38%;
+  transform-origin: 50% 40%;
+}
+
+/* 官方登录视频作为背景：object-fit 铺满、禁止鼠标交互（点击用于跳过） */
+.gi-backdrop--video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 38%;
+  pointer-events: none;
+  background: #030a1c;
+}
+
+.gi-scene--starrail .gi-backdrop {
+  transform-origin: 50% 45%;
+}
+
+.gi-scene--zzz .gi-backdrop {
+  transform-origin: 50% 50%;
+}
+
+.gi-scene--wuwa .gi-backdrop {
+  transform-origin: 50% 40%;
+}
+
+@keyframes gi-kenburns {
+  from {
+    transform: scale(1.03);
+  }
+  to {
+    transform: scale(1.14);
+  }
+}
+
+.gi-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(2 6 18 / 0.5) 0%,
+      transparent 36%,
+      transparent 64%,
+      rgb(1 3 10 / 0.86) 100%
+    ),
+    radial-gradient(circle at 50% 42%, transparent 34%, rgb(0 0 0 / 0.44) 100%);
+}
+
+/* ---- 通用：星空 ---- */
+
+.gi-stars {
+  position: absolute;
+  inset: 0;
+}
+
+.gi-star {
+  position: absolute;
+  border-radius: 9999px;
+  background: var(--intro-secondary);
+  box-shadow: 0 0 6px var(--intro-secondary);
+  opacity: 0.4;
+  animation: gi-twinkle 2.4s ease-in-out infinite;
+}
+
+@keyframes gi-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.2);
+  }
+}
+
+.gi-stars--motion .gi-star {
+  animation-name: gi-star-streak;
+  animation-duration: 3.2s;
+}
+
+@keyframes gi-star-streak {
+  0% {
+    transform: translateX(0);
+    opacity: 0.1;
+  }
+  35% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateX(-140px);
+    opacity: 0;
+  }
+}
+
+/* ---- 原神：天空岛大门光影开门 ---- */
+
+.gi-gate-light {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 3px;
+  height: 0;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(180deg, transparent, var(--intro-secondary), transparent);
+  box-shadow:
+    0 0 26px 8px rgb(255 240 190 / 0.5),
+    0 0 64px 24px rgb(90 160 232 / 0.35);
+  opacity: 0;
+  animation: gi-gate-open 1.7s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+}
+
+@keyframes gi-gate-open {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  32% {
+    opacity: 1;
+  }
+  100% {
+    height: 92vh;
+    opacity: 0.92;
+  }
+}
+
+.gi-clouds {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 22%;
+  background:
+    radial-gradient(ellipse at 18% 100%, rgb(255 244 214 / 0.28), transparent 60%),
+    radial-gradient(ellipse at 82% 100%, rgb(255 244 214 / 0.22), transparent 60%);
+  filter: blur(8px);
+  opacity: 0;
+  animation: gi-fade-in 1.4s ease 0.7s forwards;
+}
+
+/* ---- 星穹铁道：官方封面 + 星穹列车图标驶入银河 ---- */
+
+.gi-track {
+  position: absolute;
+  right: 0;
+  bottom: 19%;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--intro-accent) 30%,
+    var(--intro-accent) 70%,
+    transparent
+  );
+  opacity: 0.6;
+  box-shadow: 0 0 12px var(--intro-accent);
+}
+
+.gi-logo {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: min(42vh, 38vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: gi-logo-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+}
+
+.gi-logo__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 24px color-mix(in srgb, var(--intro-accent) 55%, transparent));
+  animation: gi-logo-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes gi-logo-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.55);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes gi-logo-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px color-mix(in srgb, var(--intro-accent) 45%, transparent));
+  }
+  50% {
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 34px color-mix(in srgb, var(--intro-accent) 70%, transparent));
+  }
+}
+
+/* 星穹铁道：图标沿轨道驶入 */
+.gi-logo--starrail {
+  top: 40%;
+  width: min(26vh, 24vw);
+  animation: gi-logo-ride 1.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.15s forwards;
+}
+
+@keyframes gi-logo-ride {
+  0% {
+    opacity: 0;
+    transform: translate(120vw, -50%) scale(0.7);
+  }
+  65% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* 绝区零：标志带霓虹描边 */
+.gi-logo--zzz {
+  width: min(30vh, 27vw);
+  animation-duration: 0.8s;
+}
+
+.gi-logo--zzz .gi-logo__img {
+  border: 2px solid color-mix(in srgb, var(--intro-primary) 80%, transparent);
+  border-radius: 18px;
+  padding: 1.1vh;
+  background: rgb(0 0 0 / 0.28);
+  box-shadow: 0 0 30px rgb(255 216 77 / 0.3);
+}
+
+.gi-speed-lines {
+  position: absolute;
+  right: 0;
+  bottom: 33%;
+  left: 0;
+  height: 18vh;
+  pointer-events: none;
+}
+
+.gi-speed-lines span {
+  position: absolute;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--intro-accent));
+  opacity: 0.5;
+  animation: gi-speed 0.7s linear infinite;
+}
+
+.gi-speed-lines span:nth-child(1) {
+  top: 6%;
+  left: -30%;
+  width: 22%;
+}
+
+.gi-speed-lines span:nth-child(2) {
+  top: 30%;
+  left: -15%;
+  width: 16%;
+  animation-delay: 0.15s;
+}
+
+.gi-speed-lines span:nth-child(3) {
+  top: 52%;
+  left: -40%;
+  width: 26%;
+  animation-delay: 0.3s;
+}
+
+.gi-speed-lines span:nth-child(4) {
+  top: 72%;
+  left: -22%;
+  width: 18%;
+  animation-delay: 0.45s;
+}
+
+.gi-speed-lines span:nth-child(5) {
+  top: 88%;
+  left: -10%;
+  width: 14%;
+  animation-delay: 0.55s;
+}
+
+.gi-speed-lines span:nth-child(6) {
+  top: 18%;
+  left: -45%;
+  width: 20%;
+  animation-delay: 0.65s;
+}
+
+@keyframes gi-speed {
+  from {
+    transform: translateX(0);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  to {
+    transform: translateX(150%);
+    opacity: 0;
+  }
+}
+
+/* ---- 绝区零：复古霓虹信号 + 标志聚光 ---- */
+
+.gi-tv-corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--intro-secondary);
+  opacity: 0;
+  animation: gi-fade-in 0.6s ease 0.55s forwards;
+}
+
+.gi-tv-corner--tl {
+  top: calc(46% - min(42vh, 40vw) / 2);
+  left: calc(50% - min(58vh, 56vw) / 2);
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 6px 0 0 0;
+}
+
+.gi-tv-corner--tr {
+  top: calc(46% - min(42vh, 40vw) / 2);
+  right: calc(50% - min(58vh, 56vw) / 2);
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0 6px 0 0;
+}
+
+.gi-tv-corner--bl {
+  bottom: calc(54% - min(42vh, 40vw) / 2);
+  left: calc(50% - min(58vh, 56vw) / 2);
+  border-top: 0;
+  border-right: 0;
+  border-radius: 0 0 0 6px;
+}
+
+.gi-tv-corner--br {
+  right: calc(50% - min(58vh, 56vw) / 2);
+  bottom: calc(54% - min(42vh, 40vw) / 2);
+  border-top: 0;
+  border-left: 0;
+  border-radius: 0 0 6px 0;
+}
+
+@keyframes gi-hollow-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.gi-scan {
+  position: absolute;
+  top: -24vh;
+  right: 0;
+  left: 0;
+  height: 24vh;
+  background: linear-gradient(180deg, transparent, rgb(255 216 77 / 0.08), transparent);
+  animation: gi-scan-move 1.4s linear infinite;
+}
+
+@keyframes gi-scan-move {
+  to {
+    transform: translateY(calc(100vh + 24vh));
+  }
+}
+
+.gi-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: gi-noise-jitter 0.4s steps(4) infinite;
+}
+
+@keyframes gi-noise-jitter {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-1.5%, 1%);
+  }
+  50% {
+    transform: translate(1%, -1%);
+  }
+  75% {
+    transform: translate(-1%, -1.5%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* ---- 鸣潮：声骸共鸣徽记 ---- */
+
+.gi-ripples {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+}
+
+.gi-ripples span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px;
+  border: 1.5px solid var(--intro-accent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: gi-ripple 1.8s cubic-bezier(0, 0.55, 0.45, 1) infinite;
+}
+
+.gi-ripples span:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.gi-ripples span:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+@keyframes gi-ripple {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(16);
+    opacity: 0;
+  }
+}
+
+.gi-core {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 22px;
+  height: 22px;
+  margin: -11px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--intro-secondary), var(--intro-primary) 60%, transparent);
+  box-shadow: 0 0 22px 6px color-mix(in srgb, var(--intro-primary) 45%, transparent);
+  animation: gi-core-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes gi-core-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.75;
+  }
+}
+
+.gi-emblem {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(38vh, 34vw);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--intro-primary) 78%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 44px color-mix(in srgb, var(--intro-primary) 38%, transparent),
+    0 0 90px color-mix(in srgb, var(--intro-primary) 18%, transparent),
+    inset 0 0 34px rgb(0 0 0 / 0.55);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: gi-hollow-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+
+.gi-emblem::before {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  content: '';
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+}
+
+.gi-emblem__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(1.06) contrast(1.04);
+  animation: gi-emblem-pulse 3s ease-in-out infinite;
+}
+
+@keyframes gi-emblem-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+/* ---- 通用：文字、跳过、收尾白光 ---- */
+
+.game-intro__flash {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  animation: gi-flash 2.6s ease-in-out forwards;
+}
+
+@keyframes gi-flash {
+  0%,
+  78% {
+    opacity: 0;
+  }
+  88% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.game-intro__caption {
+  position: absolute;
+  z-index: 7;
+  bottom: 9%;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: gi-fade-in 0.6s ease 0.9s forwards;
+}
+
+.game-intro__kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--intro-secondary);
+  opacity: 0.85;
+}
+
+.game-intro__title {
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: linear-gradient(
+    120deg,
+    var(--intro-secondary),
+    var(--intro-primary) 55%,
+    var(--intro-accent)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.game-intro__hint {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  color: var(--ggh-color-text-tertiary);
+}
+
+.game-intro__skip {
+  position: absolute;
+  z-index: 7;
+  right: 2.2rem;
+  bottom: 2.2rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.05);
+  color: var(--ggh-color-text-secondary);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  animation: gi-fade-in 0.4s ease 1.3s forwards;
+}
+
+.game-intro__skip:hover {
+  border-color: var(--intro-primary);
+  color: var(--intro-secondary);
+}
+
+@keyframes gi-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-intro,
+  .game-intro * {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .game-intro__flash {
+    animation: none;
+    opacity: 0;
   }
 }

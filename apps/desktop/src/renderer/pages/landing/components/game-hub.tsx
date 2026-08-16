@@ -1,20 +1,41 @@
-import { ArrowUpRight, Info } from '@game-guide-hub/icons';
+import { Settings } from '@game-guide-hub/icons';
 import { motion as themeMotion } from '@game-guide-hub/theme';
-import { motion } from 'framer-motion';
+import { type MotionStyle, motion } from 'framer-motion';
 import type { GameDefinition } from '../../../shared/mock/games';
 import { games } from '../../../shared/mock/games';
 import { BackgroundScene } from '../../../shared/scene/background-scene';
-import { GameCard } from './game-card';
+import { GameEnterButton } from './game-enter-button';
+import { GameInfo } from './game-info';
+import { GameOptionWheel } from './game-option-wheel';
+import { GamePreview } from './game-preview';
 
 interface GameHubProps {
   readonly isExiting: boolean;
+  readonly selectedGame: GameDefinition;
   readonly onGameSelect: (game: GameDefinition) => void;
+  readonly onEnter: () => void;
+  /** 演示模式：允许进入「敬请期待」的游戏以预览开场动画。 */
+  readonly allowComingSoon?: boolean;
 }
 
-export function GameHub({ isExiting, onGameSelect }: GameHubProps) {
+export function GameHub({
+  isExiting,
+  selectedGame,
+  onGameSelect,
+  onEnter,
+  allowComingSoon = false,
+}: GameHubProps) {
+  const selectedIndex = games.findIndex((game) => game.id === selectedGame.id);
+  const gameTheme = {
+    '--game-primary': selectedGame.accentColor,
+    '--game-secondary': selectedGame.secondaryColor,
+    '--game-glow': selectedGame.glowColor,
+    '--game-font': selectedGame.fontFamily,
+  } as MotionStyle;
   return (
     <motion.main
-      className="platform-landing"
+      className="game-hub"
+      style={gameTheme}
       initial={{ opacity: 0, scale: 1.03, filter: 'blur(12px)' }}
       animate={
         isExiting
@@ -24,45 +45,57 @@ export function GameHub({ isExiting, onGameSelect }: GameHubProps) {
       transition={{ duration: themeMotion.durationSeconds.cinematic, ease: [0.16, 1, 0.3, 1] }}
       aria-label="Asteris 游戏中心"
     >
-      <BackgroundScene className="platform-background-canvas" />
-      <div className="platform-landing-shell">
-        <header className="platform-landing-header">
-          <div className="platform-logo">
-            <span className="platform-logo-mark" aria-hidden="true">
-              A
-            </span>
-            <span className="platform-logo-name">Asteris</span>
+      <BackgroundScene className="game-hub-background-canvas" />
+      <div className="game-hub-shell">
+        <header className="game-hub-header">
+          <div className="game-hub-brand">
+            <span aria-hidden="true">A</span>
+            <strong>Asteris</strong>
           </div>
-          <span className="platform-landing-build">游戏中心 · 0.3.0</span>
+          <div className="game-hub-header-meta">
+            <span>游戏中心</span>
+            <button type="button" aria-label="设置">
+              <Settings aria-hidden="true" size={15} />
+            </button>
+          </div>
         </header>
-        <section className="platform-landing-panel" aria-labelledby="platform-title">
-          <div className="platform-landing-intro">
-            <div>
-              <p className="platform-landing-eyebrow">游戏中心 / 02</p>
-              <h1 id="platform-title">选择一个世界。</h1>
-              <p className="platform-landing-subtitle">一个入口，连接所有热爱。</p>
-            </div>
-            <div className="platform-landing-help">
-              <Info aria-hidden="true" size={16} />
-              <span>选择游戏档案开始</span>
+        <section className="game-hub-stage" aria-label="游戏选择舞台">
+          <div className="game-hub-wheel-panel">
+            <GameOptionWheel
+              games={games}
+              selectedIndex={selectedIndex}
+              onSelect={(index) => {
+                const game = games[index];
+                if (game) onGameSelect(game);
+              }}
+              onEnter={onEnter}
+              disabled={isExiting}
+            />
+          </div>
+          <div className="game-hub-preview-panel">
+            <GamePreview game={selectedGame} isExiting={isExiting} />
+            <div className="game-hub-preview-content">
+              <GameInfo game={selectedGame} />
+              <div className="game-hub-actions">
+                <span
+                  className={`game-status ${selectedGame.status === 'available' ? 'is-available' : ''}`}
+                >
+                  {selectedGame.status === 'available' ? '已开放' : '开发中'}
+                </span>
+                <GameEnterButton
+                  game={selectedGame}
+                  disabled={isExiting}
+                  onEnter={onEnter}
+                  allowComingSoon={allowComingSoon}
+                />
+              </div>
             </div>
           </div>
-          <div className="platform-game-grid">
-            {games.map((game) => (
-              <GameCard key={game.id} game={game} onSelect={onGameSelect} />
-            ))}
-          </div>
-          <footer className="platform-landing-footer">
-            <span>平台档案已就绪</span>
-            <span className="platform-landing-footer-status">
-              <span aria-hidden="true" />
-              数据已同步
-            </span>
-            <span>
-              社区动态 <ArrowUpRight aria-hidden="true" size={14} />
-            </span>
-          </footer>
         </section>
+        <footer className="game-hub-footer">
+          <span>本地游戏档案</span>
+          <span>ENTER 进入当前选择</span>
+        </footer>
       </div>
     </motion.main>
   );

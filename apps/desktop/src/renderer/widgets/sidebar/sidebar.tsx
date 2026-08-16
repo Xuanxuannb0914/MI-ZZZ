@@ -3,6 +3,7 @@ import {
   BookOpen,
   CalendarDays,
   Compass,
+  Disc3,
   Heart,
   Home,
   PackageOpen,
@@ -12,6 +13,7 @@ import {
   Settings,
   UserRound,
   UsersRound,
+  Wrench,
 } from '@game-guide-hub/icons';
 import { classNames } from '@game-guide-hub/utils';
 import { NavLink } from 'react-router-dom';
@@ -29,6 +31,9 @@ const navigationEntries: readonly NavigationEntry[] = [
   { label: '首页', to: '/zzz', icon: Home, end: true },
   { label: '攻略', to: '/zzz/guides', icon: BookOpen },
   { label: '角色', to: '/zzz/agents', icon: UsersRound },
+  { label: '配队', to: '/zzz/teams', icon: UsersRound },
+  { label: '音擎', to: '/zzz/w-engines', icon: Wrench },
+  { label: '驱动盘', to: '/zzz/drive-discs', icon: Disc3 },
   { label: '活动', to: '/zzz/events', icon: Compass },
   { label: '养成', to: '/zzz/planner', icon: CalendarDays },
   { label: '材料', to: '/zzz/materials', icon: PackageOpen },

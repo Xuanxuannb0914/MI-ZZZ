@@ -2,7 +2,7 @@ import type { Agent } from '../../entities/agent/model/types';
 
 const CITY_COVER = '/assets/zzz-city.jpg';
 
-export const agents: readonly Agent[] = [
+const agentSeeds: readonly Agent[] = [
   {
     id: 'anby-demara',
     name: '安比',
@@ -344,6 +344,79 @@ export const agents: readonly Agent[] = [
     skills: ['普攻', '连携技', '特殊技', '闪避', '支援'],
   },
 ];
+
+const agentRelationSeeds: Readonly<
+  Record<
+    string,
+    Pick<
+      Agent,
+      | 'versionId'
+      | 'recommendedWEngineIds'
+      | 'recommendedDriveDiscIds'
+      | 'teamIds'
+      | 'materialIds'
+      | 'guideIds'
+      | 'eventIds'
+    >
+  >
+> = {
+  miyabi: {
+    versionId: 'v2-1',
+    recommendedWEngineIds: ['hailstorm-shrine'],
+    recommendedDriveDiscIds: ['1-折枝剑歌', '2-啄木鸟电音'],
+    teamIds: ['miyabi-disorder'],
+    materialIds: ['advanced-anomaly-cert', 'living-drive', 'hamster-cage-pass'],
+    guideIds: ['miyabi-frostburn', 'miyabi-team'],
+    eventIds: ['astra-event', 'exclusive-banner'],
+  },
+  'zhu-yuan': {
+    versionId: 'v2-0',
+    recommendedWEngineIds: ['riot-suppressor'],
+    recommendedDriveDiscIds: ['6-混沌重金属', '2-啄木鸟电音'],
+    teamIds: ['zhu-yuan-burst'],
+    materialIds: ['advanced-attack-cert', 'ether-hunt', 'hamster-cage-pass'],
+    guideIds: ['zhu-yuan-burst'],
+    eventIds: ['combat-simulation'],
+  },
+  'jane-doe': {
+    versionId: 'v2-0',
+    recommendedWEngineIds: ['sharpened-stinger'],
+    recommendedDriveDiscIds: ['7-獠牙重金属', '8-自由蓝调'],
+    teamIds: ['jane-assault'],
+    materialIds: ['advanced-anomaly-cert', 'notorious-fall-fist', 'hamster-cage-pass'],
+    guideIds: ['jane-assault'],
+    eventIds: ['shiyu'],
+  },
+  'burnice-white': {
+    versionId: 'v2-0',
+    recommendedWEngineIds: ['flaming-shaker'],
+    recommendedDriveDiscIds: ['9-混沌爵士', '8-自由蓝调'],
+    teamIds: ['jane-assault', 'burnice-disorder'],
+    materialIds: ['advanced-anomaly-cert', 'crimson-engine', 'hamster-cage-pass'],
+    guideIds: ['burnice-off-field'],
+    eventIds: ['combat-simulation'],
+  },
+  'caesar-king': {
+    versionId: 'v2-0',
+    recommendedWEngineIds: ['tusks-of-rage'],
+    recommendedDriveDiscIds: ['10-原始朋克', '4-震星迪斯科'],
+    teamIds: ['caesar-fire'],
+    materialIds: ['advanced-defense-cert', 'crimson-engine', 'hamster-cage-pass'],
+    guideIds: ['caesar-shield'],
+    eventIds: ['combat-simulation'],
+  },
+};
+
+export const agents: readonly Agent[] = agentSeeds.map((agent, index) => ({
+  ...agent,
+  versionId: agentRelationSeeds[agent.id]?.versionId ?? (index < 10 ? 'v2-1' : 'v2-0'),
+  recommendedWEngineIds: agentRelationSeeds[agent.id]?.recommendedWEngineIds ?? [],
+  recommendedDriveDiscIds: agentRelationSeeds[agent.id]?.recommendedDriveDiscIds ?? [],
+  teamIds: agentRelationSeeds[agent.id]?.teamIds ?? [],
+  materialIds: agentRelationSeeds[agent.id]?.materialIds ?? [],
+  guideIds: agentRelationSeeds[agent.id]?.guideIds ?? [],
+  eventIds: agentRelationSeeds[agent.id]?.eventIds ?? [],
+}));
 
 export const featuredAgent = agents[2];
 export function findAgentById(agentId: string): Agent | undefined {

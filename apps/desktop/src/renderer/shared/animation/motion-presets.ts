@@ -9,7 +9,10 @@ export const motionDurations = {
   slow: themeMotion.durationSeconds.slow,
   route: themeMotion.durationSeconds.route,
   cinematic: themeMotion.durationSeconds.cinematic,
+  loading: themeMotion.durationSeconds.loading,
   ambient: themeMotion.durationSeconds.ambient,
+  shimmer: themeMotion.durationSeconds.shimmer,
+  spring: themeMotion.durationSeconds.spring,
 } as const;
 
 export const motionPresets = {
@@ -55,9 +58,9 @@ export const motionPresets = {
     transition: { duration: motionDurations.fast, ease: standardEase },
   },
   page: {
-    initial: { opacity: 0, y: 12, filter: 'blur(8px)' },
-    animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
-    exit: { opacity: 0, y: -6, filter: 'blur(5px)' },
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -6 },
     transition: { duration: motionDurations.route, ease: premiumEase },
   },
   sidebar: {
@@ -78,6 +81,43 @@ export const motionPresets = {
     initial: { opacity: 0, y: 16 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: motionDurations.slow, ease: premiumEase },
+  },
+  springPop: {
+    initial: { opacity: 0, scale: 0.7 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.9 },
+    transition: { type: 'spring', stiffness: 300, damping: 18 },
+  },
+  springReveal: {
+    initial: { opacity: 0, y: 24 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -12 },
+    transition: { type: 'spring', stiffness: 260, damping: 24 },
+  },
+  shimmer: {
+    animate: { x: ['-100%', '100%'] },
+    transition: {
+      duration: motionDurations.shimmer,
+      ease: 'easeInOut',
+      repeat: Number.POSITIVE_INFINITY,
+    },
+  },
+  aurora: {
+    animate: { backgroundPosition: ['0% 0%', '100% 100%'] },
+    transition: {
+      duration: motionDurations.ambient,
+      ease: 'easeInOut',
+      repeat: Number.POSITIVE_INFINITY,
+      repeatType: 'mirror',
+    },
+  },
+  glowPulse: {
+    animate: { opacity: [0.55, 1, 0.55] },
+    transition: {
+      duration: motionDurations.loading,
+      ease: 'easeInOut',
+      repeat: Number.POSITIVE_INFINITY,
+    },
   },
 } as const;
 

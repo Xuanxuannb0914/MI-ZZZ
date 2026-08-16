@@ -36,7 +36,8 @@
 ≥75%；核心 domain、认证/授权、迁移/支付式高风险（未来）≥90% lines、≥85%
 branches。新/改行覆盖率建议 ≥90%。
 
-门槛是最低线。禁止无意义断言、测试实现细节或排除困难文件来刷数字。Generated、类型声明、配置薄入口可按审议排除；排除清单有 owner。Mutation testing 可用于核心规则验证测试质量。
+门槛是最低线。禁止无意义断言、测试实现细节或排除困难文件来刷数字。Generated、类型声明、配置薄入口可按审议排除；排除清单有 owner。Mutation
+testing 可用于核心规则验证测试质量。
 
 ## 4. Unit 与 Domain 测试
 
@@ -48,13 +49,17 @@ branches。新/改行覆盖率建议 ≥90%。
 
 ## 5. Frontend Component 测试
 
-从可访问角色、名称和用户行为查询 DOM，不依赖 CSS class/内部 state。至少验证 loading、empty、error、disabled、overflow、键盘和 focus；主题视觉由 Storybook/visual test 覆盖。
+从可访问角色、名称和用户行为查询 DOM，不依赖 CSS
+class/内部 state。至少验证 loading、empty、error、disabled、overflow、键盘和 focus；主题视觉由 Storybook/visual
+test 覆盖。
 
 避免对大 DOM 做无审阅 snapshot。允许小型稳定序列化结构 snapshot，并在 PR 中审查差异。Motion 测试使用 reduced-motion 或可控时钟，不等待真实动画。
 
 ## 6. Backend Integration 测试
 
-Repository、事务、outbox、锁、约束、Redis TTL/失效和 BullMQ 幂等需连接真实兼容版本；不以 SQLite/in-memory 假装 PostgreSQL。每个 worker 测试成功、瞬态重试、永久失败、重复 job、超时和 poison message。
+Repository、事务、outbox、锁、约束、Redis
+TTL/失效和 BullMQ 幂等需连接真实兼容版本；不以 SQLite/in-memory 假装 PostgreSQL。每个 worker 测试成功、瞬态重试、永久失败、重复 job、超时和 poison
+message。
 
 数据库每 suite/test 使用独立 schema/database 或事务策略，不能依赖测试顺序。Migration 从上一生产 schema 升级并验证数据，不能只测空库。
 
@@ -68,7 +73,8 @@ Repository、事务、outbox、锁、约束、Redis TTL/失效和 BullMQ 幂等�
 
 ## 8. E2E 关键旅程
 
-PR smoke 至少包含：Desktop 启动/恢复、登录模拟、导航/深链接、搜索并打开攻略、错误/离线恢复、主题切换与键盘导航。相应功能里程碑加入 Build 保存冲突、AI 引用/取消、通知重连和自动更新测试。
+PR
+smoke 至少包含：Desktop 启动/恢复、登录模拟、导航/深链接、搜索并打开攻略、错误/离线恢复、主题切换与键盘导航。相应功能里程碑加入 Build 保存冲突、AI 引用/取消、通知重连和自动更新测试。
 
 Playwright 使用稳定 `data-testid`
 仅在语义查询不足时；ID 表达角色不含样式/位置。禁止固定 sleep，等待可观察状态、网络/事件条件。测试可并行且数据独立。
@@ -80,13 +86,16 @@ renderer；nightly/release 覆盖受支持 Windows/macOS，Linux 支持级别由
 
 Storybook 每个组件覆盖明/暗、高对比、长文本、200% 字体、reduced-motion。视觉差异必须人工审阅，不能盲目更新 baseline。
 
-自动 axe 检查不能替代人工：关键旅程验证仅键盘、焦点顺序/恢复、屏幕阅读器、颜色非唯一、缩放、Windows High Contrast。对比值在 Token CI 自动计算。
+自动 axe 检查不能替代人工：关键旅程验证仅键盘、焦点顺序/恢复、屏幕阅读器、颜色非唯一、缩放、Windows
+High Contrast。对比值在 Token CI 自动计算。
 
 ## 10. 性能测试
 
-基准固定硬件、OS、数据集、网络和版本。测量 Desktop 冷/热启动、route/input、内存、长列表滚动、API P95/P99、DB 查询/锁、WebSocket 重连、queue lag、AI 首 token/总时长/成本。
+基准固定硬件、OS、数据集、网络和版本。测量 Desktop 冷/热启动、route/input、内存、长列表滚动、API
+P95/P99、DB 查询/锁、WebSocket 重连、queue lag、AI 首 token/总时长/成本。
 
-PR 用 micro/target benchmark 防局部回归；nightly 做趋势；release 做容量与 soak。预算超出必须阻断或由 owner 提供有时限的 waiver。任何性能优化附 before/after 原始结果。
+PR 用 micro/target
+benchmark 防局部回归；nightly 做趋势；release 做容量与 soak。预算超出必须阻断或由 owner 提供有时限的 waiver。任何性能优化附 before/after 原始结果。
 
 ## 11. 安全测试
 
@@ -99,17 +108,20 @@ PR 用 micro/target benchmark 防局部回归；nightly 做趋势；release 做�
 
 ## 12. AI 质量评测
 
-建立版本化 golden set，按游戏版本/语言/问题类型分层，测引用正确性、groundedness、拒答、时效、毒性、提示注入、延迟和成本。评测数据区分训练/调优/验收，防止过拟合；模型/Prompt/retrieval 任一变化都重跑。
+建立版本化 golden
+set，按游戏版本/语言/问题类型分层，测引用正确性、groundedness、拒答、时效、毒性、提示注入、延迟和成本。评测数据区分训练/调优/验收，防止过拟合；模型/Prompt/retrieval 任一变化都重跑。
 
 LLM-as-judge 只能作为一个信号，需校准并抽样人工复核。无来源或低置信输出必须降级，不因“语句流畅”判定正确。
 
 ## 13. 测试数据
 
-使用 builder/factory 生成最小意图数据；生产数据不得进入测试。固定 fixture 记录来源、许可证和 schema version。PII 用合成值。E2E 账号/资源有唯一 run ID、自动清理和保留失败现场策略。
+使用 builder/factory 生成最小意图数据；生产数据不得进入测试。固定 fixture 记录来源、许可证和 schema
+version。PII 用合成值。E2E 账号/资源有唯一 run ID、自动清理和保留失败现场策略。
 
 ## 14. Flaky Test 政策
 
-Flaky 是缺陷。首次确认后创建 owner/issue、记录频率，可隔离但不得静默 retry 掩盖；隔离最长 7 天，核心安全/数据测试不得 quarantine。CI retry 只用于诊断并同时报告首次失败。逾期测试阻断 owner 模块发布。
+Flaky 是缺陷。首次确认后创建 owner/issue、记录频率，可隔离但不得静默 retry 掩盖；隔离最长 7 天，核心安全/数据测试不得 quarantine。CI
+retry 只用于诊断并同时报告首次失败。逾期测试阻断 owner 模块发布。
 
 ## 15. CI 分层
 
@@ -119,8 +131,11 @@ Flaky 是缺陷。首次确认后创建 owner/issue、记录频率，可隔离�
 - Nightly：全 E2E、跨平台、视觉、性能趋势、依赖深扫；
 - Release：迁移/恢复、容量/soak、安全、签名/更新与手工探索。
 
-Turbo cache 只缓存确定性且不含 secrets 的任务；测试报告、coverage、trace、截图和视频作为有保留期制品。
+Turbo
+cache 只缓存确定性且不含 secrets 的任务；测试报告、coverage、trace、截图和视频作为有保留期制品。
 
 ## 16. 发布门禁
 
-所有 required suites 通过、无过期 quarantine、覆盖率不下降、关键性能在预算、无未接受高危漏洞、契约无未批准 breaking change、迁移/恢复验证、关键 a11y 手工检查和测试证据链接齐全。
+所有 required
+suites 通过、无过期 quarantine、覆盖率不下降、关键性能在预算、无未接受高危漏洞、契约无未批准 breaking
+change、迁移/恢复验证、关键 a11y 手工检查和测试证据链接齐全。

@@ -8,7 +8,9 @@
 
 ## 1. 架构风格
 
-系统采用 **模块化单体后端 + 多进程桌面客户端 + 异步 Worker**。领域按 bounded context 组织；后端在同一代码库和初始部署单元内保持事务与运维简单，Worker 独立扩缩容。此方案保留 Clean Architecture 的依赖方向，不承担早期微服务的网络、数据一致性和部署成本。
+系统采用 **模块化单体后端 + 多进程桌面客户端 + 异步 Worker**。领域按 bounded
+context 组织；后端在同一代码库和初始部署单元内保持事务与运维简单，Worker 独立扩缩容。此方案保留 Clean
+Architecture 的依赖方向，不承担早期微服务的网络、数据一致性和部署成本。
 
 ```text
 Desktop Renderer -> Preload Contract -> Electron Main -> OS capabilities
@@ -102,7 +104,8 @@ WHY：`apps` 是可部署/可运行单元，`packages` 是有明确消费者和 
 是环境与运维资产，`docs` 是长期决策记录。禁止按技术类型在仓库根部堆放
 `components/`、`services/`、`helpers/`。
 
-`packages/types` 只承载平台基础类型（Result、Brand、基础运行时接口）；业务模型、Prisma 类型、Nest DTO、API request/response 和实体定义必须留在所属模块。API 契约未来进入独立的
+`packages/types` 只承载平台基础类型（Result、Brand、基础运行时接口）；业务模型、Prisma 类型、Nest
+DTO、API request/response 和实体定义必须留在所属模块。API 契约未来进入独立的
 `packages/contracts`，不与基础类型混用。
 
 ### 2.1 文档架构
@@ -143,7 +146,8 @@ modules/<context>/
 ```
 
 严格依赖方向是 interface/infrastructure -> application ->
-domain。DDD 只用于规则丰富、身份明确的核心域；简单查询、配置和 CRUD 采用清晰 application service，避免形式主义。
+domain。DDD 只用于规则丰富、身份明确的核心域；简单查询、配置和 CRUD 采用清晰 application
+service，避免形式主义。
 
 ## 5. 客户端运行时边界
 
@@ -153,7 +157,8 @@ domain。DDD 只用于规则丰富、身份明确的核心域；简单查询、�
 | Preload  | 参数校验、IPC 映射、能力版本协商    | 业务逻辑、通用 `ipcRenderer` 暴露       |
 | Main     | 窗口、协议、更新、系统凭据、通知    | 渲染不可信 HTML、绕过授权的通用文件访问 |
 
-所有 IPC channel 采用 `<namespace>:<version>:<verb>`，请求和返回均运行时校验，携带 correlation ID；长任务通过取消令牌和进度事件完成，不阻塞 main loop。
+所有 IPC channel 采用 `<namespace>:<version>:<verb>`，请求和返回均运行时校验，携带 correlation
+ID；长任务通过取消令牌和进度事件完成，不阻塞 main loop。
 
 ## 6. 数据与消息一致性
 
@@ -167,7 +172,8 @@ domain。DDD 只用于规则丰富、身份明确的核心域；简单查询、�
 
 初始生产拓扑包括静态签名 Desktop 制品、无状态 API 副本、独立 Worker 副本、托管 PostgreSQL、Redis 和对象存储/CDN。API 与 Worker 使用相同源版本但不同启动入口和扩缩容策略。
 
-环境分为 local、test、staging、production；配置遵循环境变量/secret provider 注入，启动时校验。禁止通过 `NODE_ENV`
+环境分为 local、test、staging、production；配置遵循环境变量/secret
+provider 注入，启动时校验。禁止通过 `NODE_ENV`
 之外的隐式分支改变业务规则；环境差异必须显式配置并有 schema。
 
 ### 扩缩容触发指标
@@ -182,10 +188,12 @@ domain。DDD 只用于规则丰富、身份明确的核心域；简单查询、�
 
 ## 8. 插件架构（未来）
 
-插件不是 Node 依赖，也不得进入 Electron main 进程。平台采用：签名 manifest + 插件 ID/版本 + 声明式贡献点 + 能力授权 + 隔离执行环境 +
+插件不是 Node 依赖，也不得进入 Electron
+main 进程。平台采用：签名 manifest + 插件 ID/版本 + 声明式贡献点 + 能力授权 + 隔离执行环境 +
 host-mediated API。
 
-首批贡献点仅考虑命令、内容面板、数据解析器和只读上下文菜单；网络、文件、剪贴板、通知和账号信息是独立权限。每次安装展示权限差异，运行时可撤销。SDK 遵循 SemVer，Host 提供最小/最大 API 版本协商、超时、配额、崩溃隔离和 kill switch。引入前必须 ADR 选择 Web Worker、Utility Process 或 WASM 隔离方案并完成威胁模型。
+首批贡献点仅考虑命令、内容面板、数据解析器和只读上下文菜单；网络、文件、剪贴板、通知和账号信息是独立权限。每次安装展示权限差异，运行时可撤销。SDK 遵循 SemVer，Host 提供最小/最大 API 版本协商、超时、配额、崩溃隔离和 kill
+switch。引入前必须 ADR 选择 Web Worker、Utility Process 或 WASM 隔离方案并完成威胁模型。
 
 ## 9. 可观测性
 

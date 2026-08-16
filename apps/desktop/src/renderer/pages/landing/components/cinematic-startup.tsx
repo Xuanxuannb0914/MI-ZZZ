@@ -31,7 +31,7 @@ export function CinematicStartup({ isExiting, onEnterHub }: CinematicStartupProp
     if (!root) return;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     playStartupSound();
-    const readyTimer = window.setTimeout(() => setIsReady(true), prefersReducedMotion ? 900 : 6800);
+    const readyTimer = window.setTimeout(() => setIsReady(true), prefersReducedMotion ? 200 : 600);
 
     const context = gsap.context(() => {
       const timeline = gsap.timeline({
@@ -48,7 +48,7 @@ export function CinematicStartup({ isExiting, onEnterHub }: CinematicStartupProp
         .to('.cinematic-title', { opacity: 1, y: 0, duration: 0.8 }, '-=0.35')
         .to('.cinematic-subtitle', { opacity: 1, y: 0, duration: 0.7 }, '-=0.28')
         .to('.cinematic-meta', { opacity: 1, duration: 0.55 }, '-=0.14')
-        .to({}, { duration: prefersReducedMotion ? 0.25 : 3.2 });
+        .to({}, { duration: prefersReducedMotion ? 0.1 : 0.4 });
 
       return () => timeline.kill();
     }, root);
@@ -109,7 +109,7 @@ export function CinematicStartup({ isExiting, onEnterHub }: CinematicStartupProp
         <p className="cinematic-kicker">ANIME GAME HUB / 001</p>
         <h1 className="cinematic-title">Asteris</h1>
         <p className="cinematic-subtitle">二次元游戏 · 攻略 · 数据 · 工具</p>
-        <p className="cinematic-meta">智能档案正在连接</p>
+        <p className="cinematic-meta">本地档案已就绪</p>
       </div>
       <motion.button
         type="button"
@@ -123,10 +123,10 @@ export function CinematicStartup({ isExiting, onEnterHub }: CinematicStartupProp
         }}
       >
         <span className="cinematic-enter-line" aria-hidden="true" />
-        <span>{isReady ? '点击进入' : '正在建立连接...'}</span>
+        <span>{isReady ? '点击进入' : '进入游戏中心'}</span>
         <span className="cinematic-enter-line" aria-hidden="true" />
       </motion.button>
-      <span className="cinematic-corner cinematic-corner-top">PLATFORM / ONLINE</span>
+      <span className="cinematic-corner cinematic-corner-top">PLATFORM / READY</span>
       <span className="cinematic-corner cinematic-corner-bottom">LOCAL DESKTOP · 2026</span>
     </motion.main>
   );

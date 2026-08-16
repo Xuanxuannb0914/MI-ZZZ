@@ -11,7 +11,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist/renderer',
-    emptyOutDir: false,
-    sourcemap: true,
+    // 清空旧的 renderer 产物，避免多次构建后残留旧 hash 文件与 sourcemap
+    emptyOutDir: true,
+    sourcemap: false,
   },
 });

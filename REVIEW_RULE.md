@@ -109,13 +109,16 @@ commit/证据”“不改 + 理由”“后续 issue”，不得只 resolve。
 
 ## 11. 审批与再评审
 
-代码变化使先前审批失效；机械生成/冲突解决若可证明无语义变化可由 reviewer 快速确认。最后提交者不能在批准后加入未评审行为。所有 Blocker/Major thread 关闭且 required approvals/CI 有效才可合并。
+代码变化使先前审批失效；机械生成/冲突解决若可证明无语义变化可由 reviewer 快速确认。最后提交者不能在批准后加入未评审行为。所有 Blocker/Major
+thread 关闭且 required approvals/CI 有效才可合并。
 
-紧急 hotfix 仍需双人原则（无法满足时按 incident override），缩减的是范围与等待，不是安全、数据和回滚检查。事后 24 小时内补全常规评审与测试。
+紧急 hotfix 仍需双人原则（无法满足时按 incident
+override），缩减的是范围与等待，不是安全、数据和回滚检查。事后 24 小时内补全常规评审与测试。
 
 ## 12. 评审效能
 
-团队跟踪 review wait time、首次反馈时间、返工轮次、post-merge defect 和 PR 大小，但不以“评论数/审批速度”评价个人。目标工作时段 4 小时内首次响应、1 个工作日内完成首轮；跨时区由 owner 调度。
+团队跟踪 review wait time、首次反馈时间、返工轮次、post-merge
+defect 和 PR 大小，但不以“评论数/审批速度”评价个人。目标工作时段 4 小时内首次响应、1 个工作日内完成首轮；跨时区由 owner 调度。
 
 重复评论应转成 lint、模板、测试或文档。每季度抽样已合并 PR 检查规则有效性，删除无价值门禁。
 

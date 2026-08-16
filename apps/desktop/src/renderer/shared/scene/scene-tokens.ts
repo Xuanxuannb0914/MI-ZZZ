@@ -10,6 +10,6 @@ export const scenePalette = {
 } as const;
 
 export const scenePerformance = {
-  maxDpr: 1.5,
-  landingParticles: 1800,
+  maxDpr: 1.25,
+  landingParticles: 800,
 } as const;

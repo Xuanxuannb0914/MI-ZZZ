@@ -20,4 +20,7 @@ export interface Material {
   readonly relatedAgents: readonly string[];
   readonly relatedWeapons: readonly string[];
   readonly relatedGuides: readonly string[];
+  readonly agentIds?: readonly string[];
+  readonly wEngineIds?: readonly string[];
+  readonly eventIds?: readonly string[];
 }

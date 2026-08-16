@@ -8,11 +8,15 @@ export const motion = {
     cinematic: '900ms',
     loading: '1800ms',
     ambient: '4800ms',
+    shimmer: '2000ms',
+    spring: '600ms',
   },
   easing: {
     enter: 'cubic-bezier(0.16, 1, 0.3, 1)',
     exit: 'cubic-bezier(0.7, 0, 0.84, 0)',
     standard: 'cubic-bezier(0.2, 0, 0, 1)',
+    spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+    bounce: 'cubic-bezier(0.68, -0.55, 0.27, 1.55)',
   },
   durationSeconds: {
     fast: 0.15,
@@ -22,6 +26,8 @@ export const motion = {
     cinematic: 0.9,
     loading: 1.8,
     ambient: 4.8,
+    shimmer: 2.0,
+    spring: 0.6,
   },
   distance: {
     pressed: '1px',

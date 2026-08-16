@@ -11,12 +11,14 @@ interface AppStore {
   readonly completedDailyTaskIds: readonly string[];
   readonly completedWeeklyTaskIds: readonly string[];
   readonly searchKeyword: string;
+  readonly recentSearches: readonly string[];
   readonly isSidebarOpen: boolean;
   readonly isSidebarCollapsed: boolean;
   readonly themeMode: 'dark' | 'light';
   readonly performanceMode: 'quality' | 'balanced';
   readonly animationEnabled: boolean;
   readonly setSearchKeyword: (keyword: string) => void;
+  readonly addRecentSearch: (keyword: string) => void;
   readonly toggleFavoriteAgent: (agentId: string) => void;
   readonly toggleFavoriteGuide: (guideId: string) => void;
   readonly toggleFavoriteEvent: (eventId: string) => void;
@@ -47,12 +49,24 @@ export const useAppStore = create<AppStore>()(
       completedDailyTaskIds: ['coffee', 'scratch-card'],
       completedWeeklyTaskIds: ['ridu-fund'],
       searchKeyword: '',
+      recentSearches: [],
       isSidebarOpen: false,
       isSidebarCollapsed: false,
       themeMode: 'dark',
       performanceMode: 'quality',
       animationEnabled: true,
       setSearchKeyword: (searchKeyword) => set({ searchKeyword }),
+      addRecentSearch: (keyword) =>
+        set((state) => {
+          const normalized = keyword.trim();
+          if (!normalized) return state;
+          return {
+            recentSearches: [
+              normalized,
+              ...state.recentSearches.filter((item) => item !== normalized),
+            ].slice(0, 6),
+          };
+        }),
       toggleFavoriteAgent: (agentId) =>
         set((state) => ({
           favoriteAgentIds: state.favoriteAgentIds.includes(agentId)
@@ -136,6 +150,7 @@ export const useAppStore = create<AppStore>()(
         themeMode,
         performanceMode,
         animationEnabled,
+        recentSearches,
       }) => ({
         favoriteAgentIds,
         favoriteEventIds,
@@ -149,8 +164,9 @@ export const useAppStore = create<AppStore>()(
         themeMode,
         performanceMode,
         animationEnabled,
+        recentSearches,
       }),
-      version: 3,
+      version: 4,
       migrate: (persistedState, version) => {
         if (!persistedState || typeof persistedState !== 'object') {
           return persistedState as AppStore;
@@ -174,6 +190,7 @@ export const useAppStore = create<AppStore>()(
         }
         return {
           ...state,
+          recentSearches: Array.isArray(state.recentSearches) ? state.recentSearches : [],
           completedDailyTaskIds: Array.isArray(state.completedDailyTaskIds)
             ? state.completedDailyTaskIds
             : ['coffee', 'scratch-card'],

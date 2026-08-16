@@ -25,7 +25,16 @@ import {
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app-store';
-import { agents, findAgentById, guides } from '../../shared/content';
+import {
+  agents,
+  findAgentById,
+  findDriveDiscById,
+  findVersionById,
+  findWEngineById,
+  guides,
+  resolveContentLinks,
+  teams,
+} from '../../shared/content';
 import { Page } from '../../shared/ui/page';
 import { PageTransition } from '../../shared/ui/page-transition';
 import { Tag } from '../../shared/ui/tag';
@@ -75,6 +84,17 @@ export default function AgentDetailPage() {
   const relatedGuides = guides
     .filter((guide) => guide.title.includes(agent.name) || guide.category === '角色养成')
     .slice(0, 3);
+  const recommendedWEngines = (agent.recommendedWEngineIds ?? [])
+    .map(findWEngineById)
+    .filter((item): item is NonNullable<ReturnType<typeof findWEngineById>> => Boolean(item));
+  const recommendedDriveDiscs = (agent.recommendedDriveDiscIds ?? [])
+    .map(findDriveDiscById)
+    .filter((item): item is NonNullable<ReturnType<typeof findDriveDiscById>> => Boolean(item));
+  const recommendedTeams = (agent.teamIds ?? [])
+    .map((teamId) => teams.find((team) => team.id === teamId))
+    .filter((item): item is NonNullable<(typeof teams)[number]> => Boolean(item));
+  const relatedLinks = resolveContentLinks(agent).slice(0, 8);
+  const version = agent.versionId ? findVersionById(agent.versionId) : undefined;
 
   const shareAgent = async () => {
     const shareUrl = `${window.location.origin}${window.location.pathname}#/agent/${agent.id}`;
@@ -185,7 +205,7 @@ export default function AgentDetailPage() {
                 {teamAgents.map((member) => (
                   <Link
                     key={member.id}
-                    to={`/agent/${member.id}`}
+                    to={`/zzz/agents/${member.id}`}
                     className="flex items-center gap-content rounded-lg border border-border-subtle bg-surface-1 p-content hover:bg-surface-2"
                   >
                     <img
@@ -206,18 +226,55 @@ export default function AgentDetailPage() {
               </div>
             </DetailPanel>
             <DetailPanel title="推荐音擎" icon={WandSparkles}>
-              <p className="text-title3 font-semibold text-text-primary">
-                {agent.recommendedWeapon}
-              </p>
-              <p className="mt-compact">当前版本本地培养档案中的优先推荐。</p>
+              {recommendedWEngines.length ? (
+                <div className="flex flex-wrap gap-control">
+                  {recommendedWEngines.map((item) => (
+                    <Link
+                      key={item.id}
+                      to={`/zzz/w-engines/${item.id}`}
+                      className="rounded-md border border-border-subtle bg-surface-1 p-content hover:bg-surface-2"
+                    >
+                      <strong className="block text-label text-text-primary">{item.name}</strong>
+                      <span className="mt-compact block text-caption">{item.effect}</span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <p className="text-title3 font-semibold text-text-primary">
+                    {agent.recommendedWeapon}
+                  </p>
+                  <p className="mt-compact">当前版本本地培养档案中的优先推荐。</p>
+                </>
+              )}
             </DetailPanel>
             <DetailPanel title="推荐驱动盘" icon={ShieldCheck}>
               <div className="flex flex-wrap gap-control">
-                {agent.recommendedDriveDisc.map((disc) => (
-                  <Tag key={disc}>{disc}</Tag>
-                ))}
+                {recommendedDriveDiscs.length
+                  ? recommendedDriveDiscs.map((disc) => (
+                      <Link key={disc.id} to={`/zzz/drive-discs/${disc.id}`}>
+                        <Tag>{disc.name}</Tag>
+                      </Link>
+                    ))
+                  : agent.recommendedDriveDisc.map((disc) => <Tag key={disc}>{disc}</Tag>)}
               </div>
             </DetailPanel>
+            {recommendedTeams.length ? (
+              <DetailPanel title="成型配队" icon={UsersRound}>
+                <div className="grid gap-content sm:grid-cols-2">
+                  {recommendedTeams.map((team) => (
+                    <Link
+                      key={team.id}
+                      to={`/zzz/teams/${team.id}`}
+                      className="rounded-md border border-border-subtle bg-surface-1 p-content hover:bg-surface-2"
+                    >
+                      <strong className="block text-label text-text-primary">{team.name}</strong>
+                      <span className="mt-compact block text-caption">{team.focus}</span>
+                    </Link>
+                  ))}
+                </div>
+              </DetailPanel>
+            ) : null}
             <DetailPanel title="培养思路" icon={Sparkles}>
               <p>
                 优先完成核心被动阈值，再追求完美副词条。将爆发窗口对齐队伍失衡与支援增益，在自由训练中不断优化循环。
@@ -239,6 +296,17 @@ export default function AgentDetailPage() {
                 ))}
               </div>
             </DetailPanel>
+            {relatedLinks.length ? (
+              <DetailPanel title="知识网络" icon={Sparkles}>
+                <div className="flex flex-wrap gap-control">
+                  {relatedLinks.map((item) => (
+                    <Link key={`${item.type}-${item.id}`} to={item.to}>
+                      <Tag>{item.title}</Tag>
+                    </Link>
+                  ))}
+                </div>
+              </DetailPanel>
+            ) : null}
           </div>
           <aside className="space-y-section">
             <DetailPanel title="培养材料" icon={Star}>
@@ -277,6 +345,10 @@ export default function AgentDetailPage() {
                 <dd className="text-right text-text-primary">{agent.specialty}</dd>
                 <dt>阵营</dt>
                 <dd className="text-right text-text-primary">{agent.faction}</dd>
+                <dt>版本</dt>
+                <dd className="text-right text-text-primary">
+                  {version ? `${version.code} ${version.name}` : '资料整理中'}
+                </dd>
               </dl>
             </DetailPanel>
             <DetailPanel title="最近改动" icon={History}>

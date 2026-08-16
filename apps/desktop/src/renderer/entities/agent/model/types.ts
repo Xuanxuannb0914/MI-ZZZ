@@ -22,4 +22,11 @@ export interface Agent {
   readonly recommendedDriveDisc: readonly string[];
   readonly materials: readonly string[];
   readonly skills: readonly string[];
+  readonly versionId?: string;
+  readonly recommendedWEngineIds?: readonly string[];
+  readonly recommendedDriveDiscIds?: readonly string[];
+  readonly teamIds?: readonly string[];
+  readonly materialIds?: readonly string[];
+  readonly guideIds?: readonly string[];
+  readonly eventIds?: readonly string[];
 }

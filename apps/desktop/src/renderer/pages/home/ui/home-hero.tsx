@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motionPresets } from '../../../shared/animation/motion-presets';
+import { Magnetic } from '../../../shared/ui/magnetic';
 
 export const HomeHero = memo(function HomeHero() {
   const navigate = useNavigate();
@@ -25,15 +26,19 @@ export const HomeHero = memo(function HomeHero() {
           </span>
         </div>
         <p className="workspace-hero-kicker">当前限定活动</p>
-        <h1 id="workspace-hero-title">霜月映照，新章已启。</h1>
+        <h1 id="workspace-hero-title" className="ggh-text-glow">
+          霜月映照，<span className="ggh-text-gradient">新章已启</span>。
+        </h1>
         <p className="workspace-hero-description">
           星见雅限定频段与周年庆活动进行中。今日材料、活动进度与培养计划已经同步。
         </p>
         <div className="workspace-hero-actions">
-          <Button size="comfortable" onClick={() => navigate('/zzz/events')}>
-            <Play aria-hidden="true" size={16} />
-            进入活动中心
-          </Button>
+          <Magnetic>
+            <Button size="comfortable" onClick={() => navigate('/zzz/events')}>
+              <Play aria-hidden="true" size={16} />
+              进入活动中心
+            </Button>
+          </Magnetic>
           <Link to="/zzz/planner" className="workspace-secondary-action">
             <CalendarDays aria-hidden="true" size={16} />
             查看今日养成

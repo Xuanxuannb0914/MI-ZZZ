@@ -10,7 +10,8 @@
 
 ## 1. 愿景与成功定义
 
-Game Guide Hub 要成为玩家研究游戏、组织 Build、验证资料、调用 AI 与连接可信社区资源的统一桌面工作台。成功不是“功能最多”，而是用户能快速定位可信答案、理解来源与时效、保留研究上下文，并在弱网或部分服务故障时继续完成核心任务。
+Game Guide
+Hub 要成为玩家研究游戏、组织 Build、验证资料、调用 AI 与连接可信社区资源的统一桌面工作台。成功不是“功能最多”，而是用户能快速定位可信答案、理解来源与时效、保留研究上下文，并在弱网或部分服务故障时继续完成核心任务。
 
 ### 1.1 目标用户
 
@@ -65,7 +66,8 @@ Game Guide Hub 要成为玩家研究游戏、组织 Build、验证资料、调�
    客户端通过 OpenAPI/AsyncAPI 生成契约消费后端，防止直接导入服务端 DTO 形成隐式耦合。
 3. **数据所有权唯一。** PostgreSQL 是事实源；Redis、搜索索引和客户端缓存都可重建，避免多主冲突。
 4. **安全边界默认拒绝。** Electron IPC、插件能力、外部导航和后台任务均采用 allowlist 与输入验证。
-5. **可观测性内建。** Trace ID、结构化日志、指标和审计事件从第一条生产路径开始存在，否则无法可靠扩展。
+5. **可观测性内建。** Trace
+   ID、结构化日志、指标和审计事件从第一条生产路径开始存在，否则无法可靠扩展。
 6. **可回滚交付。** 前向兼容数据库迁移、特性开关、签名制品与分阶段发布是“完成”的组成部分。
 7. **无障碍是功能。** 键盘、屏幕阅读器、缩放和减少动态效果进入 Definition of Done，而非发布后修补。
 8. **测量后优化。** 以性能预算、Profiler 和真实指标识别热点，避免用复杂缓存掩盖模型问题。
@@ -85,7 +87,9 @@ Game Guide Hub 要成为玩家研究游戏、组织 Build、验证资料、调�
 | Quality      | ESLint + Biome + Prettier + Husky + Commitlint + Vitest + Playwright | 分工明确覆盖语义、格式、提交门禁、单元与端到端 |
 | Delivery     | Git Flow + Conventional Commits + 签名制品                           | 可审计发布、自动版本与回滚                     |
 
-版本必须使用根级 `packageManager`、Corepack、`.nvmrc`/Volta 之一和 lockfile 精确固定；不在文档阶段虚构版本号。选择 Node LTS 和依赖版本时需记录 ADR，并验证 Electron/Node/Prisma/NestJS 兼容矩阵。
+版本必须使用根级
+`packageManager`、Corepack、`.nvmrc`/Volta 之一和 lockfile 精确固定；不在文档阶段虚构版本号。选择 Node
+LTS 和依赖版本时需记录 ADR，并验证 Electron/Node/Prisma/NestJS 兼容矩阵。
 
 ## 5. 全局非功能要求
 
