@@ -6,7 +6,7 @@
     "dev": "concurrently -k -n renderer,main,electron \"vite --host 127.0.0.1\" \"tsc -p tsconfig.main.json --watch --preserveWatchOutput\" \"wait-on http://127.0.0.1:5173 dist/electron/main/index.js && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron dist/electron/main/index.js\"",
     "build": "tsc -p tsconfig.main.json && vite build",
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit",
+    "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.test.json",
     "test": "vitest run --passWithNoTests",
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
   },

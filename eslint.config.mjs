@@ -15,6 +15,7 @@ export default tseslint.config(
       '**/*.config.mjs',
       '**/*.config.ts',
       'scripts/**',
+      '**/tests/fixtures/**',
     ],
   },
   eslint.configs.recommended,
