@@ -75,7 +75,11 @@ function GenshinScene() {
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const matchMedia = (
+      window as unknown as { matchMedia?: (query: string) => MediaQueryList }
+    ).matchMedia?.bind(window);
+    if (!matchMedia) return;
+    const mediaQuery = matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(mediaQuery.matches);
     const onChange = () => setReducedMotion(mediaQuery.matches);
     mediaQuery.addEventListener('change', onChange);
@@ -193,7 +197,10 @@ export function GameIntroOverlay({ game, onDone }: GameIntroOverlayProps) {
   useEffect(() => {
     if (!game) return;
     doneRef.current = false;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const matchMedia = (
+      window as unknown as { matchMedia?: (query: string) => MediaQueryList }
+    ).matchMedia?.bind(window);
+    const reduced = matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     timerRef.current = window.setTimeout(finish, reduced ? 700 : INTRO_MS);
     return () => {
       if (timerRef.current !== undefined) window.clearTimeout(timerRef.current);
