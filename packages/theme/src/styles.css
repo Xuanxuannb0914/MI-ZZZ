@@ -814,7 +814,12 @@
     width: 40%;
     pointer-events: none;
     content: '';
-    background: linear-gradient(90deg, transparent, var(--ggh-color-reflection-strong), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--ggh-color-reflection-strong),
+      transparent
+    );
     opacity: 0;
     transform: skewX(-18deg);
     transition: opacity var(--ggh-motion-fast) var(--ggh-ease-standard);

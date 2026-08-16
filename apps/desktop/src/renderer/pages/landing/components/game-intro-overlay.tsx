@@ -42,9 +42,9 @@ const STAR_FIELD: readonly StarSpec[] = [
 function Stars({ withMotion = false }: { readonly withMotion?: boolean }) {
   return (
     <div className={`gi-stars${withMotion ? ' gi-stars--motion' : ''}`}>
-      {STAR_FIELD.map((star, index) => (
+      {STAR_FIELD.map((star) => (
         <span
-          key={index}
+          key={`${star.left}-${star.top}`}
           className="gi-star"
           style={{
             left: star.left,

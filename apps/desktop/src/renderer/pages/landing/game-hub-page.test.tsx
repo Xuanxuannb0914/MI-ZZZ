@@ -52,10 +52,7 @@ describe('GameHubPage', () => {
     fireEvent.click(screen.getByRole('button', { name: '进入绝区零' }));
 
     // 开场动画播放约 2.6s 后自动进入对应工作区
-    await waitFor(
-      () => expect(screen.getByText('绝区零工作区')).toBeTruthy(),
-      { timeout: 4000 },
-    );
+    await waitFor(() => expect(screen.getByText('绝区零工作区')).toBeTruthy(), { timeout: 4000 });
   });
 
   it('keeps coming-soon games in the hub while playing its intro', async () => {
