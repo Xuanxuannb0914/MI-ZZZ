@@ -16,7 +16,6 @@
 - Phase 1 Enterprise Project Foundation：初始化 pnpm/Turborepo
   Monorepo、Desktop/API/Worker 运行时骨架、共享包、设计 Token、Radix UI
   primitives、Storybook、Vitest、Playwright、CI、Husky 与 Commitlint。
-- 新增 [STANDARDS.md](./STANDARDS.md#14-开发说明)，统一规范安装、运行、调试和贡献流程。
 - 建立项目总纲、架构、前后端、设计系统、数据库、API、编码、命名、Git、测试、评审与 AI
   Prompt 工作流的文档基线。
 - 定义面向 Desktop、API、Worker、共享包、未来 Web/Admin/Mobile 与插件 SDK 的 Monorepo 目标结构。
@@ -27,8 +26,9 @@
 
 - Header 全局搜索改为统一本地索引，支持角色、攻略、活动、资讯、版本、音擎和驱动盘。
 - 收藏状态扩展到角色、攻略、活动和配队，并通过 Zustand persist 保留在本地设备。
-- 精简根目录文档结构：根级 15 份规范合并为 `docs/` 下 6 份文档（master / architecture / frontend /
-  data-api / engineering / workflow），README 维护唯一入口索引。
+- 精简根目录文档结构：根级 15 份规范合并为 `docs/` 下 7 份文档（master / architecture / frontend /
+  data-api / engineering / workflow / development），README 维护唯一入口索引；移除根级
+  `STANDARDS.md` 单文件版，内容已全部并入 `docs/` 结构。
 
 ### Deprecated
 
