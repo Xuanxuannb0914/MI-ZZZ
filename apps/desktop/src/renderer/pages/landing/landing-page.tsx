@@ -1,7 +1,7 @@
 import { motion as themeMotion } from '@game-guide-hub/theme';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CinematicStartup } from './components/cinematic-startup';
+import { AnimeStartup } from './components/anime-startup';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export default function LandingPage() {
 
   return (
     <div className="landing-act-root">
-      <CinematicStartup isExiting={isCinematicExiting} onEnterHub={handleEnterHub} />
+      <AnimeStartup isExiting={isCinematicExiting} onEnterHub={handleEnterHub} />
     </div>
   );
 }

@@ -27,6 +27,8 @@
 
 - Header 全局搜索改为统一本地索引，支持角色、攻略、活动、资讯、版本、音擎和驱动盘。
 - 收藏状态扩展到角色、攻略、活动和配队，并通过 Zustand persist 保留在本地设备。
+- 精简根目录文档结构：根级 15 份规范合并为 `docs/` 下 6 份文档（master / architecture / frontend /
+  data-api / engineering / workflow），README 维护唯一入口索引。
 
 ### Deprecated
 

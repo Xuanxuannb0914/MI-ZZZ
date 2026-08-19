@@ -160,6 +160,154 @@
   --ggh-color-text-secondary: var(--ggh-color-text-primary);
 }
 
+/* ============================================================
+   游戏专属风格模式（Game Theme Modes）
+   通过 app-shell 依据路由首段设置 <html data-game-theme="...">，
+   每款游戏拥有独立的配色、渐变与辉光，dark / light 均适配。
+   ============================================================ */
+
+/* 绝区零 ZZZ —— 新艾利都街头霓虹 / 暖调混凝土 */
+[data-game-theme='zzz'] {
+  --ggh-color-canvas: #0b0906;
+  --ggh-color-canvas-secondary: #14100a;
+  --ggh-color-surface-1: #1a1510;
+  --ggh-color-surface-2: #221b13;
+  --ggh-color-surface-3: #2d2317;
+  --ggh-color-surface-floating: #241d14;
+  --ggh-color-text-primary: #fdf7ea;
+  --ggh-color-text-secondary: #cfc3aa;
+  --ggh-color-text-tertiary: #93846a;
+  --ggh-color-primary: #ffd84d;
+  --ggh-color-primary-hover: #ffe680;
+  --ggh-color-secondary: #ff6b35;
+  --ggh-color-accent: #ffb020;
+  --ggh-color-accent-orange: #ff8a3d;
+  --ggh-color-on-action-primary: #241b02;
+  --ggh-color-glow: rgb(255 216 77 / 34%);
+  --ggh-color-overlay: rgb(9 7 4 / 78%);
+  --ggh-gradient-page: linear-gradient(135deg, #0b0906 0%, #181207 54%, #1a0f06 100%);
+  --ggh-gradient-primary: linear-gradient(135deg, #ffd84d 0%, #ffb020 48%, #ff6b35 100%);
+  --ggh-gradient-workspace:
+    radial-gradient(circle at 72% 0%, var(--ggh-color-secondary-soft), transparent 38%),
+    radial-gradient(circle at 8% 74%, var(--ggh-color-primary-soft), transparent 34%),
+    var(--ggh-gradient-page);
+  --ggh-glow-primary: 0 0 2.5rem rgb(255 216 77 / 26%);
+  --ggh-glow-secondary: 0 0 2.5rem rgb(255 107 53 / 24%);
+}
+
+/* 原神 Genshin —— 提瓦特天空岛 / 幻想青蓝 */
+[data-game-theme='genshin'] {
+  --ggh-color-canvas: #060f1c;
+  --ggh-color-canvas-secondary: #0a1728;
+  --ggh-color-surface-1: #0e2036;
+  --ggh-color-surface-2: #142a44;
+  --ggh-color-surface-3: #1c3755;
+  --ggh-color-surface-floating: #162f4b;
+  --ggh-color-text-primary: #eef6ff;
+  --ggh-color-text-secondary: #b9d1ea;
+  --ggh-color-text-tertiary: #7c9cbe;
+  --ggh-color-primary: #5aa0e8;
+  --ggh-color-primary-hover: #7fb8f0;
+  --ggh-color-secondary: #9fd0ff;
+  --ggh-color-accent: #6fe3c1;
+  --ggh-color-accent-orange: #ffcf8a;
+  --ggh-color-on-action-primary: #06101f;
+  --ggh-color-glow: rgb(90 160 232 / 32%);
+  --ggh-color-overlay: rgb(4 10 20 / 78%);
+  --ggh-gradient-page: linear-gradient(135deg, #060f1c 0%, #0c1f38 54%, #0b1830 100%);
+  --ggh-gradient-primary: linear-gradient(135deg, #5aa0e8 0%, #7fd0ff 48%, #6fe3c1 100%);
+  --ggh-gradient-workspace:
+    radial-gradient(circle at 72% 0%, var(--ggh-color-secondary-soft), transparent 38%),
+    radial-gradient(circle at 8% 74%, var(--ggh-color-primary-soft), transparent 34%),
+    var(--ggh-gradient-page);
+  --ggh-glow-primary: 0 0 2.5rem rgb(90 160 232 / 28%);
+  --ggh-glow-secondary: 0 0 2.5rem rgb(159 208 255 / 26%);
+}
+
+/* 崩坏：星穹铁道 Star Rail —— 星轨深空 / 星际紫蓝 */
+[data-game-theme='starrail'] {
+  --ggh-color-canvas: #070a18;
+  --ggh-color-canvas-secondary: #0b1022;
+  --ggh-color-surface-1: #101633;
+  --ggh-color-surface-2: #161f42;
+  --ggh-color-surface-3: #1e2a55;
+  --ggh-color-surface-floating: #182246;
+  --ggh-color-text-primary: #eef1ff;
+  --ggh-color-text-secondary: #bcc4e8;
+  --ggh-color-text-tertiary: #7f89b5;
+  --ggh-color-primary: #8fb6ff;
+  --ggh-color-primary-hover: #a9c6ff;
+  --ggh-color-secondary: #5b8cff;
+  --ggh-color-accent: #c9a6ff;
+  --ggh-color-accent-orange: #ff9ecf;
+  --ggh-color-on-action-primary: #070b1c;
+  --ggh-color-glow: rgb(143 182 255 / 32%);
+  --ggh-color-overlay: rgb(4 6 16 / 80%);
+  --ggh-gradient-page: linear-gradient(135deg, #070a18 0%, #101534 54%, #150f2e 100%);
+  --ggh-gradient-primary: linear-gradient(135deg, #8fb6ff 0%, #5b8cff 48%, #c9a6ff 100%);
+  --ggh-gradient-workspace:
+    radial-gradient(circle at 72% 0%, var(--ggh-color-secondary-soft), transparent 38%),
+    radial-gradient(circle at 8% 74%, var(--ggh-color-primary-soft), transparent 34%),
+    var(--ggh-gradient-page);
+  --ggh-glow-primary: 0 0 2.5rem rgb(143 182 255 / 28%);
+  --ggh-glow-secondary: 0 0 2.5rem rgb(201 166 255 / 26%);
+}
+
+/* 鸣潮 Wuthering Waves —— 声骸海潮 / 深邃青绿 */
+[data-game-theme='wuwa'] {
+  --ggh-color-canvas: #04120f;
+  --ggh-color-canvas-secondary: #071a15;
+  --ggh-color-surface-1: #0b241d;
+  --ggh-color-surface-2: #102d25;
+  --ggh-color-surface-3: #173a30;
+  --ggh-color-surface-floating: #123027;
+  --ggh-color-text-primary: #eafbf4;
+  --ggh-color-text-secondary: #b7e0d2;
+  --ggh-color-text-tertiary: #7cae9d;
+  --ggh-color-primary: #6fe3c1;
+  --ggh-color-primary-hover: #8cefd2;
+  --ggh-color-secondary: #4fb8e8;
+  --ggh-color-accent: #4fd6d6;
+  --ggh-color-accent-orange: #ffd08a;
+  --ggh-color-on-action-primary: #04221b;
+  --ggh-color-glow: rgb(111 227 193 / 30%);
+  --ggh-color-overlay: rgb(3 14 11 / 80%);
+  --ggh-gradient-page: linear-gradient(135deg, #04120f 0%, #0a241d 54%, #07181f 100%);
+  --ggh-gradient-primary: linear-gradient(135deg, #6fe3c1 0%, #4fb8e8 48%, #4fd6d6 100%);
+  --ggh-gradient-workspace:
+    radial-gradient(circle at 72% 0%, var(--ggh-color-secondary-soft), transparent 38%),
+    radial-gradient(circle at 8% 74%, var(--ggh-color-primary-soft), transparent 34%),
+    var(--ggh-gradient-page);
+  --ggh-glow-primary: 0 0 2.5rem rgb(111 227 193 / 26%);
+  --ggh-glow-secondary: 0 0 2.5rem rgb(79 184 232 / 26%);
+}
+
+/* 浅色模式下：仅着色主/辅强调色，画布保持统一明亮基底 */
+.theme-light[data-game-theme='zzz'] {
+  --ggh-color-primary: #d99b00;
+  --ggh-color-primary-hover: #b88500;
+  --ggh-color-secondary: #e0521e;
+  --ggh-color-accent: #d08a00;
+}
+.theme-light[data-game-theme='genshin'] {
+  --ggh-color-primary: #2f7fc4;
+  --ggh-color-primary-hover: #276da8;
+  --ggh-color-secondary: #3e9bd6;
+  --ggh-color-accent: #1f9c7c;
+}
+.theme-light[data-game-theme='starrail'] {
+  --ggh-color-primary: #4a6fd6;
+  --ggh-color-primary-hover: #3f5eb8;
+  --ggh-color-secondary: #6b4fd6;
+  --ggh-color-accent: #8a5cd6;
+}
+.theme-light[data-game-theme='wuwa'] {
+  --ggh-color-primary: #14977a;
+  --ggh-color-primary-hover: #118168;
+  --ggh-color-secondary: #2b8fc0;
+  --ggh-color-accent: #0f9f9f;
+}
+
 @theme inline {
   --font-display: var(--font-display);
   --font-body: var(--font-body);

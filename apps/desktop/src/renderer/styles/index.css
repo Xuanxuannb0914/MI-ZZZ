@@ -8054,13 +8054,9 @@
   color: rgb(255 255 255 / 82%);
   background:
     radial-gradient(ellipse 90% 55% at 50% -10%, rgb(96 84 241 / 14%), transparent 65%),
-    radial-gradient(ellipse 100% 60% at 50% 130%, rgb(39 210 191 / 8%), transparent 60%), #05050a;
-  font-family:
-    var(--game-font, Inter),
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+    radial-gradient(ellipse 100% 60% at 50% 130%, rgb(39 210 191 / 8%), transparent 60%),
+    #05050a;
+  font-family: var(--game-font, Inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .demos-hub-header {
@@ -8163,9 +8159,7 @@
   bottom: 1.1rem;
   font-size: 1.1rem;
   color: rgb(255 255 255 / 22%);
-  transition:
-    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    color 0.4s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
 }
 
 .demos-hub-card:hover .demos-hub-card-arrow {
@@ -8287,12 +8281,7 @@
   overflow: hidden;
   background: #05050a;
   color: #fff;
-  font-family:
-    var(--demo-a-font, Inter),
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+  font-family: var(--demo-a-font, Inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --demo-a-px: 0px;
   --demo-a-py: 0px;
 }
@@ -8319,13 +8308,7 @@
   inset: 0;
   background:
     linear-gradient(0deg, rgb(3 4 9 / 88%) 0%, rgb(3 4 9 / 30%) 42%, rgb(3 4 9 / 12%) 100%),
-    linear-gradient(
-      90deg,
-      rgb(3 4 9 / 72%) 0%,
-      transparent 42%,
-      transparent 62%,
-      rgb(3 4 9 / 76%) 100%
-    );
+    linear-gradient(90deg, rgb(3 4 9 / 72%) 0%, transparent 42%, transparent 62%, rgb(3 4 9 / 76%) 100%);
 }
 
 .demo-a-world-fog {
@@ -8617,13 +8600,9 @@
   overflow: hidden;
   color: rgb(255 255 255 / 80%);
   background:
-    radial-gradient(ellipse 60% 50% at 50% 45%, rgb(18 24 48 / 60%), transparent 70%), #04060d;
-  font-family:
-    var(--demo-b-font, Inter),
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+    radial-gradient(ellipse 60% 50% at 50% 45%, rgb(18 24 48 / 60%), transparent 70%),
+    #04060d;
+  font-family: var(--demo-b-font, Inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .demo-b-grid {
@@ -8967,12 +8946,7 @@
   overflow: hidden;
   color: rgb(255 255 255 / 80%);
   background: #07070c;
-  font-family:
-    var(--demo-c-font, Inter),
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+  font-family: var(--demo-c-font, Inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .demo-c-backdrop {
@@ -9027,37 +9001,14 @@
   }
 }
 
-.demo-c-petal-1 {
-  transform: rotate(0deg);
-}
-.demo-c-petal-2 {
-  transform: rotate(45deg);
-  animation-delay: -2s;
-}
-.demo-c-petal-3 {
-  transform: rotate(90deg);
-  animation-delay: -4s;
-}
-.demo-c-petal-4 {
-  transform: rotate(135deg);
-  animation-delay: -6s;
-}
-.demo-c-petal-5 {
-  transform: rotate(180deg);
-  animation-delay: -8s;
-}
-.demo-c-petal-6 {
-  transform: rotate(225deg);
-  animation-delay: -10s;
-}
-.demo-c-petal-7 {
-  transform: rotate(270deg);
-  animation-delay: -12s;
-}
-.demo-c-petal-8 {
-  transform: rotate(315deg);
-  animation-delay: -14s;
-}
+.demo-c-petal-1 { transform: rotate(0deg); }
+.demo-c-petal-2 { transform: rotate(45deg); animation-delay: -2s; }
+.demo-c-petal-3 { transform: rotate(90deg); animation-delay: -4s; }
+.demo-c-petal-4 { transform: rotate(135deg); animation-delay: -6s; }
+.demo-c-petal-5 { transform: rotate(180deg); animation-delay: -8s; }
+.demo-c-petal-6 { transform: rotate(225deg); animation-delay: -10s; }
+.demo-c-petal-7 { transform: rotate(270deg); animation-delay: -12s; }
+.demo-c-petal-8 { transform: rotate(315deg); animation-delay: -14s; }
 
 .demo-c-halo {
   position: absolute;

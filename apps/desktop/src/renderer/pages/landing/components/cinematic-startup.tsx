@@ -97,6 +97,36 @@ export function CinematicStartup({ isExiting, onEnterHub }: CinematicStartupProp
         <StartupScene isTransitioning={isExiting} />
       </Suspense>
       <div className="cinematic-vignette" aria-hidden="true" />
+      <div className="cinematic-scanline" aria-hidden="true" />
+      <div className="cinematic-grain" aria-hidden="true" />
+      <motion.div
+        className="cinematic-letterbox cinematic-letterbox-top"
+        aria-hidden="true"
+        initial={{ scaleY: 1 }}
+        animate={isExiting ? { scaleY: 1 } : { scaleY: 0 }}
+        transition={{
+          duration: isExiting
+            ? themeMotion.durationSeconds.cinematic * 0.7
+            : themeMotion.durationSeconds.slow,
+          ease: [0.76, 0, 0.24, 1],
+          delay: isExiting ? 0 : 0.55,
+        }}
+        style={{ transformOrigin: 'top' }}
+      />
+      <motion.div
+        className="cinematic-letterbox cinematic-letterbox-bottom"
+        aria-hidden="true"
+        initial={{ scaleY: 1 }}
+        animate={isExiting ? { scaleY: 1 } : { scaleY: 0 }}
+        transition={{
+          duration: isExiting
+            ? themeMotion.durationSeconds.cinematic * 0.7
+            : themeMotion.durationSeconds.slow,
+          ease: [0.76, 0, 0.24, 1],
+          delay: isExiting ? 0 : 0.55,
+        }}
+        style={{ transformOrigin: 'bottom' }}
+      />
       <div className="cinematic-content cinematic-glass-panel">
         <div className="cinematic-panel-reflection" aria-hidden="true" />
         <motion.div

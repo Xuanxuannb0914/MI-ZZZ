@@ -55,6 +55,10 @@ export function BackgroundScene({ className }: BackgroundSceneProps) {
 
     const particles = createParticles();
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // 预计算「亮点」索引：连接线只需绘制含亮点的点对，避免每帧 O(n²) 全量距离扫描。
+    const tintedIndices = particles.flatMap((particle, index) =>
+      particle.tint !== 0 ? [index] : [],
+    );
     const tinted = particles.map((particle) => particle.tint !== 0);
     let viewport = resizeCanvas(canvas, context);
     let animationFrame = 0;
@@ -113,6 +117,42 @@ export function BackgroundScene({ className }: BackgroundSceneProps) {
         };
       });
 
+      const isVisible = (index: number) => {
+        const particle = projected[index];
+        if (!particle) return false;
+        return (
+          particle.x >= -20 &&
+          particle.x <= width + 20 &&
+          particle.y >= -20 &&
+          particle.y <= height + 20
+        );
+      };
+
+      if (!reducedMotion && tintedIndices.length > 1) {
+        // 仅遍历「亮点」到其他粒子的点对，连接线数量由亮点数决定，大幅降低每帧距离计算。
+        for (const tintedIndex of tintedIndices) {
+          if (!isVisible(tintedIndex)) continue;
+          const source = projected[tintedIndex];
+          if (!source) continue;
+          const tintA = tinted[tintedIndex];
+          for (let nextIndex = 0; nextIndex < projected.length; nextIndex += 1) {
+            if (nextIndex === tintedIndex) continue;
+            if (!tintA && !tinted[nextIndex]) continue;
+            const next = projected[nextIndex];
+            if (!next) continue;
+            const distance = Math.hypot(source.x - next.x, source.y - next.y);
+            if (distance < CONNECTION_DISTANCE) {
+              context.strokeStyle = `rgba(${scenePalette.primaryRgb}, ${Math.max(0, 0.08 - distance / 1800)})`;
+              context.lineWidth = 0.5;
+              context.beginPath();
+              context.moveTo(source.x, source.y);
+              context.lineTo(next.x, next.y);
+              context.stroke();
+            }
+          }
+        }
+      }
+
       for (let index = 0; index < projected.length; index += 1) {
         const particle = projected[index];
         if (!particle) continue;
@@ -123,21 +163,6 @@ export function BackgroundScene({ className }: BackgroundSceneProps) {
           particle.y > height + 20
         )
           continue;
-        const tintA = tinted[index];
-        for (let nextIndex = index + 1; nextIndex < projected.length; nextIndex += 1) {
-          if (!tintA && !tinted[nextIndex]) continue;
-          const next = projected[nextIndex];
-          if (!next) continue;
-          const distance = Math.hypot(particle.x - next.x, particle.y - next.y);
-          if (distance < CONNECTION_DISTANCE) {
-            context.strokeStyle = `rgba(${scenePalette.primaryRgb}, ${Math.max(0, 0.08 - distance / 1800)})`;
-            context.lineWidth = 0.5;
-            context.beginPath();
-            context.moveTo(particle.x, particle.y);
-            context.lineTo(next.x, next.y);
-            context.stroke();
-          }
-        }
         const color =
           particle.tint === 1
             ? scenePalette.accentRgb

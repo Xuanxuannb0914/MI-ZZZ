@@ -30,6 +30,14 @@ const GamePlaceholderPage = lazy(
   () => import('../../pages/game-placeholder/game-placeholder-page'),
 );
 const StarRailGachaPage = lazy(() => import('../../pages/star-rail-gacha/star-rail-gacha-page'));
+const DemosHubPage = lazy(() => import('../../pages/landing/demos/demos-hub-page'));
+const WorldGalleryDemo = lazy(() =>
+  import('../../pages/landing/demos/world-gallery-demo'),
+);
+const HolographicHudDemo = lazy(() =>
+  import('../../pages/landing/demos/holographic-hud-demo'),
+);
+const KaleidoscopeDemo = lazy(() => import('../../pages/landing/demos/kaleidoscope-demo'));
 
 export function StartupRoutes() {
   return (
@@ -38,6 +46,10 @@ export function StartupRoutes() {
         <Route path="/" element={<Navigate replace to="/startup" />} />
         <Route path="/startup" element={<LandingPage />} />
         <Route path="/games" element={<GameHubPage />} />
+        <Route path="/demos" element={<DemosHubPage />} />
+        <Route path="/demos/world-gallery" element={<WorldGalleryDemo />} />
+        <Route path="/demos/holographic-hud" element={<HolographicHudDemo />} />
+        <Route path="/demos/kaleidoscope" element={<KaleidoscopeDemo />} />
         <Route path="*" element={<Navigate replace to="/startup" />} />
       </Routes>
     </Suspense>

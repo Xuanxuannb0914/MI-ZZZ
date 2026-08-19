@@ -1,9 +1,13 @@
 import { Bell, ChevronDown, Clock3, LayoutGrid, Search, UserRound } from '@game-guide-hub/icons';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app-store';
+import { games } from '../../shared/mock/games';
 import { type SearchResult, searchLocal } from '../../shared/search/search-index';
 import { SearchBar } from '../../shared/ui/search-bar';
+
+/** 路由首段 → 游戏元信息，用于顶栏当前工作区展示。 */
+const gameByRoute = new Map(games.map((game) => [game.route.slice(1), game]));
 
 const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
   hour: '2-digit',
@@ -29,11 +33,15 @@ const HeaderClock = memo(function HeaderClock() {
 
 export function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchKeyword = useAppStore((state) => state.searchKeyword);
   const setSearchKeyword = useAppStore((state) => state.setSearchKeyword);
   const normalizedKeyword = searchKeyword.trim();
   const searchResults = useMemo(() => searchLocal(normalizedKeyword, 6), [normalizedKeyword]);
+
+  const gameKey = location.pathname.split('/')[1] ?? '';
+  const currentGame = gameByRoute.get(gameKey);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -60,13 +68,15 @@ export function Header() {
       <button
         type="button"
         className="command-workspace-switch"
-        onClick={() => navigate('/zzz')}
-        aria-label="当前工作区：绝区零"
+        onClick={() => navigate(currentGame?.route ?? '/zzz')}
+        aria-label={`当前工作区：${currentGame?.name ?? '绝区零'}`}
       >
-        <span className="command-game-mark">Z</span>
+        <span className="command-game-mark">
+          {currentGame ? currentGame.shortName.slice(0, 1) : 'Z'}
+        </span>
         <span>
           <small>当前游戏</small>
-          <strong>绝区零</strong>
+          <strong>{currentGame?.name ?? '绝区零'}</strong>
         </span>
         <ChevronDown aria-hidden="true" size={15} />
       </button>

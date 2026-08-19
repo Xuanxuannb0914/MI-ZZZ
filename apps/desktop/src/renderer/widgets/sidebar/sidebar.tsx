@@ -1,12 +1,19 @@
 import { PanelLeftClose, PanelLeftOpen } from '@game-guide-hub/icons';
 import { classNames } from '@game-guide-hub/utils';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app-store';
+import { games } from '../../shared/mock/games';
 import { sidebarNavigationEntries } from './sidebar-navigation';
+
+/** 路由首段 → 游戏名，未匹配时回退「绝区零」。 */
+const gameNameByRoute = new Map(games.map((game) => [game.route.slice(1), game.name]));
 
 export function Sidebar() {
   const isSidebarCollapsed = useAppStore((state) => state.isSidebarCollapsed);
   const toggleSidebarCollapsed = useAppStore((state) => state.toggleSidebarCollapsed);
+  const location = useLocation();
+  const gameKey = location.pathname.split('/')[1] ?? '';
+  const gameName = gameNameByRoute.get(gameKey) ?? '绝区零';
 
   return (
     <aside
@@ -20,7 +27,7 @@ export function Sidebar() {
         <span className="desktop-sidebar-logo">A</span>
         <span className="desktop-sidebar-brand-copy">
           <strong>Asteris</strong>
-          <small>绝区零工作区</small>
+          <small>{gameName}工作区</small>
         </span>
         <button
           type="button"

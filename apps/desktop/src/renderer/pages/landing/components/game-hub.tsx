@@ -51,9 +51,13 @@ export function GameHub({
           <div className="game-hub-brand">
             <span aria-hidden="true">A</span>
             <strong>Asteris</strong>
+            <i className="game-hub-brand-sep" aria-hidden="true" />
+            <span className="game-hub-brand-crumb">游戏中心</span>
           </div>
           <div className="game-hub-header-meta">
-            <span>游戏中心</span>
+            <span className="game-hub-live">
+              <i aria-hidden="true" /> LOCAL NETWORK READY
+            </span>
             <button type="button" aria-label="设置">
               <Settings aria-hidden="true" size={15} />
             </button>
@@ -73,6 +77,11 @@ export function GameHub({
             />
           </div>
           <div className="game-hub-preview-panel">
+            <span className="game-hub-preview-index" aria-hidden="true">
+              {String(selectedIndex + 1).padStart(2, '0')}
+              <i>/</i>
+              {String(games.length).padStart(2, '0')}
+            </span>
             <GamePreview game={selectedGame} isExiting={isExiting} />
             <AnimatePresence mode="wait">
               <motion.div
